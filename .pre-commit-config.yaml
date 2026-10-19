@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: detect-private-key
+  - repo: local
+    hooks:
+      - id: no-env-or-data
+        name: block .env, data and model files
+        entry: "forbidden: .env / data / models must never be committed"
+        language: fail
+        files: '^(\.env$|data/(raw|processed|splits)/|models/|artifacts/llm_cache/)'
