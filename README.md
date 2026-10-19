@@ -36,12 +36,13 @@ Every component is evaluated against **expert-coded ground truth** using **strat
 
 ## 3. Data card (verified on the original files, 19 Oct 2026)
 
-All numbers come from `data_prep/` (`parse_iu.py`, `map_and_stats.py`, `coding_policy.py`), run on the original Open-i XML. The data pipeline must reproduce them (§12, milestone M1).
+All numbers come from `data_prep/` (`parse_iu.py`, `map_and_stats.py`, `coding_policy.py`, `subset_stats.py`), run on the original Open-i XML. The data pipeline must reproduce them (§12, milestone M1).
 
 ### 3.1 Source
 | Item | Value |
 |---|---|
-| Download | `https://openi.nlm.nih.gov/imgs/collections/NLMCXR_reports.tgz`, 1.1 MB, no login. **Use this, not the Kaggle mirror.** |
+| Download | `https://openi.nlm.nih.gov/imgs/collections/NLMCXR_reports.tgz`, 1,112,632 bytes, no login. **Use this, not the Kaggle mirror.** If Open-i is down (it sometimes serves an HTML maintenance page), use the Wayback Machine raw copy of the same URL or the Academic Torrents copy ("Indiana University - Chest X-Rays (XML Reports)"). |
+| **Checksum (required)** | SHA-256 `8fb6de7eec73d8c3665067ad4bb003ccd57f971ae316d2642e1627ac7268667a`. The download script verifies it **whatever the source**, rejects anything else (e.g. an HTML page), and records the source URL used. |
 | Content | 3,955 XML reports (`ecgen-radiology/*.xml`) with COMPARISON, INDICATION, FINDINGS, IMPRESSION |
 | Licence | **CC BY-NC-ND 4.0** on all 3,955 reports (`<ccLicense>byncnd</ccLicense>`) |
 | Citation | Demner-Fushman D. et al., JAMIA 23(2):304–310, 2016 |
@@ -59,10 +60,13 @@ All numbers come from `data_prep/` (`parse_iu.py`, `map_and_stats.py`, `coding_p
 | **Usable reports** | **3,832** |
 | **Unique texts** (normalised: lowercase, `XXXX` removed, punctuation removed) | **3,086** |
 | Reports sharing exact text with another | 897 (23.4%); largest group = 50 |
+| **Duplicate clusters** (exact text + exact pairwise Jaccard ≥ 0.9) | 3,073 (used for fold assignment only, §4.2) |
 | Coded `normal` only | 1,363 usable → 650 unique (duplicates are almost all normal boilerplate) |
-| Unique reports with a hedged finding sentence | 279 (9.0%) |
-| Unique reports with `XXXX` in Findings/Impression | 1,579 (51.2%) |
-| Reports with `XXXX` within 2 words of a finding term | 415 (10.8%) |
+| Unique reports with a hedged finding sentence | 279 (9.0% of unique texts) |
+| Unique reports with `XXXX` in Findings/Impression | 1,579 (51.2% of unique texts) |
+| Reports with `XXXX` within 2 words of a finding term | 415 (10.8% of **all usable** reports; 407 on unique texts) |
+
+The three subset counts above are defined **exactly** by `data_prep/subset_stats.py` (fixed regexes, documented counting bases). `eval/subsets.py` must import or copy those definitions unchanged. The broader hedge list in `coding_policy.py` is only for the coding-policy check in §3.4 and gives different counts.
 | Usable reports with ≥ 1 code outside the standard labels | 54.5% (with the dropped labels mapped; slightly higher without) |
 
 ### 3.4 Coding policy (measured with a heuristic sentence-level check)
@@ -104,15 +108,17 @@ CC BY-NC-ND allows using and adapting the data privately, but not **sharing** ad
 - Not legal advice; this is the cautious reading of the licence.
 
 ### 4.2 Rare labels and duplicates: stratified 5-fold cross-validation (D2, D8)
-- **Duplicate clusters:** reports are grouped into clusters by exact normalised text plus near-duplicates (MinHash, Jaccard ≥ 0.9, `datasketch`). **Each cluster is treated as one item when splitting**, so the same boilerplate never appears in both training and testing.
+- **Duplicate clusters:** reports are grouped into clusters by exact normalised text plus near-duplicates found by **exact pairwise Jaccard ≥ 0.9** on word shingles (deterministic; under 3 s on this corpus). MinHash was dropped because it missed 4 true merges, which could split near-duplicates across folds. **Each cluster is treated as one item when splitting**, so the same boilerplate never appears in both training and testing.
 - **Multi-label stratification:** a report can have several labels, so ordinary stratification doesn't work. Use **iterative stratification** over cluster-level label vectors (`skmultilearn.model_selection.IterativeStratification`; fallback `iterstrat.ml_stratifiers.MultilabelStratifiedKFold`). Fixed seed, fold assignment saved to `data/splits/folds.csv` (cluster id → fold).
 - **Per fold:** 4 folds are train, 1 fold is test. Inside the 4 training folds, a stratified 10% slice is the **inner validation set** for thresholds and checkpoint selection. Nothing is ever tuned on its own test fold.
-- **Out-of-fold predictions:** every report is predicted exactly once, by a version that never saw it. All metrics are computed on these out-of-fold predictions, **one representative per cluster**.
-- **Rare-label reporting:** every label gets a score with a **95% bootstrap CI** (1,000 resamples over clusters) and its count, e.g. *"Pneumothorax F1 0.81 (0.65–0.92), n = 27"*. A pooled **rare-findings micro-F1** is also reported over the four rare labels (Edema, Pleural Other, Consolidation, Pneumothorax; about 150 positives), which is much more stable.
+- **Out-of-fold predictions:** every report is predicted exactly once, by a version that never saw it.
+- **Counting unit (decided):** clusters decide **fold assignment only**. Metrics count **one report per exact normalised text** (3,086), so the data card numbers in §4.4 are exactly the evaluation counts. Near-duplicates are kept as separate items because they often differ by exactly one word, typically a negation ("no effusion" vs "small effusion"), which are the cases this project cares about most.
+- **Near-duplicate report:** M1 writes the number of near-duplicate clusters whose members have **different** expert label sets to `artifacts/results/data_card.json`, as a data-quality fact.
+- **Rare-label reporting:** every label gets a score with a **95% bootstrap CI** (1,000 resamples **over clusters**, so near-duplicates are resampled together) and its count, e.g. *"Pneumothorax F1 0.81 (0.65–0.92), n = 27"*. A pooled **rare-findings micro-F1** is also reported over the four rare labels (Edema, Pleural Other, Consolidation, Pneumothorax; about 150 positives), which is much more stable.
 
 ### 4.3 Hedged findings: uncertainty for routing, not for accuracy claims (D3)
 - No public expert labels for uncertainty are available without PhysioNet credentialing, so **uncertainty accuracy is not claimed**.
-- The `hedged` subset is defined by an **evaluation-only** hedge lexicon (`eval/subsets.py`, from `data_prep/coding_policy.py`), independent of the pipeline's own uncertainty logic. It is **excluded from headline metrics**.
+- The `hedged` subset is defined by the **evaluation-only** regexes in `data_prep/subset_stats.py` (imported unchanged by `eval/subsets.py`; **not** the broader list in `coding_policy.py`), independent of the pipeline's own uncertainty logic. It is **excluded from headline metrics**.
 - On `hedged`, label scores are reported under both policies (uncertain counted as absent, and as present).
 - In the product, uncertainty's job is **routing to human review**. Measured:
   - **review rate on hedged vs clear reports** (should be much higher on hedged)
@@ -126,30 +132,36 @@ Codes are parsed as `head/sub/...`. A rule matches on `head`, plus the first `su
 |---|---|---|---|
 | No Finding | `normal` as the **only** code | 650 | headline |
 | Cardiomegaly | Cardiomegaly; Cardiac Shadow/enlarged | 395 | headline |
-| Lung Opacity | Opacity/lung; Density/lung; Airspace Disease/lung; Infiltrate/lung; Opacity/retrocardiac; Density/retrocardiac | 580 | headline |
-| Lung Lesion | Nodule; Mass; Cavitation; Cysts | 135 | headline |
+| Lung Opacity | Opacity; Density; Airspace Disease; Infiltrate, at a **lung site** (lung, retrocardiac, sulcus, costophrenic angle, non-anatomical; see rules below) | 608 | headline |
+| Lung Lesion | Nodule; Mass; Cavitation, **lung site only** (see rules below); Cysts go to Other Abnormality | 118 | headline |
 | Atelectasis | Pulmonary Atelectasis | 332 | headline |
 | Pleural Effusion | Pleural Effusion; Hydropneumothorax; Hemothorax | 162 | headline |
 | Fracture | Fractures, Bone | 84 | headline |
-| Support Devices | Catheters, Indwelling; Implanted Medical Device; Tube, Inserted; Medical Device; Stents; Surgical Instruments; Sutures | 381 | headline |
-| **Other Abnormality** | any other code (including the dropped labels' codes) except `normal`, `No Indexing`, `Technical Quality of Image Unsatisfactory` | 2,080 | headline |
+| Support Devices | Catheters, Indwelling; Implanted Medical Device; Tube, Inserted; Medical Device; Stents; Surgical Instruments (Sutures go to Other Abnormality) | 376 | headline |
+| **Other Abnormality** | any other code (including the dropped labels' codes) except `normal`, `No Indexing`, `Technical Quality of Image Unsatisfactory`, `Contrast Media` | 2,077 | headline |
 | Edema | Pulmonary Edema **only** | 46 | rare (individual + pooled) |
-| Pleural Other | Thickening/pleura; Pleura | 49 | rare |
+| Pleural Other | Thickening/pleura; Pleura, **except** codes with a `blunted` sub-heading; opacity/lesion codes at a pleural site | 53 | rare |
 | Consolidation | Consolidation | 30 | rare |
 | Pneumothorax | Pneumothorax; Hydropneumothorax; Hemopneumothorax | 27 | rare |
 | ~~Pneumonia~~ | — | 42 | **dropped**: clinical diagnosis, coded inconsistently |
 | ~~Enlarged Cardiomediastinum~~ | — | 27 | **dropped**: rare, ambiguous source codes |
 
 Rules that matter:
-- **No Finding** = the report describes **no abnormality of any kind**; it matches only the expert `normal` code. The extractor prompt states this explicitly. The 6 reports coded only "Technical Quality of Image Unsatisfactory" are excluded from No Finding scoring.
+- **No Finding** = the report describes **no abnormality of any kind**; it matches only the expert `normal` code. The extractor prompt states this explicitly. The 7 reports coded only with ignored codes ("Technical Quality of Image Unsatisfactory", "Contrast Media") are excluded from No Finding scoring.
 - **Other Abnormality** = any abnormality not covered by the other labels (e.g. scoliosis, calcified granuloma, hypoinflation, degenerative spine, tortuous aorta). It closes the "No Finding" gap: 28.8% of usable reports are abnormal with no standard label.
 - **Not mapped to Edema:** Pulmonary Congestion and Heart Failure. Reports say "vascular congestion without edema", and mapping them created positives that contradict the text. They fall into Other Abnormality.
 - **Not mapped to Lung Lesion:** Calcified Granuloma and Granulomatous Disease (benign, chronic). They fall into Other Abnormality.
+- **Lung Opacity and Lung Lesion require a lung site** (mapping cross-check, 2026-10-20): a code counts when its first sub-heading is `lung`, or when it is an allowed lung region or non-anatomical word and **no** sub-heading is a non-lung site (paratracheal, mediastinum, hilum, heart, ribs, thorax, sternum, breast, humerus, clavicle, abdomen, adipose tissue, cardiophrenic angle, supracardiac, mitral valve, thoracic vertebrae → Other Abnormality) or a pleural site (pleura, pleural sinus → Pleural Other). The full lists are in `mesh_to_labels_v1.yaml`.
+- **Lung Lesion requires a lung site.** Nodule, Mass, Cavitation and Cysts count only when the first sub-heading is `lung` or is not an anatomical site (e.g. none, right, left, multiple, scattered, bilateral). Codes with another site (e.g. `Cysts/humerus`, `Mass/breast`, `Nodule/heart`, `Nodule/pleura`, `Mass/mediastinum`, `Nodule/thorax`, `Mass/thorax`) go to **Other Abnormality**. Reason: `Cysts/humerus` is a bone cyst, found in the mapping audit.
+- **`Pleura/…/blunted` is not Pleural Other.** A blunted pleural angle usually hints at effusion but isn't a confirmed effusion, so it goes to **Other Abnormality**, like `Costophrenic Angle/blunted`. Found in the mapping audit (n = 3).
+- The positive counts marked *(rerun)* are regenerated by M1 after these two fixes and written into this table from `data_card.json`.
 - **Hierarchy:** scoring uses these **leaf** definitions only, with no closure, so Lung Opacity is scored against its own direct codes. The extractor prompt and verifier use the same definitions, so propagated parent labels can't create false positives.
 
 ### 4.5 Mapping audit and sensitivity (D5)
 - **Automatic per-rule audit** (`data_prep/audit_mapping.py`): for every mapping rule, the share of matched reports whose text has a clear, non-negated, non-hedged mention of the label's terms. Rules below 60% agreement are flagged in `artifacts/mapping/audit.csv` and reviewed before modelling.
-- **Strict mapping** (`mesh_to_labels_strict.yaml`): only the primary head per label (Cardiomegaly; Opacity/lung; Nodule + Mass; Pulmonary Atelectasis; Pleural Effusion; Fractures, Bone; Catheters + Tube + Medical Device; Pulmonary Edema; Thickening/pleura; Consolidation; Pneumothorax).
+- **Strict mapping** (`mesh_to_labels_strict.yaml`): only the primary head per label (Cardiomegaly; Opacity/lung; Nodule + Mass; Pulmonary Atelectasis; Pleural Effusion; Fractures, Bone; Catheters, Indwelling + Tube, Inserted + Medical Device + Implanted Medical Device; Pulmonary Edema; Thickening/pleura; Consolidation; Pneumothorax).
+  - **Other Abnormality and No Finding are identical under v1 and strict.** Strict changes only the 11 pathology labels, so the comparison isolates the effect of the looser rules.
+  - Reports that are positive for a label under v1 but **not** under strict (e.g. only `Density/lung`) are **excluded from that label's strict scoring**, counted neither positive nor negative, because they're ambiguous rather than negative. Their counts per label are reported.
 - Headline labelling results are reported under **both** v1 and strict. Conclusions must hold under both.
 
 ### 4.6 Label noise (D6)
@@ -161,6 +173,24 @@ Rules that matter:
 - `XXXX` is replaced with `[REDACTED]` before any model sees the text.
 - The verifier does not fail a label solely because its cited sentence contains `[REDACTED]` within 2 words of a finding term; it flags it instead.
 - `redaction_adjacent` is reported as a separate subset.
+
+### 4.8 Evaluation subsets: exact definitions
+All subsets live in `eval/subsets.py`, are computed once in M1, and are saved as id lists in `data/splits/subsets/` (git-ignored).
+
+| Subset | Unit | Definition |
+|---|---|---|
+| `abnormal` | report | Not coded `normal`; at least one label other than No Finding is positive |
+| `hedged` | report | `is_hedged()` from `data_prep/subset_stats.py`, unchanged (279 on unique texts) |
+| `redaction_adjacent` | report | `is_redaction_adjacent()` from `subset_stats.py`, unchanged (415 on all usable reports) |
+| `negation_only` | **(report, label) pair**, for the 11 pathology labels | All three hold: (1) the label's eval aliases (`eval/lexicon.yaml`, separate from the pipeline alias list) occur in Findings/Impression; (2) **every** occurrence is negated, per **negspacy** (the eval-only detector, never the pipeline's `negation.py`); (3) the expert code for that label is **absent**. Pairs where any sentence mentioning the label is hedged are excluded. |
+
+`negation_only` is per pair, not per report: "No pneumothorax. Small left effusion." contributes a negated pair for Pneumothorax even though the report is abnormal.
+- **Negation FP rate** = the share of `negation_only` pairs predicted `present`, reported **per label** and pooled.
+- It is also reported **restricted to abnormal reports**, because most negated pairs come from normal boilerplate, where the task is easy.
+- **negspacy termset extension (pre-registered):** the default termset doesn't treat resolution language as negation. Add these as following negations: "has resolved", "have resolved", "resolved", "no longer seen", "no longer visualized", "has cleared", "have cleared", "removed". Without them, "effusion has resolved" would count as a clear positive mention and inflate the noise-adjusted score (§4.6).
+- **Eval lexicon additions (pre-registered):** the mapping audit showed missing synonyms, e.g. devices ("ICD", "AICD", "pacemaker", "prosthetic valve", "valve replacement", "monitor leads", "ECG leads", "spinal stimulator", "port", "PICC", "sternotomy wires") and pneumothorax variants ("hydropneumothorax", "hemopneumothorax"). Add these to `eval/lexicon.yaml` with a one-line reason each.
+- **Freeze:** `eval/lexicon.yaml` and the negspacy termset are versioned `eval_v1` and **frozen at the end of M1, before any model output exists**. Any later change needs owner approval and a changelog entry. The pipeline's own alias list is written separately from general clinical knowledge and is **never copied from the eval lexicon**, to keep the two independent.
+- M1 writes the pair counts per label (all, and abnormal-only) to `data_card.json`. There are no README reference numbers for these, so they become the reference once the owner approves them.
 
 ---
 
@@ -209,7 +239,7 @@ Invariants:
 - `sentences.py`: sentence splitting with IDs `F1..Fn`, `I1..In`.
 - `negation.py`: **pipeline** NegEx-style rules (negation and hedge cues, clause boundaries at "but", "however", ";"). Kept separate from the eval detector.
 - `aliases.py`: alias dictionary per label (hand-written + CheXpert labeler mention phrases). Fixed, not tuned on data. 30% of the aliases are tagged `heldout: true` for embedding evaluation.
-- `dedup.py`: exact + MinHash clusters.
+- `dedup.py`: exact-text clusters + exact pairwise Jaccard ≥ 0.9 near-duplicate merging.
 
 ### 6.2 Labelling (`src/radlabel/labelling/`)
 **Output schema** (Pydantic, also the structured-output schema):
@@ -362,7 +392,7 @@ Even with quota shown, a specific GPU VM size may be unavailable in a region; te
 
 ## 8. Evaluation protocol
 
-All metrics use **out-of-fold predictions** from the stratified 5-fold CV (§4.2), counted once per duplicate cluster, with 95% bootstrap CIs over clusters.
+All metrics use **out-of-fold predictions** from the stratified 5-fold CV (§4.2), counted once per exact normalised text, with 95% bootstrap CIs resampled over duplicate clusters. Subsets are defined exactly in §4.8.
 
 ### 8.1 Labelling
 - **Headline:** per-label F1, precision and recall for the 9 headline labels, plus their macro-F1, excluding `hedged`, under mapping v1 **and** strict.
@@ -461,7 +491,10 @@ _Filled in automatically from `artifacts/results/*.json` by `make report`. No nu
 
 ## 12. Implementation guide (for Claude Code)
 
-Build in this order. Each milestone ends with its acceptance check passing and a commit. If a milestone is blocked by something only the owner can provide (API keys, cloud credentials), build it fully against the fake/offline mode, note the blocker in `docs/STATUS.md`, and continue with the next milestone.
+Build in this order. Each milestone ends with its acceptance check passing and a commit.
+
+- **Missing access only** (API keys, cloud credentials): build fully against the fake/offline mode, note the blocker in `docs/STATUS.md`, and continue.
+- **Everything else is a hard stop**: mismatched data numbers, failing invariant tests, implausible results, spec ambiguity, budget at 50%, or an acceptance check that would need weakening. Stop, report the cause and options, and wait for the owner. The full list is in the internal working rules, which are kept in a private file.
 
 ### Ground rules
 1. **Never use expert labels in serving code** (`src/radlabel/api`, `agent`, `index`). Only `eval/`, `training/` and `data_prep/` may read them.
@@ -476,8 +509,8 @@ Build in this order. Each milestone ends with its acceptance check passing and a
 ### Milestones
 | ID | Build | Acceptance check |
 |---|---|---|
-| **M0** | Repo skeleton, `pyproject.toml`, `Makefile`, `.gitignore` (must ignore `.env`), `config.py` matching the provided `.env.example`, Docker Compose (postgres, qdrant, redis), CI running lint + tests | `make test` passes; `docker compose up` is healthy |
-| **M1** | `make data`: download XML, parse, exclusions, `[REDACTED]`, sentences, dedup clusters, mapping v1 + strict, Other Abnormality, mapping audit, subsets | Numbers match §3.3 and §4.4 (±1 where clustering differs); `audit.csv` written |
+| **M0** | Repo skeleton, `pyproject.toml`, `Makefile`, `.gitignore` (must ignore `.env`), `config.py` matching the provided `.env.example`, Docker Compose (postgres, qdrant, redis), CI running lint + tests | `make test` passes; `docker compose up` is healthy. **The Docker check may be deferred until the owner installs Docker, but must pass before M5** (the first milestone that needs Postgres). |
+| **M1** | `make data`: download with SHA-256 check, parse, exclusions, `[REDACTED]`, sentences, dedup clusters, mapping v1 + strict, Other Abnormality, mapping audit, subsets (§4.8), `data_card.json` | Numbers match §3.3 and §4.4 exactly on exact texts; cluster count 3,073; subset counts match `subset_stats.py`; `audit.csv` written |
 | **M2** | `eval/cv.py`: iterative stratification over clusters, 5 folds + inner validation, `folds.csv`; bootstrap CI utility | Every label's positives spread across folds within ±2 of equal share; no cluster spans two folds (test) |
 | **M3** | Pipeline preprocessing + negation, Pydantic schema, verifier + unit tests, rule baseline, labelling eval on out-of-fold rule-baseline predictions | §8.1 table produced for the rule baseline |
 | **M4** | LLM client (OpenAI/Azure, cache, cost ledger, FakeLLM), Tier 0 (per fold), Tier 1 extractor, labelling eval for LLM and LLM+verifier | §8.1 rows for both; reruns cost $0 from cache |

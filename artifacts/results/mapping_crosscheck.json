@@ -1,0 +1,550 @@
+{
+ "provenance": {
+  "git_commit": "4af0dea944f085677a45b42bc0a9d82ae5e9f64e-dirty",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": null,
+  "created": "2026-10-19T23:08:53+00:00"
+ },
+ "results": {
+  "patterns": 565,
+  "code_instances": 8175,
+  "disagreements": [
+   {
+    "pattern": "Costophrenic Angle/bilateral",
+    "count": 26,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Costophrenic Angle/right",
+    "count": 22,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Costophrenic Angle/left",
+    "count": 15,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Lucency/lung",
+    "count": 9,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Costophrenic Angle/sulcus",
+    "count": 8,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Pleural Other"
+   },
+   {
+    "pattern": "Opacity/costophrenic angle",
+    "count": 7,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Costophrenic Angle/blunted",
+    "count": 6,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Density/costophrenic angle",
+    "count": 6,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Foreign Bodies/breast",
+    "count": 6,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Volume Loss/lung",
+    "count": 6,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Atelectasis"
+   },
+   {
+    "pattern": "Sutures/lung",
+    "count": 5,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Density/right",
+    "count": 4,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Heart/right",
+    "count": 4,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Opacity",
+    "count": 4,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Cardiac Shadow/borderline",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Contrast Media/abdomen",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Cysts/lung",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Lesion"
+   },
+   {
+    "pattern": "Foreign Bodies/lung",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Heart Ventricles/left",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Heart/left",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Opacity/left",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/multiple",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/right",
+    "count": 3,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Costophrenic Angle/posterior",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Density/heart",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Density/round",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Lesion"
+   },
+   {
+    "pattern": "Foreign Bodies/abdomen",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Heart Atria/right",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Opacity/pulmonary alveoli",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/round",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/scattered",
+    "count": 2,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Cholelithiasis",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Contrast Media/esophagus",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Costophrenic Angle/lower lobe",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Costophrenic Angle/obscured",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Density/bilateral",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Density/left",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Density/pleura",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Pleural Other"
+   },
+   {
+    "pattern": "Foreign Bodies",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Foreign Bodies/adipose tissue",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Foreign Bodies/clavicle",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Foreign Bodies/costophrenic angle",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Foreign Bodies/left",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Foreign Bodies/lumbar vertebrae",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Foreign Bodies/multiple",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Foreign Bodies/neck",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Heart Atria/bilateral",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Heart Atria/left",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Heart/apex",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Heart/obscured",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Heart/small",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Cardiomegaly"
+   },
+   {
+    "pattern": "Hemopneumothorax/right",
+    "count": 1,
+    "rule": [
+     "Pneumothorax"
+    ],
+    "llm": "Pleural Effusion"
+   },
+   {
+    "pattern": "Lucency/retrocardiac",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Mass/right",
+    "count": 1,
+    "rule": [
+     "Lung Lesion"
+    ],
+    "llm": "Other Abnormality"
+   },
+   {
+    "pattern": "Opacity/anterior",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/heart",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/posterior",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/sulcus",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Opacity/supracardiac",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Lung Opacity"
+   },
+   {
+    "pattern": "Pleura/blunted",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "ignore"
+   },
+   {
+    "pattern": "Pleura/right",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Pleural Other"
+   },
+   {
+    "pattern": "Sclerosis/pleura",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Pleural Other"
+   },
+   {
+    "pattern": "Sutures/mediastinum",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   },
+   {
+    "pattern": "Sutures/sternum",
+    "count": 1,
+    "rule": [
+     "Other Abnormality"
+    ],
+    "llm": "Support Devices"
+   }
+  ],
+  "disagreement_patterns": 64,
+  "disagreement_code_instances": 204,
+  "cost_usd_this_run": 0.020874,
+  "llm_spend_total_usd": 0.02104
+ }
+}

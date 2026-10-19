@@ -1,0 +1,148 @@
+# negspacy termset, version eval_v1.2 (content unchanged since eval_v1; PERMANENTLY FROZEN at end of M1; changes need owner approval + docs/eval_changelog.md).
+# = negspacy 1.1.0 'en_clinical' patterns, plus README §4.8 pre-registered
+# following negations (resolution language): has resolved, have resolved, resolved, no longer seen, no longer visualized, has cleared, have cleared, removed.
+version: eval_v1.2
+patterns:
+  following_negations:
+  - declined
+  - free
+  - has cleared
+  - has resolved
+  - have cleared
+  - have resolved
+  - no longer seen
+  - no longer visualized
+  - removed
+  - resolved
+  - unlikely
+  - was not
+  - was ruled out
+  - wasn't
+  - wasnt
+  - were not
+  - were ruled out
+  - weren't
+  - werent
+  preceding_negations:
+  - absence of
+  - aren't
+  - arent
+  - can't
+  - cannot
+  - cant
+  - couldn't
+  - couldnt
+  - declined
+  - denied
+  - denies
+  - denying
+  - did not exhibit
+  - didn't
+  - didnt
+  - doesn't
+  - doesnt
+  - don't
+  - dont
+  - doubt
+  - evaluate for
+  - fails to reveal
+  - free of
+  - isn't
+  - isnt
+  - negative for
+  - never
+  - never developed
+  - never had
+  - 'no'
+  - no cause of
+  - no complaints of
+  - no evidence of
+  - no sign of
+  - no signs of
+  - not
+  - not demonstrate
+  - patient was not
+  - r/o
+  - ro
+  - rule her out
+  - rule him out
+  - rule out
+  - rule patient out
+  - rule the patient out
+  - ruled her out
+  - ruled him out
+  - ruled out
+  - ruled patient out
+  - ruled the patient out
+  - rules out
+  - symptoms atypical
+  - versus
+  - wasn't
+  - wasnt
+  - weren't
+  - werent
+  - without
+  - without any reactions or signs of
+  - without indication of
+  - without sign of
+  - without signs of
+  pseudo_negations:
+  - gram negative
+  - might not
+  - no change
+  - no definite change
+  - no further
+  - no increase
+  - no interval change
+  - no significant change
+  - no significant interval change
+  - no suspicious change
+  - not able to be
+  - not been ruled out
+  - not cause
+  - not certain if
+  - not certain whether
+  - not drain
+  - not extend
+  - not necessarily
+  - not only
+  - not rule out
+  - not ruled out
+  - without any further
+  - without difficulty
+  - without further
+  termination:
+  - although
+  - apart from
+  - as there are
+  - aside from
+  - but
+  - cause for
+  - cause of
+  - causes for
+  - causes of
+  - etiology for
+  - etiology of
+  - except
+  - however
+  - involving
+  - nevertheless
+  - origin for
+  - origin of
+  - origins for
+  - origins of
+  - other possibilities of
+  - reason for
+  - reason of
+  - reasons for
+  - reasons of
+  - secondary to
+  - source for
+  - source of
+  - sources for
+  - sources of
+  - still
+  - though
+  - trigger event for
+  - which
+  - yet

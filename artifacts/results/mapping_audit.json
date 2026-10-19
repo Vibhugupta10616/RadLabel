@@ -1,0 +1,57 @@
+{
+ "provenance": {
+  "git_commit": "4af0dea944f085677a45b42bc0a9d82ae5e9f64e-dirty",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1+strict",
+  "fold": null,
+  "created": "2026-10-19T23:37:39+00:00"
+ },
+ "results": {
+  "eval_version": "eval_v1.2",
+  "threshold": 0.6,
+  "rules_audited": 51,
+  "flagged": [
+   {
+    "mapping": "v1",
+    "label": "Pleural Other",
+    "rule": "Pleura except blunted",
+    "n": 1,
+    "agreement": 0.0
+   },
+   {
+    "mapping": "v1",
+    "label": "Pleural Other",
+    "rule": "Opacity [pleura site]",
+    "n": 3,
+    "agreement": 0.333
+   },
+   {
+    "mapping": "v1",
+    "label": "Pleural Other",
+    "rule": "Density [pleura site]",
+    "n": 1,
+    "agreement": 0.0
+   }
+  ],
+  "distinct_unmapped_codes": 986
+ }
+}

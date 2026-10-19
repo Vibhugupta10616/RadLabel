@@ -7,9 +7,17 @@ dependencies = [
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "pyyaml>=6.0",
+    "numpy>=1.26",
+    "openai>=1.60",
 ]
 
 [project.optional-dependencies]
+eval = [
+    # pinned: negex behaviour is part of the frozen eval_v1 detector
+    "spacy==3.8.16",
+    "negspacy==1.1.0",
+    "spacy-lookups-data==1.0.5",
+]
 dev = [
     "ruff>=0.6",
     "mypy>=1.11",
@@ -26,9 +34,9 @@ build-backend = "hatchling.build"
 packages = ["src/radlabel"]
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 target-version = "py311"
-extend-exclude = ["data", "artifacts", "models", "data_prep/parse_iu.py", "data_prep/map_and_stats.py", "data_prep/coding_policy.py"]
+extend-exclude = ["data", "artifacts", "models", "data_prep/parse_iu.py", "data_prep/map_and_stats.py", "data_prep/coding_policy.py", "data_prep/subset_stats.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]

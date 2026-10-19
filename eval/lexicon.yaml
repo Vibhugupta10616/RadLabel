@@ -1,0 +1,69 @@
+# Evaluation-only aliases per pathology label (README §4.8). Version eval_v1.2, PERMANENTLY FROZEN at the end of M1
+# (before any model output exists); changes need owner approval + an entry in docs/eval_changelog.md.
+# Lower-case token sequences, matched on spaCy lookup LEMMAS (since eval_v1.1), so plural/singular variants match. Never copied into the
+# pipeline alias list (src/radlabel/preprocess/aliases.py), which is written independently.
+version: eval_v1.2
+labels:
+  Cardiomegaly: [cardiomegaly, enlarged heart, cardiac enlargement, enlarged cardiac silhouette,
+    heart is enlarged, heart size is enlarged, enlargement of the cardiac silhouette]
+  Lung Opacity: [opacity, opacities, opacification, density, densities, airspace disease,
+    airspace opacity, infiltrate, infiltrates]
+  Lung Lesion: [nodule, nodules, mass, masses, cavitation, cavitary lesion, cyst, cysts]
+  Atelectasis: [atelectasis, atelectatic]
+  Pleural Effusion:
+    - effusion
+    - effusions
+    - pleural fluid
+    # eval_v1.1 additions (owner-approved, audit-driven, before any model output):
+    - hydropneumothorax    # coded Pleural Effusion via Hydropneumothorax; reports name it this way
+    - air-fluid level      # how hydropneumothorax is described in reports
+    - air fluid level      # same, unhyphenated spelling seen in the audit examples (lemmas don't bridge the hyphen)
+  Fracture: [fracture, fractures, fractured]
+  Support Devices:
+    - catheter
+    - catheters
+    - tube
+    - tubes
+    - pacemaker
+    - pacer
+    - picc
+    - stent
+    - stents
+    - sternotomy wires
+    - clips
+    - port
+    - device
+    - devices
+    - hardware
+    # eval_v1 additions (README §4.8, from the M1 mapping audit):
+    - icd                  # implantable cardioverter-defibrillator, written as "ICD" in Implanted Medical Device reports
+    - aicd                 # automatic ICD, same device family
+    - prosthetic valve     # valve prostheses coded Implanted Medical Device/aortic valve
+    - valve replacement    # same, phrased as the procedure
+    - monitor leads        # external monitor leads, coded Medical Device/thorax
+    - ecg leads            # same, phrased as ECG leads
+    - spinal stimulator    # coded Medical Device/spine
+  Edema: [edema, pulmonary edema]
+  Pleural Other:
+    - pleural thickening
+    - pleural scarring
+    - pleural plaque
+    - pleural plaques
+    - thickening of the pleura
+    # eval_v1.1 addition (owner-approved, audit-driven, before any model output):
+    - pleural abnormality  # Pleura/base/... codes described with this phrase
+    # eval_v1.2 additions (owner-approved FINAL change, audit-driven, before any model output):
+    - pleural opacity      # Opacity/pleura codes described with this phrase
+    - pleural based nodule # Nodule/pleura codes described with this phrase
+    - pleural nodule       # same finding without "based"
+    - pleural density      # Density/pleura codes
+  Consolidation: [consolidation, consolidations, consolidative]
+  Pneumothorax:
+    - pneumothorax
+    - pneumothoraces
+    # eval_v1 additions (README §4.8, from the M1 mapping audit):
+    - hydropneumothorax    # single token, so "pneumothorax" alone doesn't match it; coded Pneumothorax via Hydropneumothorax
+    - hemopneumothorax     # same, coded via Hemopneumothorax
+    # eval_v1.1 additions (owner-approved, audit-driven, before any model output):
+    - air-fluid level      # hydropneumothorax described by its air-fluid level
+    - air fluid level      # same, unhyphenated spelling

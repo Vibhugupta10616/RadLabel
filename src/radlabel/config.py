@@ -71,10 +71,10 @@ class Settings(BaseSettings):
         """Names of settings a fresh (uncached) LLM call needs but that are empty."""
         if self.llm_provider == "openai":
             return [] if self.openai_api_key.get_secret_value() else ["OPENAI_API_KEY"]
+        # AZURE_OPENAI_API_VERSION is optional: empty -> Azure's GA v1 API (no api-version parameter)
         need = {
             "AZURE_OPENAI_ENDPOINT": self.azure_openai_endpoint,
             "AZURE_OPENAI_API_KEY": self.azure_openai_api_key.get_secret_value(),
-            "AZURE_OPENAI_API_VERSION": self.azure_openai_api_version,
         }
         return [k for k, v in need.items() if not v or "<your-resource>" in v]
 

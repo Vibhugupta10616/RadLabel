@@ -1,0 +1,24 @@
+# Strict mapping (README §4.5): only the primary head per label. Used for sensitivity analysis.
+version: strict
+no_finding_code: normal
+other_label: Other Abnormality
+ignore_codes: [No Indexing, Technical Quality of Image Unsatisfactory, Contrast Media]  # same as v1
+# Lung Lesion lung-site rule and site lists as in mesh_to_labels_v1.yaml
+sites:
+  non_lung: [paratracheal, mediastinum, hilum, heart, ribs, thorax, sternum, breast, humerus, clavicle, abdomen,
+             adipose tissue, cardiophrenic angle, supracardiac, mitral valve, thoracic vertebrae]
+  pleura: [pleura, pleural sinus]
+lung_site: &lung_site ["", right, left, bilateral, multiple, scattered]
+labels:
+  Cardiomegaly: [[Cardiomegaly]]
+  Lung Opacity: [[Opacity, lung]]
+  Lung Lesion: [{head: Nodule, subs: *lung_site, site: lung}, {head: Mass, subs: *lung_site, site: lung}]
+  Atelectasis: [[Pulmonary Atelectasis]]
+  Pleural Effusion: [[Pleural Effusion]]
+  Fracture: [["Fractures, Bone"]]
+  # Implanted Medical Device added (owner, 2026-10-20): CheXpert support_devices covers pacemaker/icd/valve/device
+  Support Devices: [["Catheters, Indwelling"], ["Tube, Inserted"], [Medical Device], [Implanted Medical Device]]
+  Edema: [[Pulmonary Edema]]
+  Pleural Other: [[Thickening, pleura]]
+  Consolidation: [[Consolidation]]
+  Pneumothorax: [[Pneumothorax]]

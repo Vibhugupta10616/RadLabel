@@ -1,0 +1,79 @@
+# Expert MeSH <major> codes -> RadLabel labels, mapping v1 (README §4.4).
+# A rule [head] or [head, sub] matches a code `head/sub/...` on head and (if given) the first sub.
+# A rule {head, subs, site: lung} is a lung-site rule: it matches when the first sub-heading is `lung`,
+# or when the first sub-heading is in `subs` AND no sub-heading is a non-lung or pleural site.
+# A rule {head, site: pleura} matches when the first sub-heading isn't `lung` and some sub-heading is pleural.
+# Codes matching no rule go to `other_label`, except `no_finding_code` and `ignore_codes`.
+# Dropped labels (Pneumonia, Enlarged Cardiomediastinum) have no rules: their codes become Other Abnormality.
+version: v1
+no_finding_code: normal
+other_label: Other Abnormality
+# Reports coded only with ignored codes have no label and are excluded from No Finding scoring.
+# Contrast Media added after the mapping cross-check (owner, 2026-10-20): not a finding.
+ignore_codes: [No Indexing, Technical Quality of Image Unsatisfactory, Contrast Media]
+sites:
+  # owner-defined (2026-10-20); last six: non-lung first sub-headings found in the data
+  non_lung: [paratracheal, mediastinum, hilum, heart, ribs, thorax, sternum, breast, humerus, clavicle, abdomen,
+             adipose tissue, cardiophrenic angle, supracardiac, mitral valve, thoracic vertebrae]
+  pleura: [pleura, pleural sinus]
+# Allowed first sub-headings besides `lung` (non-anatomical or lung regions)
+lung_site: &lung_site ["", right, left, bilateral, multiple, scattered]
+opacity_site: &opacity_site ["", right, left, bilateral, multiple, scattered, round, anterior, posterior,
+                             retrocardiac, sulcus, costophrenic angle, pulmonary alveoli]
+labels:
+  Cardiomegaly: [[Cardiomegaly], [Cardiac Shadow, enlarged]]
+  # Broadened after the mapping cross-check (owner, 2026-10-20): any lung site, not only /lung and /retrocardiac
+  Lung Opacity:
+    - {head: Opacity, subs: *opacity_site, site: lung}
+    - {head: Density, subs: *opacity_site, site: lung}
+    - {head: Airspace Disease, subs: *opacity_site, site: lung}
+    - {head: Infiltrate, subs: *opacity_site, site: lung}
+  # Cysts removed (owner decision after M1 audit): Cysts codes go to Other Abnormality
+  Lung Lesion:
+    - {head: Nodule, subs: *lung_site, site: lung}
+    - {head: Mass, subs: *lung_site, site: lung}
+    - {head: Cavitation, subs: *lung_site, site: lung}
+  Atelectasis: [[Pulmonary Atelectasis]]
+  Pleural Effusion: [[Pleural Effusion], [Hydropneumothorax], [Hemothorax]]
+  Fracture: [["Fractures, Bone"]]
+  Support Devices:
+    - ["Catheters, Indwelling"]
+    - [Implanted Medical Device]
+    - ["Tube, Inserted"]
+    - [Medical Device]
+    - [Stents]
+    - [Surgical Instruments]
+    # Sutures -> Other Abnormality: not in the CheXpert labeler support_devices mention list
+  # Pulmonary Congestion / Heart Failure deliberately NOT mapped ("congestion without edema")
+  Edema: [[Pulmonary Edema]]
+  # Pleura/.../blunted hints at effusion but isn't one: Other Abnormality (README §4.4).
+  # Opacity/lesion codes at a pleural site are Pleural Other (owner, 2026-10-20).
+  Pleural Other:
+    - [Thickening, pleura]
+    - {head: Pleura, exclude_any_sub: [blunted]}
+    - {head: Opacity, site: pleura}
+    - {head: Density, site: pleura}
+    - {head: Airspace Disease, site: pleura}
+    - {head: Infiltrate, site: pleura}
+    - {head: Nodule, site: pleura}
+    - {head: Mass, site: pleura}
+    - {head: Cavitation, site: pleura}
+  Consolidation: [[Consolidation]]
+  Pneumothorax: [[Pneumothorax], [Hydropneumothorax], [Hemopneumothorax]]
+# Mapping cross-check (README §4.5), copied into data_card.json by data_prep/build_dataset.py
+crosscheck:
+  plain: "gpt-4.1-mini, code patterns only: 64 of 565 head/sub patterns disagreed with v1 (204 code instances)"
+  context: >-
+    gpt-5-mini with full codes, 2-3 example sentences and CheXpert mention phrases: 38 of those 64 still
+    disagreed (144 code instances)
+  accepted:
+    - "Lung Opacity: any lung site, not only /lung and /retrocardiac (incl. sulcus = lung bases)"
+    - "Site check on all sub-headings for Lung Opacity and Lung Lesion when the first sub-heading isn't lung:
+       non-lung sites -> Other Abnormality, pleural sites -> Pleural Other (fixes Mass/right/paratracheal)"
+    - "Contrast Media ignored like Technical Quality of Image Unsatisfactory (not a finding)"
+  rejected:
+    - "Costophrenic/pleural blunting -> Pleural Effusion: blunting suggests but doesn't confirm an effusion"
+    - "Heart sub-structures, Cardiac Shadow/borderline, Heart/right -> Cardiomegaly / Lung Opacity: not an
+       enlarged cardiac silhouette, or describes obscuration"
+    - "Sutures, Foreign Bodies -> Support Devices: not in the CheXpert support_devices mention list"
+    - "Foreign Bodies, Heart/obscured -> No Finding: unreliable (example sentence unrelated to the code)"
