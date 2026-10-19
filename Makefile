@@ -33,3 +33,6 @@ data:
 	$(PY) -I data_prep/subset_stats.py data/processed/iu_mapped_ref.jsonl
 	$(PY) -m data_prep.build_dataset
 	$(PY) -m data_prep.audit_mapping
+
+folds:
+	$(PY) -m eval.cv

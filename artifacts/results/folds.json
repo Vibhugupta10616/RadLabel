@@ -1,0 +1,334 @@
+{
+ "provenance": {
+  "git_commit": "dacd9238ef4b67c266c1009df959f4890849c27a-dirty",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": null,
+  "created": "2026-10-19T23:43:41+00:00"
+ },
+ "results": {
+  "n_clusters": 3073,
+  "n_items_exact_texts": 3086,
+  "seed": 13,
+  "method": "iterstrat MultilabelStratifiedKFold over clusters (13 v1 labels); inner val 10% per fold",
+  "folds": {
+   "0": {
+    "clusters": 613,
+    "exact_texts": 616,
+    "positives_v1": {
+     "No Finding": 131,
+     "Cardiomegaly": 79,
+     "Lung Opacity": 122,
+     "Lung Lesion": 24,
+     "Atelectasis": 66,
+     "Pleural Effusion": 32,
+     "Fracture": 17,
+     "Support Devices": 75,
+     "Other Abnormality": 416,
+     "Edema": 9,
+     "Pleural Other": 11,
+     "Consolidation": 6,
+     "Pneumothorax": 6
+    },
+    "positives_strict": {
+     "No Finding": 131,
+     "Cardiomegaly": 73,
+     "Lung Opacity": 81,
+     "Lung Lesion": 22,
+     "Atelectasis": 66,
+     "Pleural Effusion": 31,
+     "Fracture": 17,
+     "Support Devices": 57,
+     "Other Abnormality": 416,
+     "Edema": 9,
+     "Pleural Other": 10,
+     "Consolidation": 6,
+     "Pneumothorax": 3
+    }
+   },
+   "1": {
+    "clusters": 618,
+    "exact_texts": 620,
+    "positives_v1": {
+     "No Finding": 129,
+     "Cardiomegaly": 79,
+     "Lung Opacity": 121,
+     "Lung Lesion": 23,
+     "Atelectasis": 66,
+     "Pleural Effusion": 32,
+     "Fracture": 17,
+     "Support Devices": 75,
+     "Other Abnormality": 415,
+     "Edema": 9,
+     "Pleural Other": 10,
+     "Consolidation": 6,
+     "Pneumothorax": 5
+    },
+    "positives_strict": {
+     "No Finding": 129,
+     "Cardiomegaly": 75,
+     "Lung Opacity": 78,
+     "Lung Lesion": 23,
+     "Atelectasis": 66,
+     "Pleural Effusion": 32,
+     "Fracture": 17,
+     "Support Devices": 52,
+     "Other Abnormality": 415,
+     "Edema": 9,
+     "Pleural Other": 8,
+     "Consolidation": 6,
+     "Pneumothorax": 5
+    }
+   },
+   "2": {
+    "clusters": 614,
+    "exact_texts": 617,
+    "positives_v1": {
+     "No Finding": 130,
+     "Cardiomegaly": 79,
+     "Lung Opacity": 121,
+     "Lung Lesion": 23,
+     "Atelectasis": 66,
+     "Pleural Effusion": 33,
+     "Fracture": 17,
+     "Support Devices": 75,
+     "Other Abnormality": 415,
+     "Edema": 9,
+     "Pleural Other": 11,
+     "Consolidation": 6,
+     "Pneumothorax": 6
+    },
+    "positives_strict": {
+     "No Finding": 130,
+     "Cardiomegaly": 76,
+     "Lung Opacity": 82,
+     "Lung Lesion": 22,
+     "Atelectasis": 66,
+     "Pleural Effusion": 33,
+     "Fracture": 17,
+     "Support Devices": 52,
+     "Other Abnormality": 415,
+     "Edema": 9,
+     "Pleural Other": 9,
+     "Consolidation": 6,
+     "Pneumothorax": 6
+    }
+   },
+   "3": {
+    "clusters": 614,
+    "exact_texts": 616,
+    "positives_v1": {
+     "No Finding": 130,
+     "Cardiomegaly": 79,
+     "Lung Opacity": 122,
+     "Lung Lesion": 24,
+     "Atelectasis": 67,
+     "Pleural Effusion": 33,
+     "Fracture": 16,
+     "Support Devices": 76,
+     "Other Abnormality": 415,
+     "Edema": 10,
+     "Pleural Other": 10,
+     "Consolidation": 6,
+     "Pneumothorax": 5
+    },
+    "positives_strict": {
+     "No Finding": 130,
+     "Cardiomegaly": 76,
+     "Lung Opacity": 87,
+     "Lung Lesion": 23,
+     "Atelectasis": 67,
+     "Pleural Effusion": 33,
+     "Fracture": 16,
+     "Support Devices": 53,
+     "Other Abnormality": 415,
+     "Edema": 10,
+     "Pleural Other": 9,
+     "Consolidation": 6,
+     "Pneumothorax": 5
+    }
+   },
+   "4": {
+    "clusters": 614,
+    "exact_texts": 617,
+    "positives_v1": {
+     "No Finding": 130,
+     "Cardiomegaly": 79,
+     "Lung Opacity": 122,
+     "Lung Lesion": 24,
+     "Atelectasis": 67,
+     "Pleural Effusion": 32,
+     "Fracture": 17,
+     "Support Devices": 75,
+     "Other Abnormality": 416,
+     "Edema": 9,
+     "Pleural Other": 11,
+     "Consolidation": 6,
+     "Pneumothorax": 5
+    },
+    "positives_strict": {
+     "No Finding": 130,
+     "Cardiomegaly": 75,
+     "Lung Opacity": 78,
+     "Lung Lesion": 24,
+     "Atelectasis": 67,
+     "Pleural Effusion": 32,
+     "Fracture": 17,
+     "Support Devices": 56,
+     "Other Abnormality": 416,
+     "Edema": 9,
+     "Pleural Other": 11,
+     "Consolidation": 6,
+     "Pneumothorax": 4
+    }
+   }
+  },
+  "inner_val": {
+   "0": {
+    "clusters": 245,
+    "exact_texts": 245,
+    "positives_v1": {
+     "No Finding": 51,
+     "Cardiomegaly": 32,
+     "Lung Opacity": 49,
+     "Lung Lesion": 9,
+     "Atelectasis": 27,
+     "Pleural Effusion": 13,
+     "Fracture": 7,
+     "Support Devices": 30,
+     "Other Abnormality": 166,
+     "Edema": 4,
+     "Pleural Other": 4,
+     "Consolidation": 2,
+     "Pneumothorax": 2
+    }
+   },
+   "1": {
+    "clusters": 251,
+    "exact_texts": 251,
+    "positives_v1": {
+     "No Finding": 51,
+     "Cardiomegaly": 32,
+     "Lung Opacity": 49,
+     "Lung Lesion": 10,
+     "Atelectasis": 27,
+     "Pleural Effusion": 13,
+     "Fracture": 7,
+     "Support Devices": 30,
+     "Other Abnormality": 166,
+     "Edema": 4,
+     "Pleural Other": 4,
+     "Consolidation": 2,
+     "Pneumothorax": 2
+    }
+   },
+   "2": {
+    "clusters": 250,
+    "exact_texts": 251,
+    "positives_v1": {
+     "No Finding": 52,
+     "Cardiomegaly": 32,
+     "Lung Opacity": 49,
+     "Lung Lesion": 10,
+     "Atelectasis": 27,
+     "Pleural Effusion": 13,
+     "Fracture": 7,
+     "Support Devices": 30,
+     "Other Abnormality": 166,
+     "Edema": 4,
+     "Pleural Other": 4,
+     "Consolidation": 2,
+     "Pneumothorax": 2
+    }
+   },
+   "3": {
+    "clusters": 248,
+    "exact_texts": 250,
+    "positives_v1": {
+     "No Finding": 52,
+     "Cardiomegaly": 32,
+     "Lung Opacity": 49,
+     "Lung Lesion": 9,
+     "Atelectasis": 27,
+     "Pleural Effusion": 13,
+     "Fracture": 7,
+     "Support Devices": 30,
+     "Other Abnormality": 167,
+     "Edema": 4,
+     "Pleural Other": 4,
+     "Consolidation": 2,
+     "Pneumothorax": 2
+    }
+   },
+   "4": {
+    "clusters": 261,
+    "exact_texts": 261,
+    "positives_v1": {
+     "No Finding": 51,
+     "Cardiomegaly": 32,
+     "Lung Opacity": 49,
+     "Lung Lesion": 9,
+     "Atelectasis": 27,
+     "Pleural Effusion": 13,
+     "Fracture": 7,
+     "Support Devices": 30,
+     "Other Abnormality": 166,
+     "Edema": 4,
+     "Pleural Other": 4,
+     "Consolidation": 2,
+     "Pneumothorax": 2
+    }
+   }
+  },
+  "total_positives_v1": {
+   "No Finding": 650,
+   "Cardiomegaly": 395,
+   "Lung Opacity": 608,
+   "Lung Lesion": 118,
+   "Atelectasis": 332,
+   "Pleural Effusion": 162,
+   "Fracture": 84,
+   "Support Devices": 376,
+   "Other Abnormality": 2077,
+   "Edema": 46,
+   "Pleural Other": 53,
+   "Consolidation": 30,
+   "Pneumothorax": 27
+  },
+  "max_deviation_from_equal_share": {
+   "No Finding": 1.0,
+   "Cardiomegaly": 0.0,
+   "Lung Opacity": 0.6,
+   "Lung Lesion": 0.6,
+   "Atelectasis": 0.6,
+   "Pleural Effusion": 0.6,
+   "Fracture": 0.8,
+   "Support Devices": 0.8,
+   "Other Abnormality": 0.6,
+   "Edema": 0.8,
+   "Pleural Other": 0.6,
+   "Consolidation": 0.0,
+   "Pneumothorax": 0.6
+  },
+  "acceptance_within_pm2": true
+ }
+}

@@ -8,7 +8,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 |---|---|---|
 | M0 | **Done except Docker** (`4af0dea`) | Owner accepted the direct commands in place of `make test`. `docker compose up` deferred; **must pass before M5**. |
 | M1 | **Done** (tag `m1-data`) | Owner-approved 2026-10-20. Numbers below. eval_v1.2 lexicon/termset **permanently frozen**. |
-| M2 | in progress | |
+| M2 | **Done** (acceptance passes; waiting for owner OK before M3) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
 | M3–M11 | not started | |
 
 ## M1 results (`make data`, clean `data/processed`)
@@ -33,6 +33,12 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | Cheap | gpt-5.4-nano | `gpt-5.4-nano-2026-03-17` |
 
 `AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far: **$0.0710** (ledger `artifacts/llm_cache/ledger.jsonl`).
+
+## M2 notes
+- `iterstrat` (CLAUDE.md fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
+- Stratified on the 13 **v1** labels. Strict labels are not stratified: strict Lung Opacity per fold 78–87 (equal share 81.2).
+- Inner validation (10% of training clusters) has only **2** Consolidation and **2** Pneumothorax positives per fold (Edema 4, Pleural Other 4): per-label thresholds tuned there will be noisy for rare labels.
+- Bootstrap CI utility: `eval/bootstrap.py` (1,000 resamples over clusters).
 
 ## Blocked (owner action)
 - **gpt-5.4-mini returns 404.** Check that the deployment name is exactly `gpt-5.4-mini`, on the same resource as `AZURE_OPENAI_ENDPOINT`. Needed for the Tier 1 fallback and the M4 pilot.

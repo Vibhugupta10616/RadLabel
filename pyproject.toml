@@ -17,6 +17,9 @@ eval = [
     "spacy==3.8.16",
     "negspacy==1.1.0",
     "spacy-lookups-data==1.0.5",
+    # folds (README §4.2); scikit-multilearn 0.2.0 is incompatible with scikit-learn >= 1.x seeding
+    "iterative-stratification==0.1.9",
+    "scikit-learn>=1.5",
 ]
 dev = [
     "ruff>=0.6",
