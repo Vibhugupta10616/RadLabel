@@ -1,5 +1,7 @@
-# Secrets
+# Secrets / private working rules
 .env
+CLAUDE.md
+.claude/settings.local.json
 .env.*
 !.env.example
 
