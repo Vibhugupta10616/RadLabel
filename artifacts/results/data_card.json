@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "4af0dea944f085677a45b42bc0a9d82ae5e9f64e-dirty",
+  "git_commit": "9d0a8d6bd75f2c4a70d9363c72dde0716dd85bd7-dirty",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1+strict",
   "fold": null,
-  "created": "2026-10-19T23:37:37+00:00"
+  "created": "2026-10-20T08:56:46+00:00"
  },
  "results": {
   "eval_version": "eval_v1.2",

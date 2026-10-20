@@ -189,6 +189,74 @@ def run_rule_baseline() -> dict[int, dict[str, str]]:
     return out
 
 
+def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], dict[str, Any]]:
+    """Tier 1 (gpt-4.1-mini, prompt tier1-v1, temperature 0) over every exact-text representative. Zero-shot,
+    so every prediction is out-of-fold. Returns (LLM-only statuses, LLM+verifier statuses, run stats)."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from radlabel.config import get_settings
+    from radlabel.labelling.extractor import PROMPT_VERSION, TIER1_DEPLOYMENT, extract
+    from radlabel.labelling.verifier import passed, verify
+    from radlabel.llm import LLMClient
+    from radlabel.preprocess.sentences import Sentence
+
+    s = get_settings()
+    if s.azure_openai_deployment != TIER1_DEPLOYMENT:
+        raise SystemExit(f"Tier 1 is locked to {TIER1_DEPLOYMENT}; .env has {s.azure_openai_deployment}")
+    reps = [r for r in map(json.loads, (PROC / "reports.jsonl").open(encoding="utf-8")) if r["id"] == r["group_rep"]]
+    llm = LLMClient()
+    spend0 = llm.spent
+    # Azure counts prompt + max_tokens against TPM; ~2,400 tokens/request, ~40 requests/min per worker
+    workers = max(1, min(s.llm_max_concurrency, s.tier1_tpm // (2400 * 40)))
+
+    def one(r: dict) -> tuple[int, Any, Any, list[Sentence]]:
+        sents = [Sentence(**x) for x in r["sentences"]]
+        out, resp = extract(llm, str(r["id"]), sents, temperature=0.0)
+        return r["id"], out, resp, sents
+
+    with ThreadPoolExecutor(workers) as ex:
+        rows = list(ex.map(one, reps))
+    raw: dict[int, dict[str, str]] = {}
+    ver: dict[int, dict[str, str]] = {}
+    fails: dict[str, int] = {}
+    flags: dict[str, int] = {}
+    n_invalid = n_fail = n_flag = n_review = 0
+    models = set()
+    PRED_DIR.mkdir(parents=True, exist_ok=True)
+    with (PRED_DIR / "tier1.jsonl").open("w", encoding="utf-8") as f:
+        for rid, out, resp, sents in rows:
+            models.add(resp.model)
+            if out is None:
+                n_invalid += 1
+                raw[rid] = ver[rid] = {}
+                f.write(json.dumps({"report_id": str(rid), "invalid": True}) + "\n")
+                continue
+            v = verify(out, sents)
+            raw[rid] = {x.label: x.status for x in out.labels}
+            ver[rid] = {x.label: x.status for x in v.labels}
+            fl = [m for m in v.verifier_messages if m.level == "fail"]
+            fg = [m for m in v.verifier_messages if m.level == "flag"]
+            for m in fl:
+                fails[m.check] = fails.get(m.check, 0) + 1
+            for m in fg:
+                flags[m.check] = flags.get(m.check, 0) + 1
+            n_fail += not passed(v)
+            n_flag += bool(fg)
+            # review escalation: section_rule disagreement (rule C) or hedging, on reports that pass
+            n_review += passed(v) and any(m.check in ("section_rule", "hedge_consistency") for m in fg)
+            f.write(json.dumps({"raw": json.loads(out.model_dump_json()), "verified": json.loads(v.model_dump_json())})
+                    + "\n")
+    n = len(rows)
+    stats = {"deployment": TIER1_DEPLOYMENT, "prompt_version": PROMPT_VERSION, "models_returned": sorted(models),
+             "n_reports": n, "workers": workers, "invalid_outputs": n_invalid, "invalid_rate": n_invalid / n,
+             "reports_with_fail": n_fail, "report_fail_rate": n_fail / n, "reports_with_flag": n_flag,
+             "report_flag_rate": n_flag / n, "tier2_reports": n_fail + n_invalid, "review_escalations": n_review,
+             "fails_by_check": dict(sorted(fails.items())), "flags_by_check": dict(sorted(flags.items())),
+             "spend_this_run_usd": llm.spent - spend0, "llm_spend_total_usd": llm.spent,
+             "cached_responses": sum(r.cached for _, _, r, _ in rows)}
+    return raw, ver, stats
+
+
 def verifier_counts(path: Path) -> dict[str, int]:
     c: dict[str, int] = {}
     for line in path.open(encoding="utf-8"):
@@ -198,19 +266,35 @@ def verifier_counts(path: Path) -> dict[str, int]:
     return dict(sorted(c.items()))
 
 
-def main(system: str) -> dict[str, Any]:
-    if system != "rule_baseline":
-        raise SystemExit(f"unknown system {system!r}")
-    statuses = run_rule_baseline()  # no training: fold-independent, so every prediction is out-of-fold
-    res = evaluate(Items(), statuses)
-    res["verifier_messages"] = verifier_counts(PRED_DIR / "rule_baseline.jsonl")
+def _save(system: str, res: dict[str, Any], **extra: Any) -> None:
     write_result(f"labelling_{system}", res, fold="oof", mapping_version="v1+strict", system=system,
-                 llm="none", eval_version="eval_v1.2")
+                 eval_version="eval_v1.2", **extra)
     TABLES.mkdir(parents=True, exist_ok=True)
     (TABLES / f"labelling_{system}.md").write_text(render(system, res), encoding="utf-8")
-    return res
+
+
+def main(system: str) -> dict[str, Any]:
+    it = Items()
+    if system == "rule_baseline":
+        statuses = run_rule_baseline()  # no training: fold-independent, so every prediction is out-of-fold
+        res = evaluate(it, statuses)
+        res["verifier_messages"] = verifier_counts(PRED_DIR / "rule_baseline.jsonl")
+        _save(system, res, llm="none")
+        return res
+    if system == "tier1":
+        raw, ver, stats = run_tier1()
+        llm_only = {**evaluate(it, raw), "run": stats}
+        llm_ver = {**evaluate(it, ver), "run": stats}
+        _save("llm_only", llm_only, llm=stats["deployment"], prompt=stats["prompt_version"])
+        _save("llm_verifier", llm_ver, llm=stats["deployment"], prompt=stats["prompt_version"])
+        return {"llm_only": llm_only, "llm_verifier": llm_ver, "run": stats}
+    raise SystemExit(f"unknown system {system!r}")
 
 
 if __name__ == "__main__":
-    r = main(sys.argv[1] if len(sys.argv) > 1 else "rule_baseline")
-    print((TABLES / "labelling_rule_baseline.md").read_text(encoding="utf-8"))
+    name = sys.argv[1] if len(sys.argv) > 1 else "rule_baseline"
+    r = main(name)
+    if name == "tier1":
+        print(json.dumps(r["run"], indent=1))
+    else:
+        print((TABLES / f"labelling_{name}.md").read_text(encoding="utf-8"))

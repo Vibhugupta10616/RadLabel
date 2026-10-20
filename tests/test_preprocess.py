@@ -28,3 +28,15 @@ def test_clusters_exact_and_near_duplicates() -> None:
     })
     assert c["a"] == c["b"] == c["c"]
     assert c["d"] != c["a"]
+
+
+def test_split_full_stop_directly_before_capital() -> None:
+    assert split_sentences("Clear right lung [REDACTED].In the left lobe there is a density.") == [
+        "Clear right lung [REDACTED].", "In the left lobe there is a density."]
+    assert split_sentences("Small effusion.Mild cardiomegaly.") == ["Small effusion.", "Mild cardiomegaly."]
+
+
+def test_no_split_inside_numbers_or_after_abbreviations() -> None:
+    assert split_sentences("Nodule measures 2.5 cm. No effusion.") == ["Nodule measures 2.5 cm.", "No effusion."]
+    assert split_sentences("Atelectasis vs. Pneumonia at the base.") == ["Atelectasis vs. Pneumonia at the base."]
+    assert split_sentences("1. No acute disease. 2. Stable nodule.") == ["1. No acute disease.", "2. Stable nodule."]
