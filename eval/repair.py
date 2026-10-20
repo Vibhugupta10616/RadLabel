@@ -252,7 +252,9 @@ def render_changes(changes: dict[str, Any], st: dict[str, Any], routing: dict[st
     lines = ["# Tier 2 repair agent (M5)", "",
              f"{st['tier2_reports']} reports with a verifier FAIL; attempted {st['attempted']}, fix accepted "
              f"(passes re-verification) {st['accepted']} ({st['repair_success_rate']:.1%}); mean tool calls "
-             f"{st['mean_tool_calls']:.2f}; stop reasons {st['stop_reasons']}; new spend ${st['new_spend_usd']:.3f}.",
+             f"{st['mean_tool_calls']:.2f}; stop reasons {st['stop_reasons']}; "
+             f"cost of the Tier 2 calls ${st['tier2_cost_usd']:.3f} "
+             f"(new spend in this run ${st['new_spend_usd']:.3f}; reruns are served from the cache).",
              "", f"Decision rule: {paired['decision']['rule']} -> keep Tier 2: "
              f"**{paired['decision']['keep_tier2_in_pipeline']}**", "",
              "## Label changes (agent labels vs LLM + verifier; present = positive vs v1 expert codes)", ""]
