@@ -44,6 +44,8 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | Repair / agents | gpt-5-mini | `gpt-5-mini-2025-08-07` |
 | Cheap | gpt-5.4-nano | `gpt-5.4-nano-2026-03-17` |
 
+**Budget:** `MAX_LLM_USD=20` (`.env.example`; `.env` uses the same value). Stop rule (`src/radlabel/llm/client.py`, `BUDGET_FRACTION = 0.5`): fresh LLM calls are refused once the ledger total reaches 50% of `MAX_LLM_USD`, i.e. **$10**; cache hits are always free; the owner raises the limit explicitly. Per-run caps sit inside it (M5: $3 of new spend).
+
 `AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$2.38** after M5 (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
 
 ## M2 notes
@@ -74,10 +76,10 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Owner decisions (2026-10-20, after the follow-ups): splitter fix approved incl. Tier 1 re-run (done: 66 fresh calls, $0.039); content-filter rule-baseline scoring is policy; Atelectasis stays a documented finding, plus an all-labels `uncertain` = positive sensitivity row (`artifacts/tables/labelling_summary.md`); Tier 0 serving match described as in-sample in the README.
 
 ## M5 notes
-- Owner rules (2026-10-20): Tier 2 only on FAIL reports (211); agent never sees expert codes / eval mentions / folds / metrics (`tests/test_repair_leakage.py`); $3 new-spend cap for the run (the client's $5 total stop also applied); pre-committed evaluation and keep/drop rule (`docs/evaluation_notes.md`); Tier 1 prompt and pipeline rules unchanged.
+- Owner rules (2026-10-20): Tier 2 only on FAIL reports (211); agent never sees expert codes / eval mentions / folds / metrics (`tests/test_repair_leakage.py`); $3 new-spend cap for the run (the client's stop at 50% of MAX_LLM_USD = $10 total also applied; an earlier note said $5, which was wrong); pre-committed evaluation and keep/drop rule (`docs/evaluation_notes.md`); Tier 1 prompt and pipeline rules unchanged.
 - LangGraph runs the loop only; model calls go through `radlabel.llm`, extended with native tool calling (cache key gains `tools` only when used, so Tier 1 cache entries are unchanged).
 - Smoke test on 3 never-scored FAIL reports (pilot/hedged) before the full run: plumbing/cost only, no prompt change.
-- Review table: rows (report id + reasons) in `artifacts/review/review.jsonl` (git-ignored). The Postgres `review` table and `POST /review/{id}` come with the DB/API layer (M6+).
+- Review table: rows (report id + reasons) in `artifacts/review/review.jsonl` (git-ignored). Kept as JSONL for now (owner); the Postgres `review` table and `POST /review/{id}` come with M6.
 - First cache rerun showed byte differences only in per-report bookkeeping (`cost_usd`, `cached_calls`) and file order; fixed (sorted file, call cost kept on cache hits); labels/routes were identical.
 
 ## Blocked (owner action)

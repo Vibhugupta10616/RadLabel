@@ -231,7 +231,7 @@ Written and committed before any Tier 2 call (owner rules, M5).
   messages only; it never sees expert codes, eval mentions, folds or metrics (`tests/test_repair_leakage.py`).
   It may change only labels with a FAIL message. Tier 1 prompt and pipeline rules unchanged.
 - **Limits:** 6 tool calls per report (submit_fix included), 60,000 tokens per report, 4,000 completion tokens
-  per call; new spend for the whole run stops at **$3** (the client's 50%-of-`MAX_LLM_USD` stop, $5 total, applies
+  per call; new spend for the whole run stops at **$3** (the client's 50%-of-`MAX_LLM_USD` stop, $10 total with `MAX_LLM_USD=20`, applies
   too). Reports not reached keep their Tier 1 labels and go to review. Every call is cached (reruns $0).
 - **Column "LLM + verifier + Tier 2":** LLM + verifier labels; for a Tier 2 report, the agent's labels **only if
   they pass re-verification**, else the Tier 1 labels (report → review).

@@ -232,7 +232,8 @@ def main(cache_only: bool = False, smoke: int = 0) -> dict[str, Any]:
     rule = {int(x["report_id"]): {y["label"]: y["status"] for y in x["labels"]}
             for x in map(json.loads, (PRED_DIR / "rule_baseline.jsonl").open(encoding="utf-8"))}
     paired = {"tier2_minus_llm_verifier": paired_diff(it, tier2, ver),
-              "tier2_minus_rule_baseline": paired_diff(it, tier2, rule)}
+              "tier2_minus_rule_baseline": paired_diff(it, tier2, rule),
+              "tier2_minus_llm_only": paired_diff(it, tier2, {**raw, **t0})}  # owner, after M5
     d = paired["tier2_minus_llm_verifier"]
     paired["decision"] = {"keep_tier2_in_pipeline": bool(d["hi"] >= 0),
                           "rule": "keep iff Tier 2 − LLM + verifier is not significantly negative (CI hi >= 0)"}

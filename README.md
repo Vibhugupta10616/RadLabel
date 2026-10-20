@@ -545,6 +545,7 @@ Headline macro-F1 (9 labels, v1), same out-of-fold reports and the same 1,000 cl
 - Mapping v1 is lossy, and two standard labels are dropped. Results are shown under v1 and strict.
 - Some clearly stated findings were not coded, so the raw scores are a lower bound (§4.6).
 - Reports refused by the Azure content filter get no LLM output; they are scored with the rule baseline's labels and routed to review.
+- Review volume is too high for production use (share of reports routed to review, hedged vs clear, in §10); reducing it is future work.
 - About 11% of reports have redactions next to finding terms.
 - Subsets and noise adjustment depend on a rule-based eval detector, deliberately separate from the pipeline's own.
 - Rare labels have 27–49 positives in total, hence wide CIs.

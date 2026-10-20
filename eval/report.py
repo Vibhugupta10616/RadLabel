@@ -20,11 +20,44 @@ PAIRED_NAMES = {
     "llm_verifier_minus_llm_only": "LLM + verifier − LLM only",
     "tier2_minus_llm_verifier": "LLM + verifier + Tier 2 − LLM + verifier",
     "tier2_minus_rule_baseline": "LLM + verifier + Tier 2 − rule baseline",
+    "tier2_minus_llm_only": "LLM + verifier + Tier 2 − LLM only",
 }
 
 
 def _pct(x: float) -> str:
     return f"{100 * x:.1f}%"
+
+
+def _review_limitation(t2: dict[str, Any] | None) -> list[str]:
+    if t2 is None:
+        return []
+    rt = t2["routing"]
+    dist = rt["tier_distribution"]
+    return [f"- Review volume is {_pct(dist.get('review', 0) / sum(dist.values()))} of reports (hedged "
+            f"{_pct(rt['review_rate_hedged'])}, clear {_pct(rt['review_rate_clear'])}), too high for production use; "
+            "reducing it is future work."]
+
+
+def _reading(paired: dict[str, Any], t2: dict[str, Any] | None) -> list[str]:
+    """Plain-language reading of the guardrail comparisons; the wording follows the paired test, not a claim."""
+    v, t, f = (paired.get(k) for k in ("llm_verifier_minus_llm_only", "tier2_minus_llm_verifier",
+                                        "tier2_minus_llm_only"))
+    if t2 is None or v is None or t is None or f is None:
+        return []
+    if not f["ci_excludes_zero"]:
+        verdict = (f"the full pipeline **matches** LLM-only macro-F1 (difference {_fmt(f)}; the 95% CI includes 0). "
+                   "The guardrails do not improve F1 over LLM only")
+    elif f["value"] > 0:
+        verdict = f"the full pipeline is **above** LLM only by {_fmt(f)} (95% CI excludes 0)"
+    else:
+        verdict = f"the full pipeline is **below** LLM only by {_fmt(f)} (95% CI excludes 0)"
+    ch = t2["tier2_label_changes"]["all_211"]["total"]
+    dist = t2["routing"]["tier_distribution"]
+    return ["", f"**Reading.** The verifier's hedge downgrade costs {v['value']:+.3f} macro-F1 and Tier 2 recovers "
+            f"{t['value']:+.3f}, so {verdict}. What the guardrails add is label-level correction (Tier 2: "
+            f"{ch.get('wrong_to_right', 0)} labels wrong → right vs {ch.get('right_to_wrong', 0)} right → wrong) and "
+            f"routing of uncertain cases to human review ({_pct(dist.get('review', 0) / sum(dist.values()))} of "
+            "reports)."]
 
 
 def render() -> str:
@@ -44,7 +77,8 @@ def render() -> str:
         f"- {run['content_filtered']} reports refused by the Azure content filter are scored with the rule baseline's "
         "labels.",
         "- The ground truth misses some clearly stated findings, so scores are a lower bound.",
-        "- Labels describe the report text, not the images.", "",
+        "- Labels describe the report text, not the images.",
+        *_review_limitation(t2), "",
         "### Labelling (§8.1)", "",
         render_summary(systems, paired, standalone=False).rstrip(), "",
         "Per-label tables: `artifacts/tables/labelling_*.md`.", "",
@@ -55,6 +89,7 @@ def render() -> str:
     ]
     lines += [f"| {PAIRED_NAMES.get(k, k)} | {_fmt(d)} | {'yes' if d['ci_excludes_zero'] else 'no'} |"
               for k, d in paired.items()]
+    lines += _reading(paired, t2)
     lines += ["", "### Pipeline", "",
               f"- Tier 1: {run['n_reports']:,} unique report texts labelled by {', '.join(run['models_returned'])} "
               f"(prompt `{run['prompt_version']}`, temperature 0); invalid outputs {run['invalid_outputs']}; "
