@@ -204,3 +204,26 @@ $0.039 (total LLM spend $2.12); a second cache-only rerun cost $0 with byte-iden
 The 7 negation_consistency cases that disappeared (54, 884, 1250, 2492, 3414, 3497, 3887) are exactly the
 ".." / " ." cases. The remaining 13 pipeline errors are negation scope ("no X with Y", run-ons, "without
 significant interval change", "not seen on the previous exam", "normal thoracic kyphosis"); not fixed (frozen rules).
+
+## Tier 2 repair agent (M5): pre-committed before the run
+Written and committed before any Tier 2 call (owner rules, M5).
+- **Scope:** only the reports whose verified Tier 1 output has a verifier FAIL (211). Flag-only reports and the 7
+  content-filter refusals never reach Tier 2.
+- **Agent:** `src/radlabel/labelling/repair_agent.py`, prompt `repair-v1`, repair deployment gpt-5-mini
+  (`reasoning_effort` low), LangGraph loop, tools `get_sentence`, `check_negation`, `get_label_rules`,
+  `compare_sections`, `submit_fix`. Inputs: the report's sentences, its verified Tier 1 labels and the FAIL
+  messages only; it never sees expert codes, eval mentions, folds or metrics (`tests/test_repair_leakage.py`).
+  It may change only labels with a FAIL message. Tier 1 prompt and pipeline rules unchanged.
+- **Limits:** 6 tool calls per report (submit_fix included), 60,000 tokens per report, 4,000 completion tokens
+  per call; new spend for the whole run stops at **$3** (the client's 50%-of-`MAX_LLM_USD` stop, $5 total, applies
+  too). Reports not reached keep their Tier 1 labels and go to review. Every call is cached (reruns $0).
+- **Column "LLM + verifier + Tier 2":** LLM + verifier labels; for a Tier 2 report, the agent's labels **only if
+  they pass re-verification**, else the Tier 1 labels (report → review).
+- **Tests:** paired bootstrap (v1 headline macro-F1, hedged + pilot excluded, 1,000 cluster resamples) of
+  Tier 2 − LLM + verifier and Tier 2 − rule baseline. Per label on the 211: status changes, wrong→right and
+  right→wrong (present = positive vs v1 codes).
+- **Decision rule:** Tier 2 stays in the pipeline iff Tier 2 − LLM + verifier is **not significantly negative**
+  (95% CI upper bound ≥ 0). If it is negative, it stays an evaluated component, reported as such; the agent
+  prompt is not tuned on these results.
+- **Smoke test:** a plumbing/cost check on up to 3 of the 211 that are never scored (pilot or hedged), before
+  the full run; not used to change the prompt.

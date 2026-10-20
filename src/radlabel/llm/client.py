@@ -61,6 +61,7 @@ class LLMResponse(BaseModel):
     cost_usd: float = 0.0
     cached: bool = False
     filtered: bool = False  # Azure content filter refused the prompt (HTTP 400 content_filter); text is ""
+    tool_calls: list[dict[str, str]] = []  # native tool calls: {"id", "name", "arguments" (JSON string)}
 
     def json_obj(self) -> Any:
         return json.loads(self.text)
@@ -105,7 +106,7 @@ class LLMClient:
     # ---- public
     def complete(
         self,
-        messages: list[dict[str, str]],
+        messages: list[dict[str, Any]],
         role: Role = "tier1",
         *,
         deployment: str | None = None,
@@ -113,6 +114,7 @@ class LLMClient:
         max_tokens: int | None = None,
         temperature: float | None = 0.0,
         reasoning_effort: str | None = None,
+        tools: list[dict[str, Any]] | None = None,
         purpose: str = "",
     ) -> LLMResponse:
         dep, version = deployment_for(role, self.s)
@@ -121,6 +123,8 @@ class LLMClient:
         params: dict[str, Any] = {"max_tokens": max_tokens, "temperature": temperature, "json_schema": json_schema}
         if reasoning_effort is not None:  # only in the key when used, so earlier cache entries stay valid
             params["reasoning_effort"] = reasoning_effort
+        if tools is not None:  # same rule: only in the key when used
+            params["tools"] = tools
         key = hashlib.sha256(
             json.dumps([dep, version, messages, params], sort_keys=True).encode()
         ).hexdigest()
@@ -130,15 +134,16 @@ class LLMClient:
         if self.cache_only:
             raise CacheMiss(f"{dep}: no cached response for this request (cache_only mode)")
 
-        resp = self._call(dep, messages, json_schema, max_tokens, temperature, reasoning_effort)
+        resp = self._call(dep, messages, json_schema, max_tokens, temperature, reasoning_effort, tools)
         self._ledger(resp, purpose)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(resp.model_dump_json(exclude={"cached"}), encoding="utf-8")
         return resp
 
     # ---- internals
-    def _call(self, dep: str, messages: list[dict[str, str]], json_schema: dict[str, Any] | None,
-              max_tokens: int | None, temperature: float | None, reasoning_effort: str | None = None) -> LLMResponse:
+    def _call(self, dep: str, messages: list[dict[str, Any]], json_schema: dict[str, Any] | None,
+              max_tokens: int | None, temperature: float | None, reasoning_effort: str | None = None,
+              tools: list[dict[str, Any]] | None = None) -> LLMResponse:
         if dep not in PRICES:
             raise RuntimeError(f"no verified price for deployment {dep!r}; add it to PRICES first")
         budget = self.s.max_llm_usd * BUDGET_FRACTION
@@ -151,6 +156,8 @@ class LLMClient:
             kw["temperature"] = temperature
         if reasoning_effort is not None:
             kw["reasoning_effort"] = reasoning_effort
+        if tools is not None:
+            kw["tools"] = tools
         if json_schema is not None:
             kw["response_format"] = {"type": "json_schema",
                                      "json_schema": {"name": "output", "schema": json_schema, "strict": True}}
@@ -166,8 +173,11 @@ class LLMClient:
             return LLMResponse(text="", deployment=dep, model="content_filter", filtered=True)
         u = r.usage
         cached = getattr(getattr(u, "prompt_tokens_details", None), "cached_tokens", 0) or 0
+        msg = r.choices[0].message
         return LLMResponse(
-            text=r.choices[0].message.content or "", deployment=dep, model=r.model,
+            text=msg.content or "", deployment=dep, model=r.model,
+            tool_calls=[{"id": t.id, "name": t.function.name, "arguments": t.function.arguments}
+                        for t in (msg.tool_calls or [])],
             input_tokens=u.prompt_tokens, cached_input_tokens=cached, output_tokens=u.completion_tokens,
             cost_usd=cost(dep, u.prompt_tokens, cached, u.completion_tokens),
         )
@@ -201,7 +211,7 @@ class LLMClient:
             log.warning("deployment %s returned model %s (was %s): silent upgrade?", r.deployment, r.model, prev)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         row = {"ts": datetime.now(UTC).isoformat(timespec="seconds"), "purpose": purpose,
-               **r.model_dump(exclude={"text", "cached"})}
+               **r.model_dump(exclude={"text", "cached", "tool_calls"})}
         with self._lock:
             self._spent += r.cost_usd
             with (self.cache_dir / "ledger.jsonl").open("a", encoding="utf-8") as f:
@@ -227,15 +237,21 @@ class LLMClient:
 
 
 class FakeLLM(LLMClient):
-    """Deterministic stand-in for tests/offline builds: `responder(messages) -> text`. No cost, no network."""
+    """Deterministic stand-in for tests/offline builds: `responder(messages) -> text`, or a list of tool calls
+    ({"name", "arguments"}). No cost, no network."""
 
-    def __init__(self, responder: Callable[[list[dict[str, str]]], str], cache_dir: Path,
+    def __init__(self, responder: Callable[[list[dict[str, Any]]], str | list[dict[str, str]]], cache_dir: Path,
                  settings: Settings | None = None) -> None:
         super().__init__(settings or Settings(_env_file=None), cache_dir)  # type: ignore[call-arg]
         self.responder = responder
         self.calls = 0
 
-    def _call(self, dep: str, messages: list[dict[str, str]], json_schema: dict[str, Any] | None,
-              max_tokens: int | None, temperature: float | None, reasoning_effort: str | None = None) -> LLMResponse:
+    def _call(self, dep: str, messages: list[dict[str, Any]], json_schema: dict[str, Any] | None,
+              max_tokens: int | None, temperature: float | None, reasoning_effort: str | None = None,
+              tools: list[dict[str, Any]] | None = None) -> LLMResponse:
         self.calls += 1
-        return LLMResponse(text=self.responder(messages), deployment=dep, model="fake")
+        out = self.responder(messages)
+        if isinstance(out, list):
+            calls = [{"id": f"call_{self.calls}_{i}", **c} for i, c in enumerate(out)]
+            return LLMResponse(text="", deployment=dep, model="fake", tool_calls=calls)
+        return LLMResponse(text=out, deployment=dep, model="fake")

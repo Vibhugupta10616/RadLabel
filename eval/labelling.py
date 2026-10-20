@@ -28,7 +28,7 @@ import numpy as np
 from eval.bootstrap import bootstrap_ci, f1
 from eval.cv import load_folds
 from radlabel.labels import HEADLINE, LABELS, NO_FINDING, RARE
-from radlabel.results import write_result
+from radlabel.results import RESULTS_DIR, write_result
 
 log = logging.getLogger(__name__)
 PROC = Path("data/processed")
@@ -238,6 +238,23 @@ def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any]) -
     return "\n".join(lines)
 
 
+SYSTEM_NAMES = {"rule_baseline": "Rule baseline", "llm_only": "LLM only", "llm_verifier": "LLM + verifier",
+                "llm_verifier_tier2": "LLM + verifier + Tier 2"}
+PAIRED_FILES = ("labelling_paired_diffs", "labelling_tier2_paired_diffs")
+
+
+def write_summary() -> None:
+    """Render the §8.1 summary from every labelling results file present (one column per system built so far)."""
+    def load(name: str) -> dict[str, Any] | None:
+        f = RESULTS_DIR / f"{name}.json"
+        return json.loads(f.read_text(encoding="utf-8"))["results"] if f.exists() else None
+
+    systems = {label: r for key, label in SYSTEM_NAMES.items() if (r := load(f"labelling_{key}")) is not None}
+    paired = {k: v for f in PAIRED_FILES for k, v in (load(f) or {}).items()}
+    TABLES.mkdir(parents=True, exist_ok=True)
+    (TABLES / "labelling_summary.md").write_text(render_summary(systems, paired), encoding="utf-8")
+
+
 def run_rule_baseline() -> dict[int, dict[str, str]]:
     from eval.baselines.rule_baseline import label_report
     from radlabel.preprocess.sentences import Sentence
@@ -416,10 +433,7 @@ def main(system: str) -> dict[str, Any]:
         write_result("labelling_paired_diffs", paired, fold="oof", mapping_version="v1", eval_version="eval_v1.2",
                      metric="headline macro-F1 (9 labels), hedged + pilot excluded", n_boot=N_BOOT)
         (TABLES / "labelling_paired_diffs.md").write_text(render_paired(paired), encoding="utf-8")
-        rule_res = json.loads((Path("artifacts/results") / "labelling_rule_baseline.json").read_text())["results"]
-        (TABLES / "labelling_summary.md").write_text(
-            render_summary({"Rule baseline": rule_res, "LLM only": llm_only, "LLM + verifier": llm_ver}, paired),
-            encoding="utf-8")
+        write_summary()
         return {"llm_only": llm_only, "llm_verifier": llm_ver, "run": stats}
     raise SystemExit(f"unknown system {system!r}")
 
