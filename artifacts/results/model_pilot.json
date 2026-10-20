@@ -1,0 +1,153 @@
+{
+ "provenance": {
+  "git_commit": "d3804b406d5d67cc53d56467d238ce6291bed5a4-dirty",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "pilot:fold0-inner-val",
+  "created": "2026-10-20T08:32:45+00:00"
+ },
+ "results": {
+  "n_reports": 102,
+  "n_scored_non_hedged": 96,
+  "sample": "fold-0 inner-validation clusters (training folds of fold 0)",
+  "prompt_version": "tier1-v1",
+  "candidates": {
+   "gpt-4.1-mini": {
+    "invalid_rate": 0.0,
+    "verifier_fail_rate": 0.9607843137254902,
+    "cost_usd": 0.06287039999999998,
+    "cost_per_report_usd": 0.0006163764705882351,
+    "mean_input_tokens": 1604.1960784313726,
+    "mean_output_tokens": 217.12745098039215,
+    "models_returned": [
+     "gpt-4.1-mini-2025-04-14"
+    ],
+    "settings": {
+     "temperature": 0.0,
+     "reasoning_effort": null
+    },
+    "spent_this_model_usd": 0.06287039999999992,
+    "macro_f1_headline": {
+     "value": 0.8704093581851511,
+     "lo": 0.7415680357749703,
+     "hi": 0.9449890743857664
+    },
+    "per_label_f1": {
+     "No Finding": 0.8085106382978723,
+     "Cardiomegaly": 0.9565217391304348,
+     "Lung Opacity": 0.896551724137931,
+     "Lung Lesion": 0.6666666666666666,
+     "Atelectasis": 0.8888888888888888,
+     "Pleural Effusion": 0.8888888888888888,
+     "Fracture": 0.8571428571428571,
+     "Support Devices": 0.9166666666666666,
+     "Other Abnormality": 0.9538461538461539,
+     "Edema": 1.0,
+     "Pleural Other": 1.0,
+     "Consolidation": 1.0,
+     "Pneumothorax": 1.0
+    }
+   },
+   "gpt-5.4-mini": {
+    "invalid_rate": 0.0,
+    "verifier_fail_rate": 0.8725490196078431,
+    "cost_usd": 0.1448655,
+    "cost_per_report_usd": 0.00142025,
+    "mean_input_tokens": 1603.1960784313726,
+    "mean_output_tokens": 219.7058823529412,
+    "models_returned": [
+     "gpt-5.4-mini-2026-03-17"
+    ],
+    "settings": {
+     "temperature": 0.0,
+     "reasoning_effort": "none"
+    },
+    "spent_this_model_usd": 0.14486550000000006,
+    "macro_f1_headline": {
+     "value": 0.8050948045247662,
+     "lo": 0.7048370294998882,
+     "hi": 0.8640707791279044
+    },
+    "per_label_f1": {
+     "No Finding": 0.8163265306122449,
+     "Cardiomegaly": 0.9166666666666666,
+     "Lung Opacity": 0.8484848484848485,
+     "Lung Lesion": 0.3076923076923077,
+     "Atelectasis": 0.8888888888888888,
+     "Pleural Effusion": 0.8888888888888888,
+     "Fracture": 0.75,
+     "Support Devices": 0.88,
+     "Other Abnormality": 0.948905109489051,
+     "Edema": 1.0,
+     "Pleural Other": 0.8,
+     "Consolidation": 1.0,
+     "Pneumothorax": 1.0
+    }
+   },
+   "gpt-5.4-nano": {
+    "invalid_rate": 0.0,
+    "verifier_fail_rate": 0.9019607843137255,
+    "cost_usd": 0.04076089999999999,
+    "cost_per_report_usd": 0.0003996166666666666,
+    "mean_input_tokens": 1603.1960784313726,
+    "mean_output_tokens": 229.4313725490196,
+    "models_returned": [
+     "gpt-5.4-nano-2026-03-17"
+    ],
+    "settings": {
+     "temperature": 0.0,
+     "reasoning_effort": "none"
+    },
+    "spent_this_model_usd": 0.04076090000000032,
+    "macro_f1_headline": {
+     "value": 0.8171503524636816,
+     "lo": 0.7231797521197032,
+     "hi": 0.8754566161555081
+    },
+    "per_label_f1": {
+     "No Finding": 0.5333333333333333,
+     "Cardiomegaly": 0.9565217391304348,
+     "Lung Opacity": 0.8571428571428571,
+     "Lung Lesion": 0.5,
+     "Atelectasis": 0.8888888888888888,
+     "Pleural Effusion": 0.8888888888888888,
+     "Fracture": 1.0,
+     "Support Devices": 0.8,
+     "Other Abnormality": 0.9295774647887324,
+     "Edema": 1.0,
+     "Pleural Other": 1.0,
+     "Consolidation": 1.0,
+     "Pneumothorax": 1.0
+    }
+   }
+  },
+  "rule_baseline": {
+   "macro_f1_headline": {
+    "value": 0.8068356033988534,
+    "lo": 0.6776547899526134,
+    "hi": 0.8711924730108846
+   }
+  },
+  "pilot_spend_usd": 0.2484968000000003,
+  "llm_spend_total_usd": 0.3195227500000003
+ }
+}

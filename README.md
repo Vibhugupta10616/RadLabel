@@ -264,12 +264,12 @@ Invariants:
 
 | Check | Rule |
 |---|---|
-| Evidence exists | every `present`/`absent`/`uncertain` label cites ≥ 1 valid sentence ID |
-| Evidence mentions label | a cited sentence contains an alias of the label (`[REDACTED]`-adjacent → flag, not fail) |
+| Evidence exists | every `present`/`absent`/`uncertain` label cites ≥ 1 valid sentence ID; invalid IDs fail; `absent` with no evidence → **flag** (implied absence; M4, owner-approved) |
+| Evidence mentions label | `present`/`uncertain`: a cited sentence contains an alias of the label, else **fail**. `absent`: passes if a cited sentence names the label **or** contains a label-scoped normal phrase (`src/radlabel/labelling/normal_phrases.yaml`, e.g. Consolidation ← "clear lungs", Fracture ← "no acute osseous"), else **flag**. Other Abnormality (open-ended label) → flag. A cited sentence containing `[REDACTED]` → flag (the label word may be redacted). (Changed after the M4 pilot, owner-approved.) |
 | Negation consistency | a `present` label whose only cited sentences are negated in the same clause → fail |
 | Hedge consistency | a `present` label whose only evidence is hedged → convert to `uncertain` and flag |
-| No Finding exclusivity | No Finding `present` ⇒ every other label ≠ `present` |
-| Section rule | Impression overrides Findings **only on an explicit same-label contradiction**. "No acute cardiopulmonary abnormality" does **not** cancel specific Findings. Unit test: Findings "mild cardiomegaly" + Impression "no acute disease" → Cardiomegaly stays `present`. |
+| No Finding exclusivity | No Finding `present` ⇒ every other label ≠ `present`. No Finding is **derived in code** (present iff no other label is present/uncertain, else not_mentioned); a model's No Finding value is ignored (M4). |
+| Section rule | Impression overrides Findings **only on an explicit same-label contradiction**. "No acute cardiopulmonary abnormality" does **not** cancel specific Findings. Unit test: Findings "mild cardiomegaly" + Impression "no acute disease" → Cardiomegaly stays `present`. A disagreement is a **flag** (→ review), not a fail: on the M4 pilot the LLM was right in 26 of 39 such disagreements (owner's pre-committed rule; `docs/evaluation_notes.md`). |
 
 - **Tier 2 repair agent** (`repair_agent.py`, LangGraph): receives the verifier messages and uses tools `get_sentence(id)`, `check_negation(id)`, `get_label_rules(label)`, `compare_sections(label)` and `submit_fix(labels)`. At most 6 tool calls and a token budget per report; uses a larger model if configured. The result is re-verified.
 - **Tier 3:** still failing, or escalated because of hedging → row in the `review` table; `POST /review/{id}` resumes that report's thread.

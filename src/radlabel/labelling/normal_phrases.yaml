@@ -1,0 +1,25 @@
+# Label-scoped normal phrases (owner decision, M4): an `absent` label PASSES the evidence check when a cited
+# sentence names the label OR contains one of these phrases for that label; otherwise it is FLAGGED (not failed).
+# Matched as substrings of the normalised sentence (lower-case, punctuation -> space; see aliases.normalise).
+# Written from general radiology phrasing; kept small. Labels without an entry can only pass by naming the label.
+lungs_clear: &lungs_clear [lungs are clear, lung are clear, clear lungs, lungs clear, lungs are otherwise clear,
+                           no focal airspace disease, no focal consolidation, no acute pulmonary]
+no_acute_cp: &no_acute_cp [no acute cardiopulmonary, no active cardiopulmonary, no acute disease,
+                           no acute abnormality]
+pleura_clear: &pleura_clear [pleural spaces are clear, no pleural abnormality, costophrenic angles are sharp,
+                             costophrenic angles are clear]
+labels:
+  Lung Opacity: [*lungs_clear, *no_acute_cp]
+  Consolidation: [*lungs_clear, *no_acute_cp]
+  Atelectasis: [*lungs_clear]
+  Edema: [*lungs_clear, *no_acute_cp, pulmonary vasculature is normal, pulmonary vascularity is normal,
+          pulmonary vasculature is within normal limits]
+  Lung Lesion: [*lungs_clear]
+  Pleural Effusion: [*no_acute_cp, *pleura_clear]
+  Pneumothorax: [*no_acute_cp, *pleura_clear, *lungs_clear]
+  Pleural Other: [*pleura_clear]
+  Fracture: [no acute osseous, no acute bony, osseous structures are intact, bony structures are intact,
+             no fracture]
+  Cardiomegaly: [cardiomediastinal silhouette is normal, cardiomediastinal silhouette is within normal limits,
+                 cardiomediastinal silhouette and pulmonary vasculature are within normal limits,
+                 normal cardiomediastinal silhouette, cardiomediastinal contours are normal]

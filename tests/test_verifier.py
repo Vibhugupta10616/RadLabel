@@ -54,11 +54,52 @@ def test_section_rule_generic_impression_does_not_cancel_findings() -> None:
     r = run("Mild cardiomegaly.", "No acute disease.", ("Cardiomegaly", "present", ["F1"]))
     assert r.status("Cardiomegaly") == "present" and passed(r)
     r = run("Mild cardiomegaly.", "No acute disease.", ("Cardiomegaly", "absent", ["I1"]))
-    assert ("section_rule", "fail") in checks(r)  # generic Impression can't cancel a specific finding
+    assert ("section_rule", "flag") in checks(r)  # generic Impression can't cancel a specific finding -> review
 
 
 def test_section_rule_explicit_contradiction_wins() -> None:
     r = run("Questionable small effusion. Effusion at the left base.", "No pleural effusion.",
             ("Pleural Effusion", "present", ["F2"]))
-    assert ("section_rule", "fail") in checks(r)
+    assert ("section_rule", "flag") in checks(r)
     assert passed(run("Effusion at the left base.", "No pleural effusion.", ("Pleural Effusion", "absent", ["I1"])))
+
+
+def test_absent_evidence_normal_phrase_passes_else_flags() -> None:
+    r = run("The lungs are clear.", "", ("Consolidation", "absent", ["F1"]))
+    assert not r.verifier_messages                                 # label-scoped normal phrase
+    r = run("No acute osseous abnormality.", "", ("Fracture", "absent", ["F1"]))
+    assert not r.verifier_messages
+    r = run("The heart is normal in size.", "", ("Fracture", "absent", ["F1"]))
+    assert ("evidence_mentions_label", "flag") in checks(r) and passed(r)   # absent -> flag, never fail
+    r = run("The lungs are clear.", "", ("Consolidation", "present", ["F1"]))
+    assert ("evidence_mentions_label", "fail") in checks(r)       # present still needs the label
+
+
+def test_no_finding_is_derived_not_checked() -> None:
+    from radlabel.labelling.schema import derive_no_finding
+
+    out = ReportLabels(report_id="t", labels=[LabelOut(label="No Finding", status="absent", evidence=["F9"]),
+                                              LabelOut(label="Edema", status="uncertain", evidence=["F1"])])
+    assert derive_no_finding(out).status("No Finding") == "not_mentioned"
+    out = ReportLabels(report_id="t", labels=[LabelOut(label="Edema", status="absent", evidence=["F1"])])
+    d = derive_no_finding(out)
+    assert d.status("No Finding") == "present"
+    assert not [m for m in verify(d, report_sentences("No edema.", "")).verifier_messages if m.label == "No Finding"]
+
+
+def test_rule_a_absent_without_evidence_flags() -> None:
+    r = run("Lungs are clear.", "", ("Support Devices", "absent", []))
+    assert ("evidence_exists", "flag") in checks(r) and passed(r)
+    assert ("evidence_exists", "fail") in checks(run("Lungs are clear.", "", ("Support Devices", "present", [])))
+
+
+def test_rule_b_other_abnormality_evidence_flags() -> None:
+    r = run("Enlarged pulmonary arteries.", "", ("Other Abnormality", "present", ["F1"]))
+    assert ("evidence_mentions_label", "flag") in checks(r) and passed(r)
+
+
+def test_rule_d_redacted_evidence_flags() -> None:
+    r = run("Midline sternotomy [REDACTED].", "", ("Support Devices", "present", ["F1"]))
+    assert ("evidence_mentions_label", "flag") in checks(r) and passed(r)
+    r = run("Midline sternotomy changes.", "", ("Support Devices", "present", ["F1"]))
+    assert ("evidence_mentions_label", "fail") in checks(r)

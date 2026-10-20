@@ -3,6 +3,7 @@
 from radlabel.llm.client import (
     PRICES,
     BudgetExceeded,
+    CacheMiss,
     FakeLLM,
     LLMClient,
     LLMResponse,
@@ -10,4 +11,5 @@ from radlabel.llm.client import (
     spent_usd,
 )
 
-__all__ = ["PRICES", "BudgetExceeded", "FakeLLM", "LLMClient", "LLMResponse", "deployment_for", "spent_usd"]
+__all__ = ["PRICES", "BudgetExceeded", "CacheMiss", "FakeLLM", "LLMClient", "LLMResponse", "deployment_for",
+           "spent_usd"]

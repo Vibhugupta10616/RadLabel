@@ -42,3 +42,15 @@ def test_offline_without_key_fails_clearly(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="AZURE_OPENAI_API_KEY"):
         llm.complete(MSG)
     assert LLMResponse(text="", deployment="d", model="m").cost_usd == 0
+
+
+def test_cache_only_never_calls(tmp_path: Path) -> None:
+    from radlabel.llm import CacheMiss
+
+    FakeLLM(lambda m: "x", tmp_path).complete(MSG)
+    llm = FakeLLM(lambda m: "x", tmp_path)
+    llm.cache_only = True
+    assert llm.complete(MSG).cached
+    with pytest.raises(CacheMiss):
+        llm.complete([{"role": "user", "content": "new"}])
+    assert llm.calls == 0

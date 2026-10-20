@@ -1,6 +1,8 @@
 """Labelling evaluation (README §8.1) on out-of-fold predictions.
 
 Unit: one report per exact normalised text (3,086); 95% CIs by bootstrap over duplicate clusters.
+- The 102 Tier 1 pilot reports (data/splits/pilot_ids.txt) are excluded from every score here (owner, M4);
+  the all-reports headline macro-F1 is reported once as a sensitivity check.
 - Headline: per-label F1 / precision / recall for the 9 headline labels + macro-F1, `hedged` excluded,
   under v1 and strict (strict: v1-only positives of a label are left out of that label's scoring).
 - Rare: each rare label (CI, n) + pooled rare micro-F1. `hedged` is excluded here too (same rule as headline).
@@ -48,6 +50,10 @@ class Items:
         sub = {n: {int(x) for x in (SUBSETS / f"{n}.txt").read_text().split()}
                for n in ("abnormal", "hedged", "redaction_adjacent")}
         self.subset = {n: np.array([i in s for i in self.ids]) for n, s in sub.items()}
+        # Tier 1 pilot reports (M4): used for model choice, so excluded from headline out-of-fold metrics
+        pilot_file = SUBSETS.parent / "pilot_ids.txt"
+        pilot = {int(x) for x in pilot_file.read_text().split()} if pilot_file.exists() else set()
+        self.pilot = np.array([i in pilot for i in self.ids])
         self.ignored_only = np.array([exp[i]["ignored_only"] for i in self.ids])
         def col(key: str, lab: str) -> np.ndarray:
             return np.array([lab in exp[i][key] for i in self.ids])
@@ -101,8 +107,11 @@ def score_block(it: Items, pred: dict[str, np.ndarray], mapping: str, keep: np.n
 def evaluate(it: Items, statuses: dict[int, dict[str, str]]) -> dict[str, Any]:
     present = {lab: np.array([statuses[i].get(lab) == "present" for i in it.ids]) for lab in LABELS}
     pres_unc = {lab: np.array([statuses[i].get(lab) in ("present", "uncertain") for i in it.ids]) for lab in LABELS}
-    clear = ~it.subset["hedged"]
+    clear = ~it.subset["hedged"] & ~it.pilot  # pilot reports excluded (owner, M4); sensitivity below
     res: dict[str, Any] = {m: score_block(it, present, m, clear, LABELS) for m in ("v1", "strict")}
+    res["sensitivity_all_reports_incl_pilot"] = {
+        "v1_macro_f1_headline": score_block(it, present, "v1", ~it.subset["hedged"], HEADLINE)["macro_f1_headline"]}
+    res["n_pilot_excluded"] = int((it.pilot & ~it.subset["hedged"]).sum())
     res["subsets"] = {
         "abnormal": score_block(it, present, "v1", clear & it.subset["abnormal"], HEADLINE),
         "redaction_adjacent": score_block(it, present, "v1", clear & it.subset["redaction_adjacent"], HEADLINE),
@@ -132,8 +141,10 @@ def _fmt(d: dict[str, float]) -> str:
 
 def render(name: str, res: dict[str, Any]) -> str:
     lines = [f"# Labelling: {name}", "",
-             f"Out-of-fold, one report per exact text (n = {res['n_items']}, {res['n_hedged_excluded']} hedged "
-             "excluded); 95% bootstrap CIs over clusters.", ""]
+             f"Out-of-fold, one report per exact text (n = {res['n_items']}; {res['n_hedged_excluded']} hedged and "
+             f"{res['n_pilot_excluded']} Tier 1 pilot reports excluded); 95% bootstrap CIs over clusters.", "",
+             "Sensitivity, all reports incl. pilot: v1 headline macro-F1 "
+             f"{_fmt(res['sensitivity_all_reports_incl_pilot']['v1_macro_f1_headline'])}", ""]
     for m in ("v1", "strict"):
         b = res[m]
         lines += [f"## Mapping {m}", "", "| Label | F1 (95% CI) | Precision | Recall | n |", "|---|---|---|---|---|"]

@@ -10,7 +10,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M1 | **Done** (tag `m1-data`) | Owner-approved 2026-10-20. Numbers below. eval_v1.2 lexicon/termset **permanently frozen**. |
 | M2 | **Done** (owner-approved 2026-10-20) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
 | M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. |
-| M4 | in progress (pilot first) | |
+| M4 | **Stopped: verifier fail rate after the rule change is 46% (> 20%), waiting for owner** | `artifacts/results/model_pilot.json`. Pilot spend $0.2485; total LLM spend $0.3195. Open: Q-M4-1 (verifier vs implicit absence), Q-M4-2 (pilot items are test items of folds 1–4). |
 | M5–M11 | not started | |
 
 ## Decisions (owner)
@@ -39,7 +39,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | Role | Deployment | Model returned |
 |---|---|---|
 | Tier 1 | gpt-4.1-mini | `gpt-4.1-mini-2025-04-14` |
-| Fallback | gpt-5.4-mini | **404 DeploymentNotFound** |
+| Fallback | gpt-5.4-mini | `gpt-5.4-mini-2026-03-17` (works since 2026-10-20) |
 | Repair / agents | gpt-5-mini | `gpt-5-mini-2025-08-07` |
 | Cheap | gpt-5.4-nano | `gpt-5.4-nano-2026-03-17` |
 
@@ -56,8 +56,16 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Rule baseline verifier messages: 13 `evidence_exists` fails (No Finding predicted present in reports with no No-Finding phrase to cite).
 - Pipeline/eval vocabulary overlap: 46 identical entries; accepted (D5).
 
+## M4 notes
+- Pilot: 102 reports (96 non-hedged scored) from fold-0 inner-validation clusters; temperature 0; GPT-5.x with reasoning_effort "none".
+- Process slip: 5 probe calls went directly through the SDK (not `radlabel.llm`); cost ~$0.00006, logged in the ledger after the fact.
+- Owner decisions (2026-10-20): Tier 1 = gpt-4.1-mini (chosen on pilot, CIs overlap); No Finding derived in code; absent-evidence rule (normal_phrases.yaml, else flag); pilot reports excluded from headline OOF metrics (+ all-reports sensitivity); prompt `tier1-v1` frozen; `openai` importable only in `radlabel.llm` (test).
+- Follow-up (cache only, $0 new spend): gpt-4.1-mini macro-F1 LLM-only 0.886, paired diff vs rule baseline +0.079 (-0.053 to 0.224); Lung Lesion support in the scored pilot: 2. Report fail rate 46% / flag rate 73% → stop (item 2c).
+- (resolved) **Q-M4-1:** 87–96% of pilot outputs fail the verifier, almost all `evidence_mentions_label` on `absent` labels: the models cite generic sentences ("Clear lungs.", "No acute disease.") as evidence of absence, and No Finding `absent` cites abnormal sentences. Scoring is unaffected (only `present` counts), but Tier 2 would receive ~90% of reports.
+- **Q-M4-2:** pilot reports come from fold 0's training folds but are test items in folds 1–4 (30/20/26/26).
+- Sentence split misses "[REDACTED].In ..." (no space after the period).
+
 ## Blocked (owner action)
-- **gpt-5.4-mini returns 404.** Check that the deployment name is exactly `gpt-5.4-mini`, on the same resource as `AZURE_OPENAI_ENDPOINT`. Needed for the Tier 1 fallback and the M4 pilot.
 - Docker not installed. Needed before M5.
 
 ## Notes

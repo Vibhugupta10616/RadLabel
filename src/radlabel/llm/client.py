@@ -15,6 +15,7 @@ import hashlib
 import json
 import logging
 import random
+import threading
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -43,6 +44,10 @@ MAX_RATE_LIMIT_WAIT_S = 3600
 
 class BudgetExceeded(RuntimeError):
     pass
+
+
+class CacheMiss(RuntimeError):
+    """Raised in cache_only mode instead of making a fresh (paid) call."""
 
 
 class LLMResponse(BaseModel):
@@ -81,11 +86,19 @@ def spent_usd(cache_dir: Path) -> float:
 
 
 class LLMClient:
-    def __init__(self, settings: Settings | None = None, cache_dir: Path | None = None) -> None:
+    def __init__(self, settings: Settings | None = None, cache_dir: Path | None = None,
+                 cache_only: bool = False) -> None:
+        self.cache_only = cache_only
         self.s = settings or get_settings()
         self.cache_dir = Path(cache_dir or self.s.llm_cache_dir)
         self._sdk: Any = None
         self._models: dict[str, str] = {}
+        self._lock = threading.Lock()  # thread-safe ledger and running spend (callers may use a thread pool)
+        self._spent = spent_usd(self.cache_dir)
+
+    @property
+    def spent(self) -> float:
+        return self._spent
 
     # ---- public
     def complete(
@@ -97,20 +110,25 @@ class LLMClient:
         json_schema: dict[str, Any] | None = None,
         max_tokens: int | None = None,
         temperature: float | None = 0.0,
+        reasoning_effort: str | None = None,
         purpose: str = "",
     ) -> LLMResponse:
         dep, version = deployment_for(role, self.s)
         if deployment:  # e.g. the Tier 1 pilot; version unknown -> recorded from the response
             dep, version = deployment, ""
-        params = {"max_tokens": max_tokens, "temperature": temperature, "json_schema": json_schema}
+        params: dict[str, Any] = {"max_tokens": max_tokens, "temperature": temperature, "json_schema": json_schema}
+        if reasoning_effort is not None:  # only in the key when used, so earlier cache entries stay valid
+            params["reasoning_effort"] = reasoning_effort
         key = hashlib.sha256(
             json.dumps([dep, version, messages, params], sort_keys=True).encode()
         ).hexdigest()
         path = self.cache_dir / dep / f"{key}.json"
         if path.exists():
             return LLMResponse(**json.loads(path.read_text(encoding="utf-8")), cached=True)
+        if self.cache_only:
+            raise CacheMiss(f"{dep}: no cached response for this request (cache_only mode)")
 
-        resp = self._call(dep, messages, json_schema, max_tokens, temperature)
+        resp = self._call(dep, messages, json_schema, max_tokens, temperature, reasoning_effort)
         self._ledger(resp, purpose)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(resp.model_dump_json(exclude={"cached"}), encoding="utf-8")
@@ -118,17 +136,19 @@ class LLMClient:
 
     # ---- internals
     def _call(self, dep: str, messages: list[dict[str, str]], json_schema: dict[str, Any] | None,
-              max_tokens: int | None, temperature: float | None) -> LLMResponse:
+              max_tokens: int | None, temperature: float | None, reasoning_effort: str | None = None) -> LLMResponse:
         if dep not in PRICES:
             raise RuntimeError(f"no verified price for deployment {dep!r}; add it to PRICES first")
         budget = self.s.max_llm_usd * BUDGET_FRACTION
-        if spent_usd(self.cache_dir) >= budget:
+        if self._spent >= budget:
             raise BudgetExceeded(f"LLM spend reached ${budget:.2f} (50% of MAX_LLM_USD): owner approval needed")
         kw: dict[str, Any] = {"model": dep, "messages": messages}
         if max_tokens is not None:
             kw["max_completion_tokens"] = max_tokens
         if temperature is not None:
             kw["temperature"] = temperature
+        if reasoning_effort is not None:
+            kw["reasoning_effort"] = reasoning_effort
         if json_schema is not None:
             kw["response_format"] = {"type": "json_schema",
                                      "json_schema": {"name": "output", "schema": json_schema, "strict": True}}
@@ -170,8 +190,10 @@ class LLMClient:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         row = {"ts": datetime.now(UTC).isoformat(timespec="seconds"), "purpose": purpose,
                **r.model_dump(exclude={"text", "cached"})}
-        with (self.cache_dir / "ledger.jsonl").open("a", encoding="utf-8") as f:
-            f.write(json.dumps(row) + "\n")
+        with self._lock:
+            self._spent += r.cost_usd
+            with (self.cache_dir / "ledger.jsonl").open("a", encoding="utf-8") as f:
+                f.write(json.dumps(row) + "\n")
 
     @property
     def sdk(self) -> Any:
@@ -202,6 +224,6 @@ class FakeLLM(LLMClient):
         self.calls = 0
 
     def _call(self, dep: str, messages: list[dict[str, str]], json_schema: dict[str, Any] | None,
-              max_tokens: int | None, temperature: float | None) -> LLMResponse:
+              max_tokens: int | None, temperature: float | None, reasoning_effort: str | None = None) -> LLMResponse:
         self.calls += 1
         return LLMResponse(text=self.responder(messages), deployment=dep, model="fake")

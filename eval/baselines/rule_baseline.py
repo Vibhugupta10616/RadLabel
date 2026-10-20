@@ -2,13 +2,13 @@
 
 Per label, over all sentences: an affirmed mention (asserted, not negated, not hedged) -> present, unless the
 Impression explicitly contradicts it (section rule); else a hedged non-negated mention -> uncertain; else a
-negated mention -> absent; else not_mentioned. No Finding is present iff no other label is present or uncertain.
+negated mention -> absent; else not_mentioned. No Finding is derived (schema.derive_no_finding).
 Evidence = the sentence IDs of the deciding mentions.
 """
 
 from __future__ import annotations
 
-from radlabel.labelling.schema import LabelOut, ReportLabels
+from radlabel.labelling.schema import LabelOut, ReportLabels, derive_no_finding
 from radlabel.labelling.verifier import verify
 from radlabel.labels import LABELS, NO_FINDING
 from radlabel.preprocess.negation import Mention, mentions
@@ -38,9 +38,4 @@ def label_report(report_id: str, sentences: list[Sentence]) -> ReportLabels:
         else:
             status, ev = "not_mentioned", []
         out.append(LabelOut(label=lab, status=status, evidence=sorted({s.id for s, _ in ev})))  # type: ignore[arg-type]
-    if any(x.status in ("present", "uncertain") for x in out):
-        out.insert(0, LabelOut(label=NO_FINDING, status="not_mentioned"))
-    else:
-        nf_ev = sorted({s.id for s, m in ments if m.label == NO_FINDING})
-        out.insert(0, LabelOut(label=NO_FINDING, status="present", evidence=nf_ev))
-    return verify(ReportLabels(report_id=report_id, labels=out), sentences)
+    return verify(derive_no_finding(ReportLabels(report_id=report_id, labels=out)), sentences)

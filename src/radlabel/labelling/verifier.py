@@ -1,22 +1,43 @@
 """Deterministic verifier (README §6.2). Every check has unit tests (tests/test_verifier.py).
 
 | Check                   | Rule                                                                              |
-| evidence_exists         | present/absent/uncertain cite >= 1 valid sentence ID                              |
-| evidence_mentions_label | a cited sentence contains an alias of the label; [REDACTED] within 2 words of a   |
-|                         | finding term -> flag, not fail                                                    |
+| evidence_exists         | present/absent/uncertain cite >= 1 valid sentence ID; invalid IDs fail; absent    |
+|                         | with no evidence -> flag                                                          |
+| evidence_mentions_label | present/uncertain: a cited sentence contains an alias of the label, else fail;    |
+|                         | absent: alias OR a label-scoped normal phrase (normal_phrases.yaml), else flag;   |
+|                         | Other Abnormality (open-ended) -> flag; a cited sentence with [REDACTED] -> flag  |
 | negation_consistency    | present, but every cited mention of the label is negated -> fail                  |
 | hedge_consistency       | present, but the only cited evidence is hedged -> converted to uncertain + flag   |
-| no_finding_exclusivity  | No Finding present => no other label present                                      |
+| no_finding_exclusivity  | No Finding present => no other label present (No Finding is derived in code, see |
+|                         | schema.derive_no_finding, so its own evidence is not checked)                     |
 | section_rule            | Impression overrides Findings only on an explicit same-label contradiction;       |
-|                         | "no acute disease" never cancels specific Findings                                |
+|                         | "no acute disease" never cancels specific Findings. Disagreement -> FLAG (review) |
 """
 
 from __future__ import annotations
 
+from functools import lru_cache
+from pathlib import Path
+
+import yaml
+
 from radlabel.labelling.schema import LabelOut, ReportLabels, VerifierMessage
-from radlabel.labels import NO_FINDING
+from radlabel.labels import NO_FINDING, OTHER
+from radlabel.preprocess.aliases import normalise
 from radlabel.preprocess.negation import Mention, mentions, redaction_adjacent
 from radlabel.preprocess.sentences import Sentence
+from radlabel.preprocess.text import REDACTED
+
+NORMAL_PHRASES = Path(__file__).with_name("normal_phrases.yaml")
+
+
+@lru_cache
+def normal_phrases() -> dict[str, list[str]]:
+    d = yaml.safe_load(NORMAL_PHRASES.read_text(encoding="utf-8"))["labels"]
+
+    def flat(x: object) -> list[str]:
+        return [y for v in x for y in flat(v)] if isinstance(x, list) else [str(x)]
+    return {lab: [normalise(p) for p in flat(v)] for lab, v in d.items()}
 
 
 def _msg(check: str, label: str, level: str, detail: str) -> VerifierMessage:
@@ -33,20 +54,31 @@ def verify(out: ReportLabels, sentences: list[Sentence]) -> ReportLabels:
     for lo in out.labels:
         lo = lo.model_copy()
         lab = lo.label
-        if lo.status != "not_mentioned":
+        if lo.status != "not_mentioned" and lab != NO_FINDING:  # No Finding is derived, not claimed
             valid = [e for e in lo.evidence if e in by_id]
-            if not valid or len(valid) != len(lo.evidence):
-                bad = sorted(set(lo.evidence) - set(by_id))
-                msgs.append(_msg("evidence_exists", lab, "fail",
-                                 f"invalid sentence IDs {bad}" if bad else "no evidence cited"))
+            bad = sorted(set(lo.evidence) - set(by_id))
+            if bad:
+                msgs.append(_msg("evidence_exists", lab, "fail", f"invalid sentence IDs {bad}"))
+            elif not valid:  # (A) absent with no evidence = implied absence -> flag; present/uncertain -> fail
+                msgs.append(_msg("evidence_exists", lab, "flag" if lo.status == "absent" else "fail",
+                                 "no evidence cited"))
             cited = [m for e in valid for m in ments[e] if m.label == lab]
             if valid and not cited:
-                if any(redaction_adjacent(by_id[e].text) for e in valid):
+                normal = normal_phrases().get(lab, [])
+                if lo.status == "absent" and any(p in normalise(by_id[e].text) for e in valid for p in normal):
+                    pass  # absence supported by a label-scoped normal statement ("clear lungs")
+                elif lab == OTHER:  # (B) open-ended label: no alias list can be complete
+                    msgs.append(_msg("evidence_mentions_label", lab, "flag", "no alias cited (open-ended label)"))
+                elif any(REDACTED in by_id[e].text for e in valid) or any(
+                        redaction_adjacent(by_id[e].text) for e in valid):  # (D) the label word may be redacted
                     msgs.append(_msg("evidence_mentions_label", lab, "flag",
-                                     "no alias in cited sentences; [REDACTED] next to a finding term"))
+                                     "no alias in cited sentences; cited sentence contains [REDACTED]"))
+                elif lo.status == "absent":
+                    msgs.append(_msg("evidence_mentions_label", lab, "flag",
+                                     "absent: cited sentences neither name the label nor state a normal finding"))
                 else:
                     msgs.append(_msg("evidence_mentions_label", lab, "fail", "no alias in cited sentences"))
-            if lo.status == "present" and lab != NO_FINDING and cited:
+            if lo.status == "present" and cited:
                 if all(m.negated for m in cited):
                     msgs.append(_msg("negation_consistency", lab, "fail", "only negated mentions cited"))
                 elif not any(m.affirmed for m in cited) and any(m.hedged and not m.negated for m in cited):
@@ -55,7 +87,8 @@ def verify(out: ReportLabels, sentences: list[Sentence]) -> ReportLabels:
         if lab != NO_FINDING:
             sec = section_rule(lab, lo.status, sentences, ments)
             if sec:
-                msgs.append(_msg("section_rule", lab, "fail", sec))
+                # (C) flag -> review, not repair: on the pilot the LLM was right in 26/39 disagreements (owner rule)
+                msgs.append(_msg("section_rule", lab, "flag", sec))
         labels.append(lo)
 
     if any(x.label == NO_FINDING and x.status == "present" for x in labels):

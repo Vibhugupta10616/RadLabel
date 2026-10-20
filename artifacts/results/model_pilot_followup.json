@@ -1,0 +1,102 @@
+{
+ "provenance": {
+  "git_commit": "d3804b406d5d67cc53d56467d238ce6291bed5a4-dirty",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "pilot:fold0-inner-val",
+  "created": "2026-10-20T08:55:15+00:00"
+ },
+ "results": {
+  "n_reports": 102,
+  "n_scored_non_hedged": 96,
+  "chosen_tier1": "gpt-4.1-mini",
+  "choice_note": "chosen on pilot, CIs overlap",
+  "lung_lesion_positive_support_scored": 2,
+  "candidates": {
+   "gpt-4.1-mini": {
+    "macro_f1_llm_only": 0.8861303983742764,
+    "macro_f1_llm_verifier": 0.8750883003756567,
+    "paired_diff_vs_rule_baseline": {
+     "value": 0.07929479497542302,
+     "lo": -0.053388119262657505,
+     "hi": 0.22353602943900758
+    },
+    "report_fail_rate": 0.06862745098039216,
+    "report_flag_rate": 0.8529411764705882,
+    "fails_by_check": {
+     "evidence_mentions_label": 6,
+     "negation_consistency": 1
+    },
+    "flags_by_check": {
+     "hedge_consistency": 4,
+     "evidence_mentions_label": 177,
+     "evidence_exists": 35,
+     "section_rule": 18
+    }
+   },
+   "gpt-5.4-mini": {
+    "macro_f1_llm_only": 0.8199474122345168,
+    "macro_f1_llm_verifier": 0.8090046512917558,
+    "paired_diff_vs_rule_baseline": {
+     "value": 0.01311180883566343,
+     "lo": -0.08372893551653689,
+     "hi": 0.11120314294524322
+    },
+    "report_fail_rate": 0.14705882352941177,
+    "report_flag_rate": 0.6568627450980392,
+    "fails_by_check": {
+     "evidence_mentions_label": 14,
+     "negation_consistency": 2
+    },
+    "flags_by_check": {
+     "hedge_consistency": 5,
+     "evidence_mentions_label": 90,
+     "section_rule": 10
+    }
+   },
+   "gpt-5.4-nano": {
+    "macro_f1_llm_only": 0.8604551957685249,
+    "macro_f1_llm_verifier": 0.8485695811936946,
+    "paired_diff_vs_rule_baseline": {
+     "value": 0.05361959236967151,
+     "lo": -0.04539456035734372,
+     "hi": 0.15280175350596117
+    },
+    "report_fail_rate": 0.19607843137254902,
+    "report_flag_rate": 0.6666666666666666,
+    "fails_by_check": {
+     "evidence_exists": 55,
+     "evidence_mentions_label": 9,
+     "negation_consistency": 2
+    },
+    "flags_by_check": {
+     "hedge_consistency": 6,
+     "evidence_mentions_label": 92,
+     "section_rule": 11,
+     "evidence_exists": 10
+    }
+   }
+  },
+  "rule_baseline_macro_f1": 0.8068356033988534,
+  "new_llm_spend_usd": 0.0
+ }
+}

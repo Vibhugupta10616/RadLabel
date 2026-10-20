@@ -1,0 +1,427 @@
+{
+ "provenance": {
+  "git_commit": "d3804b406d5d67cc53d56467d238ce6291bed5a4-dirty",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "pilot:fold0-inner-val",
+  "created": "2026-10-20T08:54:47+00:00"
+ },
+ "results": {
+  "n_disagreements": 39,
+  "llm_right": 26,
+  "pipeline_right": 13,
+  "decision": "apply C (section_rule -> flag)",
+  "rule": "pre-committed by owner: LLM right in >= half of the disagreements -> apply C",
+  "rows": [
+   {
+    "model": "gpt-4.1-mini",
+    "report": 240,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 520,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 746,
+    "label": "Cardiomegaly",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 746,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 1080,
+    "label": "Lung Opacity",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": true,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 1166,
+    "label": "Atelectasis",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 1715,
+    "label": "Lung Lesion",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2088,
+    "label": "Support Devices",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2088,
+    "label": "Pleural Other",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2112,
+    "label": "Lung Opacity",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2330,
+    "label": "Other Abnormality",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2469,
+    "label": "Lung Opacity",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2778,
+    "label": "Lung Lesion",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2891,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 2954,
+    "label": "Pleural Effusion",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 3418,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 3613,
+    "label": "Cardiomegaly",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-4.1-mini",
+    "report": 3614,
+    "label": "Edema",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 240,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 520,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 746,
+    "label": "Cardiomegaly",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 1166,
+    "label": "Atelectasis",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 2088,
+    "label": "Pleural Other",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 2112,
+    "label": "Lung Opacity",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 2891,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 2954,
+    "label": "Pleural Effusion",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 3418,
+    "label": "Other Abnormality",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-5.4-mini",
+    "report": 3614,
+    "label": "Edema",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 240,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 746,
+    "label": "Cardiomegaly",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 746,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 1166,
+    "label": "Atelectasis",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 2088,
+    "label": "Pleural Other",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 2112,
+    "label": "Fracture",
+    "llm": "not_mentioned",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 2330,
+    "label": "Other Abnormality",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 2891,
+    "label": "Lung Opacity",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 2954,
+    "label": "Pleural Effusion",
+    "llm": "uncertain",
+    "pipeline": "present",
+    "ground_truth": true,
+    "hedged_report": false,
+    "right": "pipeline"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 3613,
+    "label": "Cardiomegaly",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   },
+   {
+    "model": "gpt-5.4-nano",
+    "report": 3614,
+    "label": "Edema",
+    "llm": "absent",
+    "pipeline": "present",
+    "ground_truth": false,
+    "hedged_report": false,
+    "right": "llm"
+   }
+  ]
+ }
+}
