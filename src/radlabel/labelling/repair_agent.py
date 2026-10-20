@@ -98,6 +98,7 @@ class RepairResult(BaseModel):
     tokens: int
     cost_usd: float  # cost of the calls as made (cache hits keep it), so the result is the same on every rerun
     cached_calls: int  # run-specific
+    models: list[str]  # model versions returned (cache hits keep them)
     ignored_changes: int
     submitted: list[LabelOut] | None
 
@@ -110,6 +111,7 @@ class _State(TypedDict):
     cached_calls: int
     cost: float
     names: list[str]
+    models: list[str]
     fix: list[dict[str, Any]] | None
     stop: str
 
@@ -164,7 +166,8 @@ def repair(llm: LLMClient, report_id: str, sentences: list[Sentence], verified: 
                          reasoning_effort=REASONING_EFFORT, purpose=f"repair:{PROMPT_VERSION}")
         upd: dict[str, Any] = {"llm_calls": st["llm_calls"] + 1, "cached_calls": st["cached_calls"] + r.cached,
                                "tokens": st["tokens"] + r.input_tokens + r.output_tokens,
-                               "cost": st["cost"] + r.cost_usd}  # original call cost, also when served from cache
+                               "cost": st["cost"] + r.cost_usd,  # original call cost, also when served from cache
+                               "models": sorted({*st["models"], r.model})}
         if r.filtered:
             return {**upd, "stop": "content_filtered"}
         if not r.tool_calls:
@@ -209,7 +212,7 @@ def repair(llm: LLMClient, report_id: str, sentences: list[Sentence], verified: 
     g.add_conditional_edges("tools", lambda st: END if st["stop"] else "agent")
     init: _State = {"messages": [{"role": "system", "content": REPAIR_SYSTEM},
                                  {"role": "user", "content": user_message(sentences, verified)}],
-                    "calls": 0, "tokens": 0, "llm_calls": 0, "cached_calls": 0, "cost": 0.0, "names": [],
+                    "calls": 0, "tokens": 0, "llm_calls": 0, "cached_calls": 0, "cost": 0.0, "names": [], "models": [],
                     "fix": None, "stop": ""}
     st = g.compile().invoke(init, {"recursion_limit": 4 * MAX_TOOL_CALLS + 4})
 
@@ -237,4 +240,4 @@ def repair(llm: LLMClient, report_id: str, sentences: list[Sentence], verified: 
     return RepairResult(report_id=report_id, final=final, route=final.route, stop=st["stop"], accepted=accepted,
                         tool_calls=st["calls"], tool_names=st["names"], llm_calls=st["llm_calls"],
                         tokens=st["tokens"], cost_usd=st["cost"], cached_calls=st["cached_calls"],
-                        ignored_changes=ignored, submitted=submitted)
+                        ignored_changes=ignored, submitted=submitted, models=st["models"])

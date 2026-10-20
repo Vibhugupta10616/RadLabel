@@ -200,7 +200,7 @@ def main(cache_only: bool = False, smoke: int = 0) -> dict[str, Any]:
     tier2_stats = {
         "deployment": llm.s.azure_openai_repair_deployment, "prompt_version": PROMPT_VERSION,
         "reasoning_effort": REASONING_EFFORT, "max_tool_calls": MAX_TOOL_CALLS, "max_report_tokens": MAX_REPORT_TOKENS,
-        "models_returned": sorted({m for m in llm._models.values()}) or "all cached",
+        "models_returned": sorted({m for r in results.values() for m in r.models}),
         "tier2_reports": len(fail_ids), "attempted": len(rr), "not_run": dict(Counter(skipped.values())),
         "accepted": sum(r.accepted for r in rr), "repair_success_rate": sum(r.accepted for r in rr) / len(fail_ids),
         "stop_reasons": dict(Counter(r.stop for r in rr)), "content_filtered": sum(r.stop == "content_filtered"

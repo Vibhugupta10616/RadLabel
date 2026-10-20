@@ -2,7 +2,7 @@
 
 - Items = duplicate clusters (3,073); a cluster's label vector is the union of the v1 expert labels of
   its exact-text representatives (the metrics unit), over all 13 labels.
-- Iterative stratification: `iterstrat` MultilabelStratifiedKFold (the CLAUDE.md fallback: scikit-multilearn
+- Iterative stratification: `iterstrat` MultilabelStratifiedKFold (the README §4.2 fallback: scikit-multilearn
   0.2.0 can't take a seed with scikit-learn >= 1.x). Seed = SEED.
 - Inner validation: per test fold k, a stratified 10% of fold k's training clusters (seed SEED + k).
 

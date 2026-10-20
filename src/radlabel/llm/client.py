@@ -4,7 +4,7 @@
   and CI needs no API calls. Cache files hold report text: `LLM_CACHE_DIR` is git-ignored.
 - Ledger (`<cache>/ledger.jsonl`): one line per fresh call with tokens, cost and the `model` field the
   API returned. A changed `model` for a deployment logs a warning (silent upgrades).
-- Budget: fresh calls stop at 50% of MAX_LLM_USD (CLAUDE.md hard stop #5); the owner raises it.
+- Budget: fresh calls stop at 50% of MAX_LLM_USD (README §7.1); the owner raises it explicitly.
 - 429: wait (Retry-After if given, else exponential) and retry; never surfaces as a failed label.
 - Deployments without a verified price are refused (README §7.1).
 """
@@ -38,7 +38,7 @@ PRICES: dict[str, tuple[float, float, float]] = {
     "gpt-5.4-mini": (0.75, 0.075, 4.50),
     "gpt-5.4-nano": (0.20, 0.02, 1.25),
 }
-BUDGET_FRACTION = 0.5  # ponytail: hard stop at 50% of MAX_LLM_USD; owner raises it explicitly
+BUDGET_FRACTION = 0.5  # fresh calls stop at 50% of MAX_LLM_USD; the owner raises it explicitly
 MAX_RATE_LIMIT_WAIT_S = 3600
 MAX_CONNECTION_RETRIES = 8  # ~6 min of back-off before the caller sees the error
 

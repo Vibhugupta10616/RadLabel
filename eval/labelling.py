@@ -214,7 +214,7 @@ def render_paired(p: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any]) -> str:
+def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any], standalone: bool = True) -> str:
     """README §8.1 ablation table (systems built so far). Headline rows first; the sensitivity row is labelled."""
     rows: list[tuple[str, Callable[[dict[str, Any]], str]]] = [
         ("Headline macro-F1, 9 labels (v1)", lambda r: _fmt(r["v1"]["macro_f1_headline"])),
@@ -228,13 +228,14 @@ def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any]) -
          lambda r: _fmt(r["sensitivity_all_reports_incl_pilot"]["v1_macro_f1_headline"])),
     ]
     names = list(systems)
-    lines = ["# Labelling summary (README §8.1)", "",
-             "Out-of-fold, one report per exact text; hedged and Tier 1 pilot reports excluded unless stated; "
+    lines = ["# Labelling summary (README §8.1)", ""] if standalone else []
+    lines += ["Out-of-fold, one report per exact text; hedged and Tier 1 pilot reports excluded unless stated; "
              "95% bootstrap CIs over clusters. Scoring: `present` = positive, except in the sensitivity row.", "",
              "| Metric | " + " | ".join(names) + " |", "|---|" + "---|" * len(names)]
     lines += [f"| {k} | " + " | ".join(f(systems[n]) for n in names) + " |" for k, f in rows]
-    lines += ["", "Paired differences (headline macro-F1, v1): "
-              + "; ".join(f"{k.replace('_minus_', ' − ')} {_fmt(d)}" for k, d in paired.items()), ""]
+    if standalone:
+        lines += ["", "Paired differences (headline macro-F1, v1): "
+                  + "; ".join(f"{k.replace('_minus_', ' − ')} {_fmt(d)}" for k, d in paired.items()), ""]
     return "\n".join(lines)
 
 
@@ -243,16 +244,21 @@ SYSTEM_NAMES = {"rule_baseline": "Rule baseline", "llm_only": "LLM only", "llm_v
 PAIRED_FILES = ("labelling_paired_diffs", "labelling_tier2_paired_diffs")
 
 
-def write_summary() -> None:
-    """Render the §8.1 summary from every labelling results file present (one column per system built so far)."""
-    def load(name: str) -> dict[str, Any] | None:
-        f = RESULTS_DIR / f"{name}.json"
-        return json.loads(f.read_text(encoding="utf-8"))["results"] if f.exists() else None
+def load_result(name: str) -> dict[str, Any] | None:
+    f = RESULTS_DIR / f"{name}.json"
+    return json.loads(f.read_text(encoding="utf-8"))["results"] if f.exists() else None
 
-    systems = {label: r for key, label in SYSTEM_NAMES.items() if (r := load(f"labelling_{key}")) is not None}
-    paired = {k: v for f in PAIRED_FILES for k, v in (load(f) or {}).items()}
+
+def summary_inputs() -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Every labelling results file present (one column per system built so far) and all paired differences."""
+    systems = {label: r for key, label in SYSTEM_NAMES.items() if (r := load_result(f"labelling_{key}")) is not None}
+    paired = {k: v for f in PAIRED_FILES for k, v in (load_result(f) or {}).items()}
+    return systems, paired
+
+
+def write_summary() -> None:
     TABLES.mkdir(parents=True, exist_ok=True)
-    (TABLES / "labelling_summary.md").write_text(render_summary(systems, paired), encoding="utf-8")
+    (TABLES / "labelling_summary.md").write_text(render_summary(*summary_inputs()), encoding="utf-8")
 
 
 def run_rule_baseline() -> dict[int, dict[str, str]]:

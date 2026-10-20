@@ -2,6 +2,22 @@
 
 Decisions that shape how numbers are computed. Results come only from `eval/` scripts.
 
+## Output vs evaluation policy (same text as README §6.2)
+- System output is four-valued: `present | uncertain | absent | not_mentioned`, representing what the report text says.
+- Headline evaluation binarises it: `present` = positive, everything else = negative, against the expert codes.
+  The "`uncertain` = positive" row is a sensitivity check, not the headline metric (on the `hedged` subset both
+  policies are reported).
+- The verifier's hedge downgrade (`present` → `uncertain`) is product policy (hedged statements go to review). Its
+  cost (−0.006 headline macro-F1, LLM + verifier − LLM only; mostly "borderline cardiomegaly", which the expert
+  codes treat as present) is reported as a known disagreement with the expert coding policy.
+- The Atelectasis gap to the rule baseline comes from the LLM's own `uncertain` outputs (e.g. "scarring or
+  atelectasis"), not from the verifier.
+- The absent-evidence rules (`absent` with no or generic evidence → flag) affect routing only, never scores.
+- Checked against every eval script (M5): `eval/labelling.py` (all systems, subsets, negation_only, paired
+  bootstrap), `eval/pilot.py`, `eval/m4_analysis.py`, `eval/repair.py` (label changes, escalation precision) all
+  score `present` as the only positive; the only exceptions are the labelled sensitivity row and the hedged-subset
+  "uncertain = present" policy. No script deviates.
+
 ## Counting unit and CIs
 - One report per exact normalised text (3,086); clusters (3,073) decide fold assignment only.
 - 95% CIs: 1,000 bootstrap resamples over duplicate clusters (`eval/bootstrap.py`).

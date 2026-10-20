@@ -1,4 +1,4 @@
-"""The only way to call an LLM (CLAUDE.md): cached, cost-logged, budget-capped, 429-tolerant."""
+"""The only way to call an LLM (README §5, invariant 3): cached, cost-logged, budget-capped, 429-tolerant."""
 
 from radlabel.llm.client import (
     PRICES,

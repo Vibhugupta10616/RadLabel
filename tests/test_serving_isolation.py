@@ -1,4 +1,4 @@
-"""Invariant: serving code never reads expert labels (CLAUDE.md ground rule 1, README §5)."""
+"""Invariant: serving code never reads expert labels (README §5, invariant 1)."""
 
 import re
 from pathlib import Path

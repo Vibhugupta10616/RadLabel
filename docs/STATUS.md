@@ -9,16 +9,16 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M0 | **Done** (`4af0dea`; Docker check 2026-10-20) | Owner accepted the direct commands in place of `make test`. `docker compose up -d --wait`: postgres, qdrant, redis healthy (Docker 29.9.1, Compose v5.6.0). |
 | M1 | **Done** (tag `m1-data`) | Owner-approved 2026-10-20. Numbers below. eval_v1.2 lexicon/termset **permanently frozen**. |
 | M2 | **Done** (owner-approved 2026-10-20) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
-| M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. |
+| M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; numbers at M3 (pre-splitter): macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. Current, after the M4 splitter fix: v1 0.838, strict 0.829, rare 0.742 (README §10). |
 | M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
 | M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
-| M6–M11 | not started | |
+| M6–M11 | planned | |
 
 ## Decisions (owner)
 - **D1 (2026-10-20): nothing is tuned per label.** Every tuned parameter (Tier 0 patterns, refusal threshold, embedding checkpoint, any rule-baseline setting) is ONE global value, selected on a pooled metric (macro-F1 or nDCG over the 9 headline labels) on inner validation. Rare labels are never used for selection.
 - **D2 (2026-10-20): gpt-5.4-mini is missing access.** If it still returns 404 at M4, run the Tier 1 pilot with gpt-4.1-mini and gpt-5.4-nano, and use gpt-5-mini as the Tier 1 fallback.
 - D3: strict-label fold balance accepted; iterstrat accepted.
-- D4: CLAUDE.md stays in the pushed history (`origin/main` was at `dacd923` when checked); no history rewrite.
+- D4: no history rewrite and no force push; the pushed history stays as is.
 - **D5 (M3): pipeline/eval vocabulary overlap accepted** (README §11 limitation). The pipeline alias list is **frozen** at the M3 commit (alias-set hash pinned in `tests/test_alias_freeze.py`); any later change needs owner OK and may only be based on training-fold error analysis, never on out-of-fold or test results.
 - D6 (M3): `hedged` is excluded from rare-label scores and from the abnormal / redaction_adjacent subset scores, as for headline scores.
 - D7 (M3): noise-adjusted scores (README §4.6, Stretch) skipped for now.
@@ -44,10 +44,10 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | Repair / agents | gpt-5-mini | `gpt-5-mini-2025-08-07` |
 | Cheap | gpt-5.4-nano | `gpt-5.4-nano-2026-03-17` |
 
-`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far: **$0.0710** (ledger `artifacts/llm_cache/ledger.jsonl`).
+`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$2.38** after M5 (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
 
 ## M2 notes
-- `iterstrat` (CLAUDE.md fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
+- `iterstrat` (README §4.2 fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
 - Stratified on the 13 **v1** labels. Strict labels are not stratified: strict Lung Opacity per fold 78–87 (equal share 81.2).
 - Inner validation (10% of training clusters) has only **2** Consolidation and **2** Pneumothorax positives per fold (Edema 4, Pleural Other 4): per-label thresholds tuned there will be noisy for rare labels.
 - Bootstrap CI utility: `eval/bootstrap.py` (1,000 resamples over clusters).
@@ -64,11 +64,11 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Follow-up (cache only, $0 new spend): gpt-4.1-mini macro-F1 LLM-only 0.886, paired diff vs rule baseline +0.079 (-0.053 to 0.224); Lung Lesion support in the scored pilot: 2. Report fail rate 46% / flag rate 73% → stop (item 2c).
 - (resolved) **Q-M4-1:** 87–96% of pilot outputs fail the verifier, almost all `evidence_mentions_label` on `absent` labels: the models cite generic sentences ("Clear lungs.", "No acute disease.") as evidence of absence, and No Finding `absent` cites abnormal sentences. Scoring is unaffected (only `present` counts), but Tier 2 would receive ~90% of reports.
 - **Q-M4-2:** pilot reports come from fold 0's training folds but are test items in folds 1–4 (30/20/26/26).
-- (fixed in `cd215fa`) Sentence split missed "[REDACTED].In ...". Still not split: "..", " ." (known issue, `docs/evaluation_notes.md`).
+- (fixed) Sentence splitting: "[REDACTED].In ..." fixed in `cd215fa`; "..", " ." fixed in `b2d2045` (M4, owner-approved, Tier 1 re-run; before/after in `docs/evaluation_notes.md`).
 
 - Full run: 7 reports refused by Azure's content filter (violence, medium); handled as filtered, cached, routed to review. Two runs were interrupted (content-filter 400, then a network error); client/run hardened; completed responses were cached, so no call was paid twice.
 - `negation_only` FP pairs now exclude the pilot reports (6,164 pairs): rule 41, LLM 6.
-- Owner follow-ups (2026-10-20), all cache-only, $0: paired bootstrap; Atelectasis analysis (57 of 59 LLM FNs are `uncertain` on "scarring or atelectasis"-type alternatives); verifier-column drop explained (hedge conversions, mostly "borderline cardiomegaly"); content-filtered → rule-baseline fallback (default, not owner-decided); `negation_consistency` → flag (pipeline wrong in 20/23, owner's pre-committed rule). Details: `docs/evaluation_notes.md`, `artifacts/results/m4_analysis.json`.
+- Owner follow-ups (2026-10-20), all cache-only, $0: paired bootstrap; Atelectasis analysis (57 of 59 LLM FNs are `uncertain` on "scarring or atelectasis"-type alternatives); verifier-column drop explained (hedge conversions, mostly "borderline cardiomegaly"); content-filtered reports scored with rule-baseline labels (policy, owner-confirmed); `negation_consistency` → flag (pipeline wrong in 20/23, owner's pre-committed rule). Details: `docs/evaluation_notes.md`, `artifacts/results/m4_analysis.json`.
 - Tier 0 per fold: 67–81 patterns, 0 OOF hits (exact duplicates share a cluster → fold). Serving patterns: 96.
 - Review: 785 escalations (25.4%); M5+ error analysis uses a random sample of ~50.
 - Owner decisions (2026-10-20, after the follow-ups): splitter fix approved incl. Tier 1 re-run (done: 66 fresh calls, $0.039); content-filter rule-baseline scoring is policy; Atelectasis stays a documented finding, plus an all-labels `uncertain` = positive sensitivity row (`artifacts/tables/labelling_summary.md`); Tier 0 serving match described as in-sample in the README.
@@ -84,7 +84,6 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.
 
 ## Notes
-- CLAUDE.md is untracked (`607d1ed`) but remains in the M0 commit's history; no history rewrite (owner decides).
 - No commit contains a Co-Authored-By trailer (checked 2026-10-20).
 - `.venv`: stdlib venv on uv-managed CPython 3.11.15, packages via `uv pip --python`. `make` not installed; run the Makefile commands directly.
 - Data source: Wayback raw capture (Open-i serving a maintenance page). SHA-256 verified.

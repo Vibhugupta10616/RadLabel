@@ -12,5 +12,5 @@ jobs:
         with:
           python-version: "3.11"
       - uses: astral-sh/setup-uv@v3
-      - run: make setup EXTRAS=dev
+      - run: make setup EXTRAS=dev,eval
       - run: make test

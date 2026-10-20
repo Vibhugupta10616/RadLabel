@@ -1,4 +1,4 @@
-"""CLAUDE.md: every LLM call goes through src/radlabel/llm/. Nothing else may import the openai SDK."""
+"""README §5, invariant 3: every LLM call goes through src/radlabel/llm/. Nothing else may import the openai SDK."""
 
 import re
 from pathlib import Path

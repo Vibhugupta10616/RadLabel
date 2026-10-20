@@ -39,3 +39,6 @@ folds:
 
 label-eval:
 	$(PY) -m eval.labelling rule_baseline
+
+report:
+	$(PY) -m eval.report
