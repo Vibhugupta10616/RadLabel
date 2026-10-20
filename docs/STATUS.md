@@ -11,7 +11,8 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M2 | **Done** (owner-approved 2026-10-20) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
 | M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. |
 | M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
-| M5–M11 | not started | |
+| M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
+| M6–M11 | not started | |
 
 ## Decisions (owner)
 - **D1 (2026-10-20): nothing is tuned per label.** Every tuned parameter (Tier 0 patterns, refusal threshold, embedding checkpoint, any rule-baseline setting) is ONE global value, selected on a pooled metric (macro-F1 or nDCG over the 9 headline labels) on inner validation. Rare labels are never used for selection.
@@ -71,6 +72,13 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Tier 0 per fold: 67–81 patterns, 0 OOF hits (exact duplicates share a cluster → fold). Serving patterns: 96.
 - Review: 785 escalations (25.4%); M5+ error analysis uses a random sample of ~50.
 - Owner decisions (2026-10-20, after the follow-ups): splitter fix approved incl. Tier 1 re-run (done: 66 fresh calls, $0.039); content-filter rule-baseline scoring is policy; Atelectasis stays a documented finding, plus an all-labels `uncertain` = positive sensitivity row (`artifacts/tables/labelling_summary.md`); Tier 0 serving match described as in-sample in the README.
+
+## M5 notes
+- Owner rules (2026-10-20): Tier 2 only on FAIL reports (211); agent never sees expert codes / eval mentions / folds / metrics (`tests/test_repair_leakage.py`); $3 new-spend cap for the run (the client's $5 total stop also applied); pre-committed evaluation and keep/drop rule (`docs/evaluation_notes.md`); Tier 1 prompt and pipeline rules unchanged.
+- LangGraph runs the loop only; model calls go through `radlabel.llm`, extended with native tool calling (cache key gains `tools` only when used, so Tier 1 cache entries are unchanged).
+- Smoke test on 3 never-scored FAIL reports (pilot/hedged) before the full run: plumbing/cost only, no prompt change.
+- Review table: rows (report id + reasons) in `artifacts/review/review.jsonl` (git-ignored). The Postgres `review` table and `POST /review/{id}` come with the DB/API layer (M6+).
+- First cache rerun showed byte differences only in per-report bookkeeping (`cost_usd`, `cached_calls`) and file order; fixed (sorted file, call cost kept on cache hits); labels/routes were identical.
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.

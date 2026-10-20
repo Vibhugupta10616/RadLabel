@@ -227,3 +227,32 @@ Written and committed before any Tier 2 call (owner rules, M5).
   prompt is not tuned on these results.
 - **Smoke test:** a plumbing/cost check on up to 3 of the 211 that are never scored (pilot or hedged), before
   the full run; not used to change the prompt.
+
+## Tier 2 results (M5)
+`artifacts/results/labelling_llm_verifier_tier2.json`, `labelling_tier2_paired_diffs.json`,
+`artifacts/tables/labelling_summary.md`, `artifacts/tables/tier2_changes.md` (`python -m eval.repair`).
+gpt-5-mini-2025-08-07; new spend $0.26 (smoke $0.003 + run $0.257); total LLM spend $2.38. Rerun from cache: $0.
+
+- **Run:** 211 / 211 attempted, all ended with `submit_fix` (no tool-cap, token-cap or budget stops; 0 content-filter
+  refusals, 0 errors). Mean 1.97 tool calls (submit_fix 211, get_label_rules 160, get_sentence 42,
+  check_negation 3). The agent never tried to change a label without a FAIL.
+- **Repair success** (fix passes re-verification): **78 / 211 (37.0%)**. 36 of the 78 still go to review because of
+  a review flag, so 42 end as `tier2_repaired`.
+- The 133 not accepted keep their Tier 1 labels. In 114 failing labels the agent resubmitted the Tier 1 status
+  (48 of them `present` and expert-positive: correct answers the frozen alias list cannot confirm, e.g.
+  "heart is large"); in 32 it changed the status but the fix still failed.
+- **Paired bootstrap:** Tier 2 − LLM + verifier **+0.006 (0.003 to 0.009)**; Tier 2 − rule baseline **+0.025
+  (0.010 to 0.040)**. **Decision rule: Tier 2 is kept in the pipeline** (not significantly negative; here
+  significantly positive). Headline macro-F1 0.862 (LLM + verifier 0.857); strict 0.865. Pooled rare micro-F1
+  0.829 vs 0.838 (one Pleural Other and one Consolidation right→wrong; CIs overlap). Tier 2's 0.86226 equals LLM
+  only's 0.86227 by coincidence: per-label F1s differ (Cardiomegaly 0.914 vs 0.946, Lung Lesion 0.614 vs 0.590).
+- **Label changes on the 211:** 75 status changes; 29 wrong→right, 5 right→wrong, 41 without score effect
+  (e.g. uncertain → not_mentioned). Scored reports only: 55 changes, 25 wrong→right, 5 right→wrong. Largest gains:
+  Support Devices 11/1, Lung Lesion 6/0, Lung Opacity 5/0. Right→wrong: No Finding 2 (derived), Support Devices 1,
+  Pleural Other 1, Consolidation 1.
+- **Routing:** tier distribution: Tier 1 accepted 2,090, Tier 2 repaired 42, review 954 (30.9%; was 785 before
+  Tier 2 existed, because the 133 not-accepted and 36 accepted-but-flagged reports now go to review). Review rate
+  **hedged 58.1% vs clear 28.2%**. Escalation precision (Tier 1 labels disagree with v1 codes on ≥ 1 label):
+  Tier 2 **64.9%**, review 51.7%, vs a base rate of 25.5% over all reports.
+- Review rows: `artifacts/review/review.jsonl` (git-ignored; IDs and reasons only). Error analysis in M6+ uses a
+  random sample of ~50 of them (owner).
