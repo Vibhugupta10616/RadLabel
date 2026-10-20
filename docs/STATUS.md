@@ -10,7 +10,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M1 | **Done** (tag `m1-data`) | Owner-approved 2026-10-20. Numbers below. eval_v1.2 lexicon/termset **permanently frozen**. |
 | M2 | **Done** (owner-approved 2026-10-20) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
 | M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. |
-| M4 | **Stopped: verifier fail rate after the rule change is 46% (> 20%), waiting for owner** | `artifacts/results/model_pilot.json`. Pilot spend $0.2485; total LLM spend $0.3195. Open: Q-M4-1 (verifier vs implicit absence), Q-M4-2 (pilot items are test items of folds 1–4). |
+| M4 | **Tier 1 full run done; Tier 0 + $0-rerun check pending** | gpt-4.1-mini over 3,086 texts: invalid 0, content-filtered 7, reports with a verifier fail 7.5% (→ Tier 2: 232), with a flag 82.0%, review escalations 770. Macro-F1 (9 headline, v1, pilot excluded): rule 0.834, LLM 0.860, LLM+verifier 0.854. Total LLM spend $2.08. |
 | M5–M11 | not started | |
 
 ## Decisions (owner)
@@ -64,6 +64,9 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - (resolved) **Q-M4-1:** 87–96% of pilot outputs fail the verifier, almost all `evidence_mentions_label` on `absent` labels: the models cite generic sentences ("Clear lungs.", "No acute disease.") as evidence of absence, and No Finding `absent` cites abnormal sentences. Scoring is unaffected (only `present` counts), but Tier 2 would receive ~90% of reports.
 - **Q-M4-2:** pilot reports come from fold 0's training folds but are test items in folds 1–4 (30/20/26/26).
 - Sentence split misses "[REDACTED].In ..." (no space after the period).
+
+- Full run: 7 reports refused by Azure's content filter (violence, medium); handled as filtered, cached, routed to review. Two runs were interrupted (content-filter 400, then a network error); client/run hardened; completed responses were cached, so no call was paid twice.
+- Known gap: `negation_only` FP pairs still include the 102 pilot reports (headline metrics exclude them).
 
 ## Blocked (owner action)
 - Docker not installed. Needed before M5.
