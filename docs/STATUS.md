@@ -8,8 +8,19 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 |---|---|---|
 | M0 | **Done except Docker** (`4af0dea`) | Owner accepted the direct commands in place of `make test`. `docker compose up` deferred; **must pass before M5**. |
 | M1 | **Done** (tag `m1-data`) | Owner-approved 2026-10-20. Numbers below. eval_v1.2 lexicon/termset **permanently frozen**. |
-| M2 | **Done** (acceptance passes; waiting for owner OK before M3) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
-| M3–M11 | not started | |
+| M2 | **Done** (owner-approved 2026-10-20) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
+| M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. |
+| M4 | in progress (pilot first) | |
+| M5–M11 | not started | |
+
+## Decisions (owner)
+- **D1 (2026-10-20): nothing is tuned per label.** Every tuned parameter (Tier 0 patterns, refusal threshold, embedding checkpoint, any rule-baseline setting) is ONE global value, selected on a pooled metric (macro-F1 or nDCG over the 9 headline labels) on inner validation. Rare labels are never used for selection.
+- **D2 (2026-10-20): gpt-5.4-mini is missing access.** If it still returns 404 at M4, run the Tier 1 pilot with gpt-4.1-mini and gpt-5.4-nano, and use gpt-5-mini as the Tier 1 fallback.
+- D3: strict-label fold balance accepted; iterstrat accepted.
+- D4: CLAUDE.md stays in the pushed history (`origin/main` was at `dacd923` when checked); no history rewrite.
+- **D5 (M3): pipeline/eval vocabulary overlap accepted** (README §11 limitation). The pipeline alias list is **frozen** at the M3 commit (alias-set hash pinned in `tests/test_alias_freeze.py`); any later change needs owner OK and may only be based on training-fold error analysis, never on out-of-fold or test results.
+- D6 (M3): `hedged` is excluded from rare-label scores and from the abnormal / redaction_adjacent subset scores, as for headline scores.
+- D7 (M3): noise-adjusted scores (README §4.6, Stretch) skipped for now.
 
 ## M1 results (`make data`, clean `data/processed`)
 | Check | Result |
@@ -39,6 +50,11 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Stratified on the 13 **v1** labels. Strict labels are not stratified: strict Lung Opacity per fold 78–87 (equal share 81.2).
 - Inner validation (10% of training clusters) has only **2** Consolidation and **2** Pneumothorax positives per fold (Edema 4, Pleural Other 4): per-label thresholds tuned there will be noisy for rare labels.
 - Bootstrap CI utility: `eval/bootstrap.py` (1,000 resamples over clusters).
+
+## M3 notes
+- Pipeline modules: `preprocess/negation.py` (NegEx-style, own cue lists), `preprocess/aliases.py` (hand + CheXpert phrases, 30% held out by a fixed SHA-1 rule, anatomy-only anchors), `labelling/schema.py`, `labelling/verifier.py` (6 checks, 7 unit tests), `eval/baselines/rule_baseline.py` (no tuned parameters), `eval/labelling.py` (§8.1).
+- Rule baseline verifier messages: 13 `evidence_exists` fails (No Finding predicted present in reports with no No-Finding phrase to cite).
+- Pipeline/eval vocabulary overlap: 46 identical entries; accepted (D5).
 
 ## Blocked (owner action)
 - **gpt-5.4-mini returns 404.** Check that the deployment name is exactly `gpt-5.4-mini`, on the same resource as `AZURE_OPENAI_ENDPOINT`. Needed for the Tier 1 fallback and the M4 pilot.

@@ -36,3 +36,6 @@ data:
 
 folds:
 	$(PY) -m eval.cv
+
+label-eval:
+	$(PY) -m eval.labelling rule_baseline

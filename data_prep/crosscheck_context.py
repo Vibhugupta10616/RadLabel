@@ -21,13 +21,14 @@ from data_prep.mapping import parse_parts
 from radlabel.labels import LABELS
 from radlabel.llm import PRICES, LLMClient, spent_usd
 from radlabel.llm.client import deployment_for
+from radlabel.preprocess.aliases import CHEXPERT_PATH
 from radlabel.results import write_result
 
 PROC = Path("data/processed")
 RUN_CAP_USD = 0.50
 MAX_TOKENS = 4000
 N_EXAMPLES = 3
-CHEXPERT = json.loads((Path(__file__).parent / "reference" / "chexpert_mentions.json").read_text(encoding="utf-8"))
+CHEXPERT = json.loads(CHEXPERT_PATH.read_text(encoding="utf-8"))
 CHEXPERT_FOR = {  # RadLabel label -> CheXpert mention files
     "Cardiomegaly": ["cardiomegaly"], "Lung Opacity": ["lung_opacity"], "Lung Lesion": ["lung_lesion"],
     "Atelectasis": ["atelectasis"], "Pleural Effusion": ["pleural_effusion"], "Fracture": ["fracture"],

@@ -486,6 +486,7 @@ _Filled in automatically from `artifacts/results/*.json` by `make report`. No nu
 - Rare labels have 27–49 positives in total, hence wide CIs.
 - Labels describe the report text, not the image.
 - The CC BY-NC-ND licence keeps models and processed data private.
+- Pipeline aliases and the eval lexicon share standard vocabulary (same author); independence comes from expert-code ground truth and separate negation detectors.
 
 ---
 
