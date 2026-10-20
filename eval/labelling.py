@@ -164,7 +164,9 @@ def evaluate(it: Items, statuses: dict[int, dict[str, str]]) -> dict[str, Any]:
 
 
 def _fmt(d: dict[str, float]) -> str:
-    return "–" if d["value"] != d["value"] else f"{d['value']:.3f} ({d['lo']:.3f}–{d['hi']:.3f})"
+    def n(x: float) -> str:
+        return f"{x:.3f}".replace("-0.000", "0.000")  # no negative zero after rounding
+    return "–" if d["value"] != d["value"] else f"{n(d['value'])} ({n(d['lo'])}–{n(d['hi'])})"
 
 
 def render(name: str, res: dict[str, Any]) -> str:

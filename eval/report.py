@@ -53,8 +53,8 @@ def _reading(paired: dict[str, Any], t2: dict[str, Any] | None) -> list[str]:
         verdict = f"the full pipeline is **below** LLM only by {_fmt(f)} (95% CI excludes 0)"
     ch = t2["tier2_label_changes"]["all_211"]["total"]
     dist = t2["routing"]["tier_distribution"]
-    return ["", f"**Reading.** The verifier's hedge downgrade costs {v['value']:+.3f} macro-F1 and Tier 2 recovers "
-            f"{t['value']:+.3f}, so {verdict}. What the guardrails add is label-level correction (Tier 2: "
+    return ["", f"**Reading.** The verifier's hedge downgrade costs {abs(v['value']):.3f} macro-F1 and Tier 2 recovers "
+            f"{t['value']:.3f}, so {verdict}. What the guardrails add is label-level correction (Tier 2: "
             f"{ch.get('wrong_to_right', 0)} labels wrong → right vs {ch.get('right_to_wrong', 0)} right → wrong) and "
             f"routing of uncertain cases to human review ({_pct(dist.get('review', 0) / sum(dist.values()))} of "
             "reports)."]

@@ -272,3 +272,13 @@ gpt-5-mini-2025-08-07; new spend $0.26 (smoke $0.003 + run $0.257); total LLM sp
   Tier 2 **64.9%**, review 51.7%, vs a base rate of 25.5% over all reports.
 - Review rows: `artifacts/review/review.jsonl` (git-ignored; IDs and reasons only). Error analysis in M6+ uses a
   random sample of ~50 of them (owner).
+
+## Guardrails vs LLM only (added after M5, owner)
+Paired bootstrap, headline macro-F1 (v1), same out-of-fold reports and resamples
+(`artifacts/results/labelling_tier2_paired_diffs.json`, key `tier2_minus_llm_only`):
+**LLM + verifier + Tier 2 − LLM only = 0.000 (−0.004 to 0.004); the CI includes 0.**
+Reading: the verifier's hedge downgrade costs about 0.006 and Tier 2 recovers about 0.006, so the full pipeline
+**matches** LLM-only F1. The guardrails do **not** improve F1 over LLM only. What they add is label-level correction
+(Tier 2: 29 labels wrong → right vs 5 right → wrong on the 211 FAIL reports) and routing of uncertain cases to human
+review (30.9% of reports; hedged 58.1% vs clear 28.2%). That review volume is too high for production use; reducing
+it is future work.
