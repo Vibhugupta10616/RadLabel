@@ -16,7 +16,9 @@ RESULTS_DIR = Path("artifacts/results")
 def git_commit() -> str:
     try:
         sha = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout
-        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+        # outputs and docs don't make the code dirty (scripts write tracked results one after another)
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no", "--", ".",
+                                ":(exclude)artifacts/results", ":(exclude)artifacts/tables", ":(exclude)docs"],
                                capture_output=True, text=True).stdout.strip()
         return sha.strip() + ("-dirty" if dirty else "")
     except (OSError, subprocess.CalledProcessError):
