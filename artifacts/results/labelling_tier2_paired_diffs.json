@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "1b274e2429a1c426d9f3ea189ed42bd1e05de50d",
+  "git_commit": "2b918f1b6a5449f3dbd542ba4a9eebd18d7db979",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-20T21:26:07+00:00",
+  "created": "2026-10-20T21:34:05+00:00",
   "eval_version": "eval_v1.2",
   "decision": {
    "keep_tier2_in_pipeline": true,

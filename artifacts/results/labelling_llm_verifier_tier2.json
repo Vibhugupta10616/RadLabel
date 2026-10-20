@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "1b274e2429a1c426d9f3ea189ed42bd1e05de50d",
+  "git_commit": "2b918f1b6a5449f3dbd542ba4a9eebd18d7db979",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1+strict",
   "fold": "oof",
-  "created": "2026-10-20T21:26:05+00:00",
+  "created": "2026-10-20T21:34:00+00:00",
   "system": "llm_verifier_tier2",
   "eval_version": "eval_v1.2",
   "llm": "gpt-4.1-mini+gpt-5-mini",
@@ -1232,7 +1232,9 @@
    "reasoning_effort": "low",
    "max_tool_calls": 6,
    "max_report_tokens": 60000,
-   "models_returned": "all cached",
+   "models_returned": [
+    "gpt-5-mini-2025-08-07"
+   ],
    "tier2_reports": 211,
    "attempted": 211,
    "not_run": {},
@@ -1253,7 +1255,7 @@
    "submitted_but_failed_reverification": 133,
    "llm_calls": 411,
    "cached_calls": 411,
-   "tier2_cost_usd": 0.2604202500000001,
+   "tier2_cost_usd": 0.26042024999999996,
    "new_spend_usd": 0.0,
    "llm_spend_total_usd": 2.381040599999997,
    "m5_new_spend_cap_usd": 3.0
