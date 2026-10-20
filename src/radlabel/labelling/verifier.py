@@ -6,7 +6,8 @@
 | evidence_mentions_label | present/uncertain: a cited sentence contains an alias of the label, else fail;    |
 |                         | absent: alias OR a label-scoped normal phrase (normal_phrases.yaml), else flag;   |
 |                         | Other Abnormality (open-ended) -> flag; a cited sentence with [REDACTED] -> flag  |
-| negation_consistency    | present, but every cited mention of the label is negated -> fail                  |
+| negation_consistency    | present, but every cited mention of the label is negated -> flag (review; M4: the |
+|                         | pipeline negation was wrong in 20/23 full-run fails, owner rule)                   |
 | hedge_consistency       | present, but the only cited evidence is hedged -> converted to uncertain + flag   |
 | no_finding_exclusivity  | No Finding present => no other label present (No Finding is derived in code, see |
 |                         | schema.derive_no_finding, so its own evidence is not checked)                     |
@@ -80,7 +81,7 @@ def verify(out: ReportLabels, sentences: list[Sentence]) -> ReportLabels:
                     msgs.append(_msg("evidence_mentions_label", lab, "fail", "no alias in cited sentences"))
             if lo.status == "present" and cited:
                 if all(m.negated for m in cited):
-                    msgs.append(_msg("negation_consistency", lab, "fail", "only negated mentions cited"))
+                    msgs.append(_msg("negation_consistency", lab, "flag", "only negated mentions cited"))
                 elif not any(m.affirmed for m in cited) and any(m.hedged and not m.negated for m in cited):
                     lo.status = "uncertain"
                     msgs.append(_msg("hedge_consistency", lab, "flag", "only hedged evidence: set to uncertain"))

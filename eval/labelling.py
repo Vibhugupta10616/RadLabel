@@ -80,12 +80,36 @@ def _ci(metric: Callable[[np.ndarray], float], clusters: np.ndarray) -> dict[str
     return {"value": point, "lo": lo, "hi": hi}
 
 
+def _elig(it: Items, mapping: str, keep: np.ndarray, labels: list[str]) -> dict[str, np.ndarray]:
+    none = np.zeros(len(it.ids), bool)
+    return {lab: keep & ~it.excluded[mapping][lab] & ~(it.ignored_only if lab == NO_FINDING else none)
+            for lab in labels}
+
+
+def _macro(gold: dict[str, np.ndarray], pred: dict[str, np.ndarray], elig: dict[str, np.ndarray],
+           labels: list[str]) -> Callable[[np.ndarray], float]:
+    return lambda i: float(np.nanmean([f1(gold[lab][i][elig[lab][i]], pred[lab][i][elig[lab][i]])
+                                       for lab in labels]))
+
+
+def paired_diff(it: Items, a: dict[int, dict[str, str]], b: dict[int, dict[str, str]]) -> dict[str, Any]:
+    """Paired bootstrap of headline macro-F1(a) - macro-F1(b), v1, on the same scored reports and resamples."""
+    keep = ~it.subset["hedged"] & ~it.pilot
+    elig, gold = _elig(it, "v1", keep, HEADLINE), it.gold["v1"]
+    ma, mb = (_macro(gold, _present(it, s), elig, HEADLINE) for s in (a, b))
+    d = _ci(lambda i: ma(i) - mb(i), it.cluster)
+    return {**d, "a": ma(np.arange(len(it.ids))), "b": mb(np.arange(len(it.ids))),
+            "ci_excludes_zero": bool(d["lo"] > 0 or d["hi"] < 0)}
+
+
+def _present(it: Items, statuses: dict[int, dict[str, str]]) -> dict[str, np.ndarray]:
+    return {lab: np.array([statuses[i].get(lab) == "present" for i in it.ids]) for lab in LABELS}
+
+
 def score_block(it: Items, pred: dict[str, np.ndarray], mapping: str, keep: np.ndarray,
                 labels: list[str]) -> dict[str, Any]:
     """Per-label F1 (+CI), headline macro-F1 (+CI) and pooled rare micro-F1 (+CI) over items `keep`."""
-    none = np.zeros(len(it.ids), bool)
-    elig = {lab: keep & ~it.excluded[mapping][lab] & ~(it.ignored_only if lab == NO_FINDING else none)
-            for lab in labels}
+    elig = _elig(it, mapping, keep, labels)
     gold = it.gold[mapping]
     out: dict[str, Any] = {"labels": {}}
     for lab in labels:
@@ -95,9 +119,7 @@ def score_block(it: Items, pred: dict[str, np.ndarray], mapping: str, keep: np.n
                               **_scores(t[m], p[m])}
     head = [lab for lab in HEADLINE if lab in labels]
     if head:
-        out["macro_f1_headline"] = _ci(
-            lambda i: float(np.nanmean([f1(gold[lab][i][elig[lab][i]], pred[lab][i][elig[lab][i]]) for lab in head])),
-            it.cluster)
+        out["macro_f1_headline"] = _ci(_macro(gold, pred, elig, head), it.cluster)
     rare = [lab for lab in RARE if lab in labels]
     if rare:
         out["rare_micro_f1"] = _ci(
@@ -107,7 +129,7 @@ def score_block(it: Items, pred: dict[str, np.ndarray], mapping: str, keep: np.n
 
 
 def evaluate(it: Items, statuses: dict[int, dict[str, str]]) -> dict[str, Any]:
-    present = {lab: np.array([statuses[i].get(lab) == "present" for i in it.ids]) for lab in LABELS}
+    present = _present(it, statuses)
     pres_unc = {lab: np.array([statuses[i].get(lab) in ("present", "uncertain") for i in it.ids]) for lab in LABELS}
     clear = ~it.subset["hedged"] & ~it.pilot  # pilot reports excluded (owner, M4); sensitivity below
     res: dict[str, Any] = {m: score_block(it, present, m, clear, LABELS) for m in ("v1", "strict")}
@@ -122,8 +144,8 @@ def evaluate(it: Items, statuses: dict[int, dict[str, str]]) -> dict[str, Any]:
     }
     abn = it.subset["abnormal"]
     neg: dict[str, Any] = {}
-    for scope in ("all", "abnormal"):
-        pairs = [(k, lab) for k, lab in it.neg_pairs if scope == "all" or abn[k]]
+    for scope in ("all", "abnormal"):  # pilot reports excluded, as in the headline metrics (owner, M4)
+        pairs = [(k, lab) for k, lab in it.neg_pairs if not it.pilot[k] and (scope == "all" or abn[k])]
         per = {lab: [present[lab][k] for k, la in pairs if la == lab] for lab in sorted({la for _, la in pairs})}
         neg[scope] = {lab: {"n_pairs": len(v), "fp": int(sum(v)), "fp_rate": sum(v) / len(v) if v else None}
                       for lab, v in per.items()}
@@ -175,6 +197,16 @@ def render(name: str, res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def render_paired(p: dict[str, Any]) -> str:
+    lines = ["# Paired bootstrap: headline macro-F1 difference (v1)", "",
+             "Same out-of-fold reports (hedged and Tier 1 pilot excluded), same cluster resamples for both systems.",
+             "", "| Comparison | A | B | A − B (95% CI) | CI excludes 0 |", "|---|---|---|---|---|"]
+    for k, d in p.items():
+        lines.append(f"| {k.replace('_minus_', ' − ')} | {d['a']:.3f} | {d['b']:.3f} | {_fmt(d)} | "
+                     f"{'yes' if d['ci_excludes_zero'] else 'no'} |")
+    return "\n".join(lines) + "\n"
+
+
 def run_rule_baseline() -> dict[int, dict[str, str]]:
     from eval.baselines.rule_baseline import label_report
     from radlabel.preprocess.sentences import Sentence
@@ -191,22 +223,53 @@ def run_rule_baseline() -> dict[int, dict[str, str]]:
     return out
 
 
-def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], dict[str, Any]]:
-    """Tier 1 (gpt-4.1-mini, prompt tier1-v1, temperature 0) over every exact-text representative. Zero-shot,
-    so every prediction is out-of-fold. Returns (LLM-only statuses, LLM+verifier statuses, run stats)."""
+def run_tier0(it: Items) -> tuple[dict[int, dict[str, str]], dict[str, Any]]:
+    """Tier 0 per fold: patterns learned on that fold's training folds only (all usable reports coded normal,
+    duplicates counted), applied to its test reports. Exact duplicates share a cluster, hence a fold, so the
+    out-of-fold hit count is 0 by construction: Tier 0 only saves calls in serving, on new copies of boilerplate."""
+    from radlabel.labelling import tier0
+
+    fold, _ = load_folds()
+    reports = list(map(json.loads, (PROC / "reports.jsonl").open(encoding="utf-8")))
+    normal = {e["id"] for e in map(json.loads, (PROC / "expert_labels.jsonl").open(encoding="utf-8"))
+              if NO_FINDING in e["v1"]}
+    hits: dict[int, dict[str, str]] = {}
+    per: dict[str, Any] = {}
+    for k in sorted(set(fold.values())):
+        pats = tier0.learn(tier0.key(r["findings"], r["impression"]) for r in reports
+                           if fold[r["cluster"]] != k and r["id"] in normal)
+        test = [r for r in reports if r["id"] == r["group_rep"] and fold[r["cluster"]] == k]
+        got = {r["id"]: tier0.label(str(r["id"]), r["findings"], r["impression"], pats) for r in test}
+        hits.update({i: {x.label: x.status for x in o.labels} for i, o in got.items() if o is not None})
+        per[str(k)] = {"patterns": len(pats), "test_reports": len(test),
+                       "test_hits": sum(o is not None for o in got.values())}
+    allp = tier0.learn(tier0.key(r["findings"], r["impression"]) for r in reports if r["id"] in normal)
+    return hits, {"min_count": tier0.MIN_COUNT, "per_fold": per, "oof_hits": len(hits),
+                  "patterns_all_reports": len(allp),
+                  "usable_reports_matching_all_report_patterns": sum(
+                      tier0.key(r["findings"], r["impression"]) in allp for r in reports)}
+
+
+def run_tier1(cache_only: bool = False, skip: frozenset[int] = frozenset()
+              ) -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], dict[str, Any]]:
+    """Tier 1 (gpt-4.1-mini, prompt tier1-v1, temperature 0) over every exact-text representative not handled by
+    Tier 0 (`skip`). Zero-shot, so every prediction is out-of-fold. Content-filtered reports are scored with the
+    rule baseline's labels (owner default, M4). Returns (LLM-only statuses, LLM+verifier statuses, run stats)."""
     from concurrent.futures import ThreadPoolExecutor
 
+    from eval.baselines.rule_baseline import label_report
     from radlabel.config import get_settings
     from radlabel.labelling.extractor import PROMPT_VERSION, TIER1_DEPLOYMENT, extract
     from radlabel.labelling.verifier import passed, verify
-    from radlabel.llm import LLMClient
+    from radlabel.llm import CacheMiss, LLMClient
     from radlabel.preprocess.sentences import Sentence
 
     s = get_settings()
     if s.azure_openai_deployment != TIER1_DEPLOYMENT:
         raise SystemExit(f"Tier 1 is locked to {TIER1_DEPLOYMENT}; .env has {s.azure_openai_deployment}")
-    reps = [r for r in map(json.loads, (PROC / "reports.jsonl").open(encoding="utf-8")) if r["id"] == r["group_rep"]]
-    llm = LLMClient()
+    reps = [r for r in map(json.loads, (PROC / "reports.jsonl").open(encoding="utf-8"))
+            if r["id"] == r["group_rep"] and r["id"] not in skip]
+    llm = LLMClient(cache_only=cache_only)
     spend0 = llm.spent
     # Azure counts prompt + max_tokens against TPM; ~2,400 tokens/request, ~40 requests/min per worker
     workers = max(1, min(s.llm_max_concurrency, s.tier1_tpm // (2400 * 40)))
@@ -215,6 +278,8 @@ def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], d
         sents = [Sentence(**x) for x in r["sentences"]]
         try:
             out, resp = extract(llm, str(r["id"]), sents, temperature=0.0)
+        except CacheMiss:
+            raise
         except Exception as e:  # network trouble after the client's retries: retried below, never "failed"
             log.warning("report %s not labelled yet: %s", r["id"], type(e).__name__)
             return None
@@ -240,8 +305,8 @@ def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], d
     with (PRED_DIR / "tier1.jsonl").open("w", encoding="utf-8") as f:
         for rid, out, resp, sents in rows:
             if resp.filtered:  # Azure content filter: no output -> human review (a repair call would be refused too)
-                n_filtered += 1
-                raw[rid] = ver[rid] = {}
+                n_filtered += 1  # scored with the rule baseline's labels (owner default until decided otherwise)
+                raw[rid] = ver[rid] = {x.label: x.status for x in label_report(str(rid), sents).labels}
                 f.write(json.dumps({"report_id": str(rid), "content_filtered": True}) + "\n")
                 continue
             models.add(resp.model)
@@ -261,14 +326,16 @@ def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], d
                 flags[m.check] = flags.get(m.check, 0) + 1
             n_fail += not passed(v)
             n_flag += bool(fg)
-            # review escalation: section_rule disagreement (rule C) or hedging, on reports that pass
-            n_review += passed(v) and any(m.check in ("section_rule", "hedge_consistency") for m in fg)
+            # review escalation on reports that pass: section_rule disagreement (rule C), hedging, negation_consistency
+            n_review += passed(v) and any(m.check in ("section_rule", "hedge_consistency", "negation_consistency")
+                                          for m in fg)
             f.write(json.dumps({"raw": json.loads(out.model_dump_json()), "verified": json.loads(v.model_dump_json())})
                     + "\n")
     n = len(rows)
     stats = {"deployment": TIER1_DEPLOYMENT, "prompt_version": PROMPT_VERSION, "models_returned": sorted(models),
              "n_reports": n, "workers": workers, "invalid_outputs": n_invalid, "invalid_rate": n_invalid / n,
              "content_filtered": n_filtered, "content_filtered_ids": sorted(r for r, _, x, _ in rows if x.filtered),
+             "content_filtered_scoring": "rule_baseline_fallback", "tier0_skipped": len(skip),
              "reports_with_fail": n_fail, "report_fail_rate": n_fail / n, "reports_with_flag": n_flag,
              "report_flag_rate": n_flag / n, "tier2_reports": n_fail + n_invalid,
              "review_escalations": n_review + n_filtered,
@@ -303,11 +370,21 @@ def main(system: str) -> dict[str, Any]:
         _save(system, res, llm="none")
         return res
     if system == "tier1":
-        raw, ver, stats = run_tier1()
+        t0, t0_stats = run_tier0(it)
+        raw, ver, stats = run_tier1(cache_only="--cache-only" in sys.argv, skip=frozenset(t0))
+        raw, ver = {**raw, **t0}, {**ver, **t0}
+        stats["tier0"] = t0_stats
         llm_only = {**evaluate(it, raw), "run": stats}
         llm_ver = {**evaluate(it, ver), "run": stats}
         _save("llm_only", llm_only, llm=stats["deployment"], prompt=stats["prompt_version"])
         _save("llm_verifier", llm_ver, llm=stats["deployment"], prompt=stats["prompt_version"])
+        rule = {int(x["report_id"]): {y["label"]: y["status"] for y in x["labels"]}
+                for x in map(json.loads, (PRED_DIR / "rule_baseline.jsonl").open(encoding="utf-8"))}
+        paired = {"llm_only_minus_rule_baseline": paired_diff(it, raw, rule),
+                  "llm_verifier_minus_llm_only": paired_diff(it, ver, raw)}
+        write_result("labelling_paired_diffs", paired, fold="oof", mapping_version="v1", eval_version="eval_v1.2",
+                     metric="headline macro-F1 (9 labels), hedged + pilot excluded", n_boot=N_BOOT)
+        (TABLES / "labelling_paired_diffs.md").write_text(render_paired(paired), encoding="utf-8")
         return {"llm_only": llm_only, "llm_verifier": llm_ver, "run": stats}
     raise SystemExit(f"unknown system {system!r}")
 

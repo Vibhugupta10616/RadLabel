@@ -32,8 +32,8 @@ def test_evidence_mentions_label_fail_and_redaction_flag() -> None:
 
 def test_negation_consistency() -> None:
     r = run("No pleural effusion.", "", ("Pleural Effusion", "present", ["F1"]))
-    assert ("negation_consistency", "fail") in checks(r)
-    assert ("negation_consistency", "fail") not in checks(run("No pneumothorax but small effusion.", "",
+    assert ("negation_consistency", "flag") in checks(r) and passed(r)  # flag, not fail (owner rule, M4)
+    assert ("negation_consistency", "flag") not in checks(run("No pneumothorax but small effusion.", "",
                                                                ("Pleural Effusion", "present", ["F1"])))
 
 
