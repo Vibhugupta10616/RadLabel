@@ -59,6 +59,7 @@ class LLMResponse(BaseModel):
     output_tokens: int = 0
     cost_usd: float = 0.0
     cached: bool = False
+    filtered: bool = False  # Azure content filter refused the prompt (HTTP 400 content_filter); text is ""
 
     def json_obj(self) -> Any:
         return json.loads(self.text)
@@ -152,7 +153,16 @@ class LLMClient:
         if json_schema is not None:
             kw["response_format"] = {"type": "json_schema",
                                      "json_schema": {"name": "output", "schema": json_schema, "strict": True}}
-        r = self._with_backoff(lambda: self.sdk.chat.completions.create(**kw))
+        import openai
+
+        try:
+            r = self._with_backoff(lambda: self.sdk.chat.completions.create(**kw))
+        except openai.BadRequestError as e:
+            if getattr(e, "code", None) != "content_filter":
+                raise
+            # deterministic refusal for this prompt: returned (and cached) as a filtered response, not a crash
+            log.warning("content filter refused a %s request", dep)
+            return LLMResponse(text="", deployment=dep, model="content_filter", filtered=True)
         u = r.usage
         cached = getattr(getattr(u, "prompt_tokens_details", None), "cached_tokens", 0) or 0
         return LLMResponse(
@@ -184,7 +194,7 @@ class LLMClient:
                 time.sleep(min(30.0, 2.0**errors))
 
     def _ledger(self, r: LLMResponse, purpose: str) -> None:
-        prev = self._models.setdefault(r.deployment, r.model)
+        prev = r.model if r.filtered else self._models.setdefault(r.deployment, r.model)
         if prev != r.model:
             log.warning("deployment %s returned model %s (was %s): silent upgrade?", r.deployment, r.model, prev)
         self.cache_dir.mkdir(parents=True, exist_ok=True)

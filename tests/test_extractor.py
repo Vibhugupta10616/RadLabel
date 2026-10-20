@@ -49,3 +49,16 @@ def test_tier1_prompt_frozen_and_model_locked() -> None:
     assert hashlib.sha256((SYSTEM + json.dumps(SCHEMA, sort_keys=True)).encode()).hexdigest() == frozen
     example = Settings(_env_file=Path(__file__).resolve().parents[1] / ".env.example")  # type: ignore[call-arg]
     assert TIER1_DEPLOYMENT == example.azure_openai_deployment == "gpt-4.1-mini"
+
+
+def test_content_filtered_response_is_invalid_not_a_crash(tmp_path: Path) -> None:
+    from radlabel.llm import LLMResponse
+
+    class Filtered(FakeLLM):
+        def _call(self, *a: object, **k: object) -> LLMResponse:
+            return LLMResponse(text="", deployment="gpt-4.1-mini", model="content_filter", filtered=True)
+
+    llm = Filtered(lambda m: "", tmp_path)
+    out, r = extract(llm, "1", report_sentences("Gunshot wound.", ""))
+    assert out is None and r.filtered
+    assert extract(llm, "1", report_sentences("Gunshot wound.", ""))[1].cached  # refusal cached, not retried

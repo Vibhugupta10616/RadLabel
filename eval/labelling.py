@@ -220,11 +220,16 @@ def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], d
     ver: dict[int, dict[str, str]] = {}
     fails: dict[str, int] = {}
     flags: dict[str, int] = {}
-    n_invalid = n_fail = n_flag = n_review = 0
+    n_invalid = n_fail = n_flag = n_review = n_filtered = 0
     models = set()
     PRED_DIR.mkdir(parents=True, exist_ok=True)
     with (PRED_DIR / "tier1.jsonl").open("w", encoding="utf-8") as f:
         for rid, out, resp, sents in rows:
+            if resp.filtered:  # Azure content filter: no output -> human review (a repair call would be refused too)
+                n_filtered += 1
+                raw[rid] = ver[rid] = {}
+                f.write(json.dumps({"report_id": str(rid), "content_filtered": True}) + "\n")
+                continue
             models.add(resp.model)
             if out is None:
                 n_invalid += 1
@@ -249,8 +254,10 @@ def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], d
     n = len(rows)
     stats = {"deployment": TIER1_DEPLOYMENT, "prompt_version": PROMPT_VERSION, "models_returned": sorted(models),
              "n_reports": n, "workers": workers, "invalid_outputs": n_invalid, "invalid_rate": n_invalid / n,
+             "content_filtered": n_filtered, "content_filtered_ids": sorted(r for r, _, x, _ in rows if x.filtered),
              "reports_with_fail": n_fail, "report_fail_rate": n_fail / n, "reports_with_flag": n_flag,
-             "report_flag_rate": n_flag / n, "tier2_reports": n_fail + n_invalid, "review_escalations": n_review,
+             "report_flag_rate": n_flag / n, "tier2_reports": n_fail + n_invalid,
+             "review_escalations": n_review + n_filtered,
              "fails_by_check": dict(sorted(fails.items())), "flags_by_check": dict(sorted(flags.items())),
              "spend_this_run_usd": llm.spent - spend0, "llm_spend_total_usd": llm.spent,
              "cached_responses": sum(r.cached for _, _, r, _ in rows)}
