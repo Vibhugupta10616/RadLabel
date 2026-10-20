@@ -17,6 +17,7 @@ Usage: python -m eval.labelling rule_baseline
 from __future__ import annotations
 
 import json
+import logging
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -29,6 +30,7 @@ from eval.cv import load_folds
 from radlabel.labels import HEADLINE, LABELS, NO_FINDING, RARE
 from radlabel.results import write_result
 
+log = logging.getLogger(__name__)
 PROC = Path("data/processed")
 SUBSETS = Path("data/splits/subsets")
 PRED_DIR = Path("artifacts/predictions")
@@ -209,13 +211,25 @@ def run_tier1() -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], d
     # Azure counts prompt + max_tokens against TPM; ~2,400 tokens/request, ~40 requests/min per worker
     workers = max(1, min(s.llm_max_concurrency, s.tier1_tpm // (2400 * 40)))
 
-    def one(r: dict) -> tuple[int, Any, Any, list[Sentence]]:
+    def one(r: dict) -> tuple[int, Any, Any, list[Sentence]] | None:
         sents = [Sentence(**x) for x in r["sentences"]]
-        out, resp = extract(llm, str(r["id"]), sents, temperature=0.0)
+        try:
+            out, resp = extract(llm, str(r["id"]), sents, temperature=0.0)
+        except Exception as e:  # network trouble after the client's retries: retried below, never "failed"
+            log.warning("report %s not labelled yet: %s", r["id"], type(e).__name__)
+            return None
         return r["id"], out, resp, sents
 
-    with ThreadPoolExecutor(workers) as ex:
-        rows = list(ex.map(one, reps))
+    todo, rows = reps, []
+    for attempt in range(3):  # completed reports are cached, so a pass only pays for what is still missing
+        with ThreadPoolExecutor(workers if attempt == 0 else 1) as ex:
+            got = list(ex.map(one, todo))
+        rows += [g for g in got if g is not None]
+        todo = [r for r, g in zip(todo, got, strict=True) if g is None]
+        if not todo:
+            break
+    if todo:  # never publish metrics with unlabelled reports; rerun later (cache keeps the finished ones)
+        raise SystemExit(f"{len(todo)} reports still unlabelled after 3 passes; rerun `python -m eval.labelling tier1`")
     raw: dict[int, dict[str, str]] = {}
     ver: dict[int, dict[str, str]] = {}
     fails: dict[str, int] = {}

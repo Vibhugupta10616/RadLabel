@@ -40,6 +40,7 @@ PRICES: dict[str, tuple[float, float, float]] = {
 }
 BUDGET_FRACTION = 0.5  # ponytail: hard stop at 50% of MAX_LLM_USD; owner raises it explicitly
 MAX_RATE_LIMIT_WAIT_S = 3600
+MAX_CONNECTION_RETRIES = 8  # ~6 min of back-off before the caller sees the error
 
 
 class BudgetExceeded(RuntimeError):
@@ -189,9 +190,10 @@ class LLMClient:
                 time.sleep(delay)
             except (openai.APIConnectionError, openai.InternalServerError):
                 errors += 1
-                if errors > 5:
+                if errors > MAX_CONNECTION_RETRIES:
                     raise
-                time.sleep(min(30.0, 2.0**errors))
+                log.warning("connection/5xx error, retry %d", errors)
+                time.sleep(min(60.0, 2.0**errors) + random.random())
 
     def _ledger(self, r: LLMResponse, purpose: str) -> None:
         prev = r.model if r.filtered else self._models.setdefault(r.deployment, r.model)
