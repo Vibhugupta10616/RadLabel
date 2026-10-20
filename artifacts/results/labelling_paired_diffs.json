@@ -1,0 +1,49 @@
+{
+ "provenance": {
+  "git_commit": "4fcdbbae72d9cb86170d7f26846a1db1d97a4ebe",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "oof",
+  "created": "2026-10-20T19:31:16+00:00",
+  "eval_version": "eval_v1.2",
+  "metric": "headline macro-F1 (9 labels), hedged + pilot excluded",
+  "n_boot": 1000
+ },
+ "results": {
+  "llm_only_minus_rule_baseline": {
+   "value": 0.028413304645402038,
+   "lo": 0.013361636498000953,
+   "hi": 0.043793174337725435,
+   "a": 0.8627170181410198,
+   "b": 0.8343037134956177,
+   "ci_excludes_zero": true
+  },
+  "llm_verifier_minus_llm_only": {
+   "value": -0.006692732077907437,
+   "lo": -0.00977738387632544,
+   "hi": -0.0040627149110120135,
+   "a": 0.8560242860631123,
+   "b": 0.8627170181410198,
+   "ci_excludes_zero": true
+  }
+ }
+}

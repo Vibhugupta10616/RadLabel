@@ -59,14 +59,14 @@ Sensitivity, all reports incl. pilot: v1 headline macro-F1 0.833 (0.819–0.846)
 
 | Label | All: FP / pairs (rate) | Abnormal only |
 |---|---|---|
-| Cardiomegaly | 0 / 5 (0.000) | 0 / 5 (0.000) |
-| Lung Opacity | 34 / 688 (0.049) | 34 / 500 (0.068) |
-| Lung Lesion | 2 / 137 (0.015) | 2 / 98 (0.020) |
+| Cardiomegaly | 0 / 4 (0.000) | 0 / 4 (0.000) |
+| Lung Opacity | 32 / 668 (0.048) | 32 / 483 (0.066) |
+| Lung Lesion | 2 / 132 (0.015) | 2 / 94 (0.021) |
 | Atelectasis | 1 / 4 (0.250) | 1 / 3 (0.333) |
-| Pleural Effusion | 0 / 2172 (0.000) | 0 / 1640 (0.000) |
-| Fracture | 0 / 85 (0.000) | 0 / 47 (0.000) |
+| Pleural Effusion | 0 / 2100 (0.000) | 0 / 1585 (0.000) |
+| Fracture | 0 / 83 (0.000) | 0 / 45 (0.000) |
 | Support Devices | 0 / 4 (0.000) | 0 / 3 (0.000) |
-| Edema | 5 / 211 (0.024) | 5 / 170 (0.029) |
-| Consolidation | 1 / 982 (0.001) | 1 / 754 (0.001) |
-| Pneumothorax | 0 / 2081 (0.000) | 0 / 1588 (0.000) |
-| pooled | 43 / 6369 (0.007) | 43 / 4808 (0.009) |
+| Edema | 5 / 208 (0.024) | 5 / 168 (0.030) |
+| Consolidation | 1 / 953 (0.001) | 1 / 733 (0.001) |
+| Pneumothorax | 0 / 2008 (0.000) | 0 / 1531 (0.000) |
+| pooled | 41 / 6164 (0.007) | 41 / 4649 (0.009) |

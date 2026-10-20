@@ -10,7 +10,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M1 | **Done** (tag `m1-data`) | Owner-approved 2026-10-20. Numbers below. eval_v1.2 lexicon/termset **permanently frozen**. |
 | M2 | **Done** (owner-approved 2026-10-20) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
 | M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. |
-| M4 | **Tier 1 full run done; Tier 0 + $0-rerun check pending** | gpt-4.1-mini over 3,086 texts: invalid 0, content-filtered 7, reports with a verifier fail 7.5% (→ Tier 2: 232), with a flag 82.0%, review escalations 770. Macro-F1 (9 headline, v1, pilot excluded): rule 0.834, LLM 0.860, LLM+verifier 0.854. Total LLM spend $2.08. |
+| M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, raw outputs identical) | gpt-4.1-mini over 3,086 texts: invalid 0, content-filtered 7 (scored with rule-baseline labels), reports with a verifier fail 6.9% (→ Tier 2: 212), review escalations 790. Macro-F1 (9 headline, v1, pilot excluded): rule 0.834, LLM 0.863, LLM+verifier 0.856; paired LLM − rule +0.028 (0.013–0.044). Tier 0: 0 OOF hits by construction. Total LLM spend $2.08. |
 | M5–M11 | not started | |
 
 ## Decisions (owner)
@@ -63,10 +63,13 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Follow-up (cache only, $0 new spend): gpt-4.1-mini macro-F1 LLM-only 0.886, paired diff vs rule baseline +0.079 (-0.053 to 0.224); Lung Lesion support in the scored pilot: 2. Report fail rate 46% / flag rate 73% → stop (item 2c).
 - (resolved) **Q-M4-1:** 87–96% of pilot outputs fail the verifier, almost all `evidence_mentions_label` on `absent` labels: the models cite generic sentences ("Clear lungs.", "No acute disease.") as evidence of absence, and No Finding `absent` cites abnormal sentences. Scoring is unaffected (only `present` counts), but Tier 2 would receive ~90% of reports.
 - **Q-M4-2:** pilot reports come from fold 0's training folds but are test items in folds 1–4 (30/20/26/26).
-- Sentence split misses "[REDACTED].In ..." (no space after the period).
+- (fixed in `cd215fa`) Sentence split missed "[REDACTED].In ...". Still not split: "..", " ." (known issue, `docs/evaluation_notes.md`).
 
 - Full run: 7 reports refused by Azure's content filter (violence, medium); handled as filtered, cached, routed to review. Two runs were interrupted (content-filter 400, then a network error); client/run hardened; completed responses were cached, so no call was paid twice.
-- Known gap: `negation_only` FP pairs still include the 102 pilot reports (headline metrics exclude them).
+- `negation_only` FP pairs now exclude the pilot reports (6,164 pairs): rule 41, LLM 6.
+- Owner follow-ups (2026-10-20), all cache-only, $0: paired bootstrap; Atelectasis analysis (57 of 59 LLM FNs are `uncertain` on "scarring or atelectasis"-type alternatives); verifier-column drop explained (hedge conversions, mostly "borderline cardiomegaly"); content-filtered → rule-baseline fallback (default, not owner-decided); `negation_consistency` → flag (pipeline wrong in 20/23, owner's pre-committed rule). Details: `docs/evaluation_notes.md`, `artifacts/results/m4_analysis.json`.
+- Tier 0 per fold: 67–81 patterns, 0 OOF hits (exact duplicates share a cluster → fold). Serving patterns: 96.
+- Review: 790 escalations (25.6%); M5+ error analysis uses a random sample of ~50.
 
 ## Blocked (owner action)
 - Docker not installed. Needed before M5.
