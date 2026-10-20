@@ -96,8 +96,8 @@ class RepairResult(BaseModel):
     tool_names: list[str]
     llm_calls: int
     tokens: int
-    cost_usd: float
-    cached_calls: int
+    cost_usd: float  # cost of the calls as made (cache hits keep it), so the result is the same on every rerun
+    cached_calls: int  # run-specific
     ignored_changes: int
     submitted: list[LabelOut] | None
 
@@ -164,7 +164,7 @@ def repair(llm: LLMClient, report_id: str, sentences: list[Sentence], verified: 
                          reasoning_effort=REASONING_EFFORT, purpose=f"repair:{PROMPT_VERSION}")
         upd: dict[str, Any] = {"llm_calls": st["llm_calls"] + 1, "cached_calls": st["cached_calls"] + r.cached,
                                "tokens": st["tokens"] + r.input_tokens + r.output_tokens,
-                               "cost": st["cost"] + (0.0 if r.cached else r.cost_usd)}
+                               "cost": st["cost"] + r.cost_usd}  # original call cost, also when served from cache
         if r.filtered:
             return {**upd, "stop": "content_filtered"}
         if not r.tool_calls:

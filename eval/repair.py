@@ -210,6 +210,7 @@ def main(cache_only: bool = False, smoke: int = 0) -> dict[str, Any]:
         "ignored_changes_to_non_failing_labels": sum(r.ignored_changes for r in rr),
         "submitted_but_failed_reverification": sum(r.submitted is not None and not r.accepted for r in rr),
         "llm_calls": sum(r.llm_calls for r in rr), "cached_calls": sum(r.cached_calls for r in rr),
+        "tier2_cost_usd": sum(r.cost_usd for r in rr),
         "new_spend_usd": spend, "llm_spend_total_usd": llm.spent, "m5_new_spend_cap_usd": M5_NEW_SPEND_CAP}
     routing = {
         "tier_distribution": dict(Counter(route.values())),
@@ -240,8 +241,8 @@ def main(cache_only: bool = False, smoke: int = 0) -> dict[str, Any]:
                  metric="headline macro-F1 (9 labels), hedged + pilot excluded")
     write_summary()
     with (PRED_DIR / "tier2.jsonl").open("w", encoding="utf-8") as f:
-        for r in rr:
-            f.write(r.model_dump_json() + "\n")
+        for r in sorted(rr, key=lambda x: int(x.report_id)):  # deterministic: same file on every rerun
+            f.write(r.model_dump_json(exclude={"cached_calls"}) + "\n")
     (TABLES / "tier2_changes.md").write_text(render_changes(changes, tier2_stats, routing, paired), encoding="utf-8")
     return {"tier2": tier2_stats, "routing": routing, "changes": changes, "paired": paired}
 
