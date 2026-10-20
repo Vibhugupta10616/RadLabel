@@ -104,8 +104,8 @@ All numbers: v1, 9 headline labels, hedged + pilot excluded, from `artifacts/res
   Cardiomegaly cases are "borderline cardiomegaly", which MeSH codes as Cardiomegaly but the pipeline reads as
   hedged (Cardiomegaly F1 0.946 → 0.914); Other Abnormality has 28. Known issue, not fixed (frozen rules); the
   hedged-evidence check is right in direction only for genuinely uncertain phrasing.
-- **Content-filter refusals (7 reports: 206, 800, 1095, 1874, 2729, 2827, 3154):** no decision existed, so they
-  are scored with the **rule baseline's labels** in both LLM columns (owner default, M4; recorded as
+- **Content-filter refusals (7 reports: 206, 800, 1095, 1874, 2729, 2827, 3154). Policy (owner-confirmed, M4):**
+  they are scored with the **rule baseline's labels** in both LLM columns (recorded as
   `content_filtered_scoring: rule_baseline_fallback` in the run stats) and routed to review. Before this they were
   scored as all `not_mentioned`; the change moved LLM-only macro-F1 from 0.860 to 0.863.
 - **Paired bootstrap** (same reports, same 1,000 cluster resamples): LLM only − rule baseline **+0.028
@@ -118,7 +118,7 @@ Per fold, patterns = exact normalised texts coded `normal` ≥ 3 times in that f
 fold). **Out-of-fold hits: 0, by construction:** identical normalised texts share a cluster, and a cluster stays
 in one fold, so a test report never repeats a training text exactly. Tier 0 therefore leaves every OOF metric
 unchanged and only saves calls in serving (patterns learned on all reports: 96, matching 773 of 3,832 usable
-reports in-sample — not a held-out estimate). No parameter tuned (`MIN_COUNT = 3` is the README value).
+reports, measured in-sample: patterns learned and matched on the same reports, not a held-out result). No parameter tuned (`MIN_COUNT = 3` is the README value).
 
 ## Review volume
 790 reports (25.6%) escalate to review (section_rule, hedge_consistency or negation_consistency flags on reports

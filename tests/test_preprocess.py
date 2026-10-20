@@ -36,6 +36,18 @@ def test_split_full_stop_directly_before_capital() -> None:
     assert split_sentences("Small effusion.Mild cardiomegaly.") == ["Small effusion.", "Mild cardiomegaly."]
 
 
+def test_split_after_double_full_stop() -> None:
+    assert split_sentences("No pleural effusion.. Minimal basilar atelectasis.") == [
+        "No pleural effusion..", "Minimal basilar atelectasis."]
+    assert split_sentences("No effusion..Minimal atelectasis.") == ["No effusion..", "Minimal atelectasis."]
+
+
+def test_split_after_spaced_full_stop() -> None:
+    assert split_sentences("No pneumothorax . Deformity of the left ribs.") == [
+        "No pneumothorax .", "Deformity of the left ribs."]
+    assert split_sentences("Lungs clear . no effusion.") == ["Lungs clear . no effusion."]  # lowercase: no split
+
+
 def test_no_split_inside_numbers_or_after_abbreviations() -> None:
     assert split_sentences("Nodule measures 2.5 cm. No effusion.") == ["Nodule measures 2.5 cm.", "No effusion."]
     assert split_sentences("Atelectasis vs. Pneumonia at the base.") == ["Atelectasis vs. Pneumonia at the base."]

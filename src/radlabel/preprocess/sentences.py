@@ -6,11 +6,12 @@ from pydantic import BaseModel
 
 from radlabel.preprocess.text import redact
 
-# Split after . ! ? preceded by a letter, "]", ")" or "%" (never "2.5 cm" or "1. Cardiomegaly"), when
+# Split after . ! ? preceded by a letter, "]", ")", "%", another full stop ("effusion.. Minimal") or whitespace
+# ("pneumothorax . Deformity"); never after a digit ("2.5 cm", "1. Cardiomegaly"), when
 #  - whitespace follows and the next sentence starts with a capital, digit or "[REDACTED]", or
 #  - an uppercase letter follows directly ("[REDACTED].In the left ...").
 # No split after a known abbreviation ("vs.", "e.g.", "Dr.").
-_SPLIT = re.compile(r"(?<=[A-Za-z\]\)%][.!?])(?:\s+(?=[A-Z0-9\[])|(?=[A-Z]))")
+_SPLIT = re.compile(r"(?<=[A-Za-z\]\)%.\s][.!?])(?:\s+(?=[A-Z0-9\[])|(?=[A-Z]))")
 _ABBREV = re.compile(r"(?:^|\W)(?:vs|e\.g|i\.e|dr|mr|mrs|ms|approx)\.$", re.I)
 
 

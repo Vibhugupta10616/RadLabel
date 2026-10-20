@@ -258,7 +258,7 @@ Invariants:
 - `status` ∈ `present | absent | uncertain | not_mentioned`. Scoring: `present` = positive; the uncertainty policy applies only on the `hedged` subset (§4.3).
 
 **Tiers:**
-- **Tier 0:** exact normalised texts coded `normal` at least 3 times **in the training folds** → No Finding, with no LLM call.
+- **Tier 0:** exact normalised texts coded `normal` at least 3 times **in the training folds** → No Finding, with no LLM call. Out-of-fold it matches **no** test report, by construction (identical texts share a cluster and so a fold), so it leaves every §8.1 metric unchanged and only saves calls in serving. Learned on all reports, the 96 patterns match 773 of 3,832 usable reports; that figure is **in-sample** (patterns learned and matched on the same reports), not a held-out result.
 - **Tier 1:** LLM extractor, zero-shot, with **synthetic** in-prompt examples (written by hand, never IU text, so there is no leakage). Provider configurable (OpenAI or Azure OpenAI); the dated model snapshot is pinned in config and recorded in every result file.
 - **Verifier checks** (`verifier.py`, all unit-tested):
 

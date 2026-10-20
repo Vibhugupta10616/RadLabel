@@ -135,6 +135,10 @@ def evaluate(it: Items, statuses: dict[int, dict[str, str]]) -> dict[str, Any]:
     res: dict[str, Any] = {m: score_block(it, present, m, clear, LABELS) for m in ("v1", "strict")}
     res["sensitivity_all_reports_incl_pilot"] = {
         "v1_macro_f1_headline": score_block(it, present, "v1", ~it.subset["hedged"], HEADLINE)["macro_f1_headline"]}
+    # sensitivity analysis, NOT the headline metric (owner, M4): `uncertain` counts as positive for every label
+    unc = score_block(it, pres_unc, "v1", clear, LABELS)
+    res["sensitivity_uncertain_as_present_all_labels"] = {"v1_macro_f1_headline": unc["macro_f1_headline"],
+                                                          "v1_rare_micro_f1": unc["rare_micro_f1"]}
     res["n_pilot_excluded"] = int((it.pilot & ~it.subset["hedged"]).sum())
     res["subsets"] = {
         "abnormal": score_block(it, present, "v1", clear & it.subset["abnormal"], HEADLINE),
@@ -168,7 +172,10 @@ def render(name: str, res: dict[str, Any]) -> str:
              f"Out-of-fold, one report per exact text (n = {res['n_items']}; {res['n_hedged_excluded']} hedged and "
              f"{res['n_pilot_excluded']} Tier 1 pilot reports excluded); 95% bootstrap CIs over clusters.", "",
              "Sensitivity, all reports incl. pilot: v1 headline macro-F1 "
-             f"{_fmt(res['sensitivity_all_reports_incl_pilot']['v1_macro_f1_headline'])}", ""]
+             f"{_fmt(res['sensitivity_all_reports_incl_pilot']['v1_macro_f1_headline'])}  ",
+             "Sensitivity analysis (not the headline metric), `uncertain` counts as positive for all labels: v1 "
+             f"headline macro-F1 {_fmt(res['sensitivity_uncertain_as_present_all_labels']['v1_macro_f1_headline'])}",
+             ""]
     for m in ("v1", "strict"):
         b = res[m]
         lines += [f"## Mapping {m}", "", "| Label | F1 (95% CI) | Precision | Recall | n |", "|---|---|---|---|---|"]
@@ -205,6 +212,30 @@ def render_paired(p: dict[str, Any]) -> str:
         lines.append(f"| {k.replace('_minus_', ' − ')} | {d['a']:.3f} | {d['b']:.3f} | {_fmt(d)} | "
                      f"{'yes' if d['ci_excludes_zero'] else 'no'} |")
     return "\n".join(lines) + "\n"
+
+
+def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any]) -> str:
+    """README §8.1 ablation table (systems built so far). Headline rows first; the sensitivity row is labelled."""
+    rows: list[tuple[str, Callable[[dict[str, Any]], str]]] = [
+        ("Headline macro-F1, 9 labels (v1)", lambda r: _fmt(r["v1"]["macro_f1_headline"])),
+        ("Headline macro-F1, 9 labels (strict)", lambda r: _fmt(r["strict"]["macro_f1_headline"])),
+        ("Pooled rare micro-F1 (v1)", lambda r: _fmt(r["v1"]["rare_micro_f1"])),
+        ("negation_only FP rate (pooled)", lambda r: "{fp} / {n_pairs} ({fp_rate:.4f})".format(
+            **r["negation_only_fp"]["all"]["_pooled"])),
+        ("*Sensitivity, not headline:* macro-F1 (v1) with `uncertain` = positive for all labels",
+         lambda r: _fmt(r["sensitivity_uncertain_as_present_all_labels"]["v1_macro_f1_headline"])),
+        ("*Sensitivity, not headline:* macro-F1 (v1), all reports incl. Tier 1 pilot",
+         lambda r: _fmt(r["sensitivity_all_reports_incl_pilot"]["v1_macro_f1_headline"])),
+    ]
+    names = list(systems)
+    lines = ["# Labelling summary (README §8.1)", "",
+             "Out-of-fold, one report per exact text; hedged and Tier 1 pilot reports excluded unless stated; "
+             "95% bootstrap CIs over clusters. Scoring: `present` = positive, except in the sensitivity row.", "",
+             "| Metric | " + " | ".join(names) + " |", "|---|" + "---|" * len(names)]
+    lines += [f"| {k} | " + " | ".join(f(systems[n]) for n in names) + " |" for k, f in rows]
+    lines += ["", "Paired differences (headline macro-F1, v1): "
+              + "; ".join(f"{k.replace('_minus_', ' − ')} {_fmt(d)}" for k, d in paired.items()), ""]
+    return "\n".join(lines)
 
 
 def run_rule_baseline() -> dict[int, dict[str, str]]:
@@ -254,7 +285,7 @@ def run_tier1(cache_only: bool = False, skip: frozenset[int] = frozenset()
               ) -> tuple[dict[int, dict[str, str]], dict[int, dict[str, str]], dict[str, Any]]:
     """Tier 1 (gpt-4.1-mini, prompt tier1-v1, temperature 0) over every exact-text representative not handled by
     Tier 0 (`skip`). Zero-shot, so every prediction is out-of-fold. Content-filtered reports are scored with the
-    rule baseline's labels (owner default, M4). Returns (LLM-only statuses, LLM+verifier statuses, run stats)."""
+    rule baseline's labels (owner policy, M4). Returns (LLM-only statuses, LLM+verifier statuses, run stats)."""
     from concurrent.futures import ThreadPoolExecutor
 
     from eval.baselines.rule_baseline import label_report
@@ -305,7 +336,7 @@ def run_tier1(cache_only: bool = False, skip: frozenset[int] = frozenset()
     with (PRED_DIR / "tier1.jsonl").open("w", encoding="utf-8") as f:
         for rid, out, resp, sents in rows:
             if resp.filtered:  # Azure content filter: no output -> human review (a repair call would be refused too)
-                n_filtered += 1  # scored with the rule baseline's labels (owner default until decided otherwise)
+                n_filtered += 1  # scored with the rule baseline's labels (owner policy, M4)
                 raw[rid] = ver[rid] = {x.label: x.status for x in label_report(str(rid), sents).labels}
                 f.write(json.dumps({"report_id": str(rid), "content_filtered": True}) + "\n")
                 continue
@@ -385,6 +416,10 @@ def main(system: str) -> dict[str, Any]:
         write_result("labelling_paired_diffs", paired, fold="oof", mapping_version="v1", eval_version="eval_v1.2",
                      metric="headline macro-F1 (9 labels), hedged + pilot excluded", n_boot=N_BOOT)
         (TABLES / "labelling_paired_diffs.md").write_text(render_paired(paired), encoding="utf-8")
+        rule_res = json.loads((Path("artifacts/results") / "labelling_rule_baseline.json").read_text())["results"]
+        (TABLES / "labelling_summary.md").write_text(
+            render_summary({"Rule baseline": rule_res, "LLM only": llm_only, "LLM + verifier": llm_ver}, paired),
+            encoding="utf-8")
         return {"llm_only": llm_only, "llm_verifier": llm_ver, "run": stats}
     raise SystemExit(f"unknown system {system!r}")
 
