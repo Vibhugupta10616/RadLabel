@@ -497,6 +497,7 @@ Limitations that bound these numbers (details in §11):
 - 7 reports refused by the Azure content filter are scored with the rule baseline's labels.
 - The ground truth misses some clearly stated findings, so scores are a lower bound.
 - Labels describe the report text, not the images.
+- Review volume is 30.9% of reports (hedged 58.1%, clear 28.2%), too high for production use; reducing it is future work.
 
 ### Labelling (§8.1)
 
@@ -523,6 +524,9 @@ Headline macro-F1 (9 labels, v1), same out-of-fold reports and the same 1,000 cl
 | LLM + verifier − LLM only | -0.006 (-0.008–-0.003) | yes |
 | LLM + verifier + Tier 2 − LLM + verifier | 0.006 (0.003–0.009) | yes |
 | LLM + verifier + Tier 2 − rule baseline | 0.025 (0.010–0.040) | yes |
+| LLM + verifier + Tier 2 − LLM only | 0.000 (-0.004–0.004) | no |
+
+**Reading.** The verifier's hedge downgrade costs 0.006 macro-F1 and Tier 2 recovers 0.006, so the full pipeline **matches** LLM-only macro-F1 (difference 0.000 (-0.004–0.004); the 95% CI includes 0). The guardrails do not improve F1 over LLM only. What the guardrails add is label-level correction (Tier 2: 29 labels wrong → right vs 5 right → wrong) and routing of uncertain cases to human review (30.9% of reports).
 
 ### Pipeline
 

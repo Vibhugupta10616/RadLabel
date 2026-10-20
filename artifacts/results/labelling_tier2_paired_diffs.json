@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "2b918f1b6a5449f3dbd542ba4a9eebd18d7db979",
+  "git_commit": "416b1316abde3b559800039c755435ef1c14dd46",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-20T21:34:05+00:00",
+  "created": "2026-10-20T21:43:30+00:00",
   "eval_version": "eval_v1.2",
   "decision": {
    "keep_tier2_in_pipeline": true,
@@ -47,6 +47,14 @@
    "a": 0.8622575243877025,
    "b": 0.8375170839815025,
    "ci_excludes_zero": true
+  },
+  "tier2_minus_llm_only": {
+   "value": -1.601649718352416e-05,
+   "lo": -0.00396075126210535,
+   "hi": 0.003629718806805335,
+   "a": 0.8622575243877025,
+   "b": 0.8622735408848861,
+   "ci_excludes_zero": false
   }
  }
 }
