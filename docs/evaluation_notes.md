@@ -92,24 +92,25 @@ Pre-committed owner rule: if the LLM is right in at least half of the pilot's se
 - Pipeline aliases are frozen (D5), so e.g. "sternotomy" alone (device word redacted) is not an alias; handled by rule D (cited [REDACTED] → flag), not by adding aliases.
 
 ## Scoring of the M4 columns
-All numbers: v1, 9 headline labels, hedged + pilot excluded, from `artifacts/results/labelling_*.json` and
-`labelling_paired_diffs.json` (`python -m eval.labelling tier1 --cache-only`).
+All numbers: v1, 9 headline labels, hedged + pilot excluded, from `artifacts/results/labelling_*.json`,
+`labelling_paired_diffs.json` and `artifacts/tables/labelling_summary.md` (`python -m eval.labelling tier1
+--cache-only`), **after the splitter fix** (see "Splitter fix" below; earlier values are in tag `m4-pre-splitter`).
 
 - **"LLM + verifier" before Tier 2 exists** = the Tier 1 output after the deterministic verifier, with nothing
   repaired. Fails do not change any label: a report with a fail keeps its Tier 1 labels in this column (it is only
   marked for Tier 2). The only status changes the verifier makes are `hedge_consistency` conversions
   (`present` → `uncertain`, which then scores as negative outside the hedged subset).
-- **Why it is lower than LLM only (−0.007, paired 95% CI −0.010 to −0.004):** on the 2,711 scored reports the
-  verifier converts 73 `present` labels to `uncertain`; 59 of them are ground-truth positive. 18 of the 19
+- **Why it is lower than LLM only (−0.006, paired 95% CI −0.008 to −0.003):** on the 2,711 scored reports the
+  verifier converts 70 `present` labels to `uncertain`; 57 of them are ground-truth positive. 18 of the 19
   Cardiomegaly cases are "borderline cardiomegaly", which MeSH codes as Cardiomegaly but the pipeline reads as
-  hedged (Cardiomegaly F1 0.946 → 0.914); Other Abnormality has 28. Known issue, not fixed (frozen rules); the
+  hedged (Cardiomegaly F1 0.946 → 0.914); Other Abnormality has 28 (of 35). Known issue, not fixed (frozen rules); the
   hedged-evidence check is right in direction only for genuinely uncertain phrasing.
 - **Content-filter refusals (7 reports: 206, 800, 1095, 1874, 2729, 2827, 3154). Policy (owner-confirmed, M4):**
   they are scored with the **rule baseline's labels** in both LLM columns (recorded as
   `content_filtered_scoring: rule_baseline_fallback` in the run stats) and routed to review. Before this they were
-  scored as all `not_mentioned`; the change moved LLM-only macro-F1 from 0.860 to 0.863.
-- **Paired bootstrap** (same reports, same 1,000 cluster resamples): LLM only − rule baseline **+0.028
-  (0.013 to 0.044)**; LLM + verifier − LLM only **−0.007 (−0.010 to −0.004)**. Both CIs exclude 0, so "LLM beats
+  scored as all `not_mentioned`; the change moved LLM-only macro-F1 from 0.860 to 0.863 (pre-splitter).
+- **Paired bootstrap** (same reports, same 1,000 cluster resamples): LLM only − rule baseline **+0.025
+  (0.010 to 0.040)**; LLM + verifier − LLM only **−0.006 (−0.008 to −0.003)**. Both CIs exclude 0, so "LLM beats
   the rule baseline on headline macro-F1" holds on the paired test even though the marginal CIs touch.
 - `negation_only` FP rate now excludes the pilot reports too (6,164 pairs): rule baseline 41 (0.67%), LLM 6 (0.10%).
 
@@ -121,18 +122,22 @@ unchanged and only saves calls in serving (patterns learned on all reports: 96, 
 reports, measured in-sample: patterns learned and matched on the same reports, not a held-out result). No parameter tuned (`MIN_COUNT = 3` is the README value).
 
 ## Review volume
-790 reports (25.6%) escalate to review (section_rule, hedge_consistency or negation_consistency flags on reports
+785 reports (25.4%) escalate to review (section_rule, hedge_consistency or negation_consistency flags on reports
 that pass, plus the 7 content-filtered). Too many to review by hand: **for M5+ error analysis, review a random
 sample of ~50 (seeded with `SEED`)**, not all of them.
 
-## Known issue: Atelectasis (LLM 0.857 vs rule baseline 0.969), cache-only analysis, not fixed
+## Known issue: Atelectasis (LLM 0.857 vs rule baseline 0.973), cache-only analysis, not fixed
+**Owner decision (M4): no prompt change and no label-specific scoring change; documented finding only.** A
+sensitivity row with `uncertain` = positive for **all** labels is in `artifacts/tables/labelling_summary.md`
+(not the headline metric): rule baseline 0.839, LLM only 0.853, LLM + verifier 0.853. It lowers the LLM's macro-F1
+(0.862 → 0.853) and barely moves the rule baseline (0.838 → 0.839).
 `artifacts/results/m4_analysis.json` (`python -m eval.m4_analysis`, 0 LLM calls). Example sentences are in
 `artifacts/analysis/m4_examples.md` (git-ignored: report text).
 
 | Scored reports (n = 2,707, 257 positive) | TP | FP | FN |
 |---|---|---|---|
 | LLM (gpt-4.1-mini) | 198 | 7 | 59 |
-| Rule baseline | 249 | 8 | 8 |
+| Rule baseline | 251 | 8 | 6 |
 
 - LLM status on ground-truth positives: present 198, **uncertain 57**, not_mentioned 2. In 56 of the 57
   `uncertain` cases the rule baseline said `present` (2050: both uncertain). The gap is almost entirely the LLM marking alternatives as uncertain
@@ -147,19 +152,19 @@ sample of ~50 (seeded with `SEED`)**, not all of them.
 - LLM false positives (7): "volume loss" read as atelectasis (1559, 3014), interstitial markings (41),
   "combination of consolidation and atelectasis" coded negative by MeSH (1015), and 3 that the rule baseline
   also gets wrong (104, 524, 2372).
-- Rule-baseline errors (8 FN / 8 FP): negation scope across a double full stop or "without significant interval
-  change" (FN), and "cleared in the interval" / "favoring scar or atelectasis" (FP).
-- Options for later (owner decision, not applied): prompt guidance that "A or B" alternatives are `present` for
+- Rule-baseline errors (6 FN / 8 FP): "without significant interval change", "probably mostly atelectasis"
+  (FN), and "cleared in the interval" / "favoring scar or atelectasis" (FP). The splitter fix removed 2 FN (54, 3414).
+- Options considered (owner: neither applied): prompt guidance that "A or B" alternatives are `present` for
   each alternative (the prompt is frozen, so only via a dev slice that is never a test fold), or a scoring policy
   change (a README decision).
 
 ## Verifier fails in the full run (cache-only)
-After the change below: **212 reports with a fail (6.9%) → Tier 2**, all from `evidence_mentions_label`
-(227 label-level fails).
+After the changes below: **211 reports with a fail (6.8%) → Tier 2**, all from `evidence_mentions_label`
+(226 label-level fails).
 
 - `evidence_mentions_label` by label: Consolidation 64, Support Devices 57, Lung Lesion 26, Lung Opacity 25,
-  Pleural Other 16, Fracture 16, Cardiomegaly 14, Atelectasis 6, Edema 2, Pneumothorax 1. By LLM status:
-  present 119, uncertain 108.
+  Pleural Other 16, Fracture 16, Cardiomegaly 13, Atelectasis 6, Edema 2, Pneumothorax 1. By LLM status:
+  present 119, uncertain 107.
   - Consolidation: 60 of 64 are `uncertain` and GT-negative ("may reflect atelectasis or pneumonia": the LLM
     maps pneumonia to Consolidation; the pipeline aliases do not).
   - Support Devices: 31 GT-positive (device words outside the frozen alias list, e.g. a neurostimulator) and
@@ -167,7 +172,7 @@ After the change below: **212 reports with a fail (6.9%) → Tier 2**, all from 
   - Of the 119 `present` fails, 52 are GT-positive (alias gaps, e.g. "heart is large") and 67 GT-negative, so
     the fail is a useful but noisy Tier 2 signal.
   - 10 sampled examples (report IDs): 995, 1100, 3086, 3668, 3873, 664, 3014, 816, 3056, 590.
-- **`negation_consistency` (23): LLM right in 20, pipeline right in 3** (1393, 3746: a line/stent "removed";
+- **`negation_consistency`, pre-splitter (23): LLM right in 20, pipeline right in 3** (1393, 3746: a line/stent "removed";
   2783: "no suggestion of enlargement of the known nodule"). 2 of the 23 are in hedged reports, 1 in the pilot.
   Pipeline errors: a double full stop or " ." is not split, so "Specifically, no evidence of …" scopes over the next
   sentence (54, 884, 1250, 2492, 3414, 3497, 3887); "no X with Y" / run-on sentences (546, 1203, 2682); "without
@@ -175,5 +180,27 @@ After the change below: **212 reports with a fail (6.9%) → Tier 2**, all from 
   like …" (3103, 1365, 3820, 3942, 3997).
   **Owner's pre-committed rule applied: negation_consistency is a FLAG (→ review), not a FAIL**, so Tier 2 does
   not "fix" correct answers. Tests and README §6.2 updated.
-- Known pipeline issue (not fixed): the splitter does not split after "..", " ." or a full stop preceded by a
-  non-letter. Fixing it changes sentence IDs, hence Tier 1 inputs and the cache (a paid re-run); owner decision.
+- After the splitter fix: 16 cases, LLM right in 13, pipeline right in 3 (the same three). The LLM's status did
+  not change on any of the 23.
+
+## Splitter fix (M4, owner-approved)
+`sentences.py` now also splits after ".." and " ." when a capital follows (unit tests; "[REDACTED].In", "2.5 cm",
+"1. …" and abbreviation rules kept). 109 usable reports / 66 unique texts got new sentences; expert labels, eval
+mentions, subsets and the data card are byte-identical. Tier 1 re-run with the frozen prompt: 66 fresh calls,
+$0.039 (total LLM spend $2.12); a second cache-only rerun cost $0 with byte-identical outputs. Before = tag
+`m4-pre-splitter`.
+
+| Metric | Before | After |
+|---|---|---|
+| Macro-F1 v1, rule baseline | 0.834 (0.820–0.847) | 0.838 (0.823–0.850) |
+| Macro-F1 v1, LLM only | 0.863 (0.848–0.875) | 0.862 (0.848–0.875) |
+| Macro-F1 v1, LLM + verifier | 0.856 (0.842–0.869) | 0.857 (0.842–0.870) |
+| Paired LLM only − rule baseline | +0.028 (0.013 to 0.044) | +0.025 (0.010 to 0.040) |
+| negation_only FP (rule / LLM), of 6,164 | 41 / 6 | 41 / 6 |
+| Tier 2 reports | 212 | 211 |
+| Review escalations | 790 | 785 |
+| negation_consistency cases (LLM right / pipeline right) | 23 (20 / 3) | 16 (13 / 3) |
+
+The 7 negation_consistency cases that disappeared (54, 884, 1250, 2492, 3414, 3497, 3887) are exactly the
+".." / " ." cases. The remaining 13 pipeline errors are negation scope ("no X with Y", run-ons, "without
+significant interval change", "not seen on the previous exam", "normal thoracic kyphosis"); not fixed (frozen rules).

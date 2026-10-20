@@ -4,5 +4,5 @@ Same out-of-fold reports (hedged and Tier 1 pilot excluded), same cluster resamp
 
 | Comparison | A | B | A − B (95% CI) | CI excludes 0 |
 |---|---|---|---|---|
-| llm_only − rule_baseline | 0.863 | 0.834 | 0.028 (0.013–0.044) | yes |
-| llm_verifier − llm_only | 0.856 | 0.863 | -0.007 (-0.010–-0.004) | yes |
+| llm_only − rule_baseline | 0.862 | 0.838 | 0.025 (0.010–0.040) | yes |
+| llm_verifier − llm_only | 0.857 | 0.862 | -0.006 (-0.008–-0.003) | yes |

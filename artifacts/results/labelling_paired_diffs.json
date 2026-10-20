@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "4fcdbbae72d9cb86170d7f26846a1db1d97a4ebe",
+  "git_commit": "b2d20452d243a11743c45634d83f7398ec243be6",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,26 +23,26 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-20T19:31:16+00:00",
+  "created": "2026-10-20T20:57:05+00:00",
   "eval_version": "eval_v1.2",
   "metric": "headline macro-F1 (9 labels), hedged + pilot excluded",
   "n_boot": 1000
  },
  "results": {
   "llm_only_minus_rule_baseline": {
-   "value": 0.028413304645402038,
-   "lo": 0.013361636498000953,
-   "hi": 0.043793174337725435,
-   "a": 0.8627170181410198,
-   "b": 0.8343037134956177,
+   "value": 0.024756456903383572,
+   "lo": 0.009562313684974783,
+   "hi": 0.040024327089654435,
+   "a": 0.8622735408848861,
+   "b": 0.8375170839815025,
    "ci_excludes_zero": true
   },
   "llm_verifier_minus_llm_only": {
-   "value": -0.006692732077907437,
-   "lo": -0.00977738387632544,
-   "hi": -0.0040627149110120135,
-   "a": 0.8560242860631123,
-   "b": 0.8627170181410198,
+   "value": -0.00567922904584095,
+   "lo": -0.008263329997948729,
+   "hi": -0.00348880530352117,
+   "a": 0.8565943118390451,
+   "b": 0.8622735408848861,
    "ci_excludes_zero": true
   }
  }

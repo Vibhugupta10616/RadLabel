@@ -6,11 +6,11 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 ## Milestones
 | ID | State | Notes |
 |---|---|---|
-| M0 | **Done except Docker** (`4af0dea`) | Owner accepted the direct commands in place of `make test`. `docker compose up` deferred; **must pass before M5**. |
+| M0 | **Done** (`4af0dea`; Docker check 2026-10-20) | Owner accepted the direct commands in place of `make test`. `docker compose up -d --wait`: postgres, qdrant, redis healthy (Docker 29.9.1, Compose v5.6.0). |
 | M1 | **Done** (tag `m1-data`) | Owner-approved 2026-10-20. Numbers below. eval_v1.2 lexicon/termset **permanently frozen**. |
 | M2 | **Done** (owner-approved 2026-10-20) | 5 folds over 3,073 clusters, every label within ±1 of equal share (check: ±2); no cluster or exact-text group spans two folds; inner val 245–261 clusters per fold. `artifacts/results/folds.json`. |
 | M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. |
-| M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, raw outputs identical) | gpt-4.1-mini over 3,086 texts: invalid 0, content-filtered 7 (scored with rule-baseline labels), reports with a verifier fail 6.9% (→ Tier 2: 212), review escalations 790. Macro-F1 (9 headline, v1, pilot excluded): rule 0.834, LLM 0.863, LLM+verifier 0.856; paired LLM − rule +0.028 (0.013–0.044). Tier 0: 0 OOF hits by construction. Total LLM spend $2.08. |
+| M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
 | M5–M11 | not started | |
 
 ## Decisions (owner)
@@ -69,10 +69,11 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - `negation_only` FP pairs now exclude the pilot reports (6,164 pairs): rule 41, LLM 6.
 - Owner follow-ups (2026-10-20), all cache-only, $0: paired bootstrap; Atelectasis analysis (57 of 59 LLM FNs are `uncertain` on "scarring or atelectasis"-type alternatives); verifier-column drop explained (hedge conversions, mostly "borderline cardiomegaly"); content-filtered → rule-baseline fallback (default, not owner-decided); `negation_consistency` → flag (pipeline wrong in 20/23, owner's pre-committed rule). Details: `docs/evaluation_notes.md`, `artifacts/results/m4_analysis.json`.
 - Tier 0 per fold: 67–81 patterns, 0 OOF hits (exact duplicates share a cluster → fold). Serving patterns: 96.
-- Review: 790 escalations (25.6%); M5+ error analysis uses a random sample of ~50.
+- Review: 785 escalations (25.4%); M5+ error analysis uses a random sample of ~50.
+- Owner decisions (2026-10-20, after the follow-ups): splitter fix approved incl. Tier 1 re-run (done: 66 fresh calls, $0.039); content-filter rule-baseline scoring is policy; Atelectasis stays a documented finding, plus an all-labels `uncertain` = positive sensitivity row (`artifacts/tables/labelling_summary.md`); Tier 0 serving match described as in-sample in the README.
 
 ## Blocked (owner action)
-- Docker not installed. Needed before M5.
+- (resolved 2026-10-20) Docker installed by the owner; compose healthy.
 
 ## Notes
 - CLAUDE.md is untracked (`607d1ed`) but remains in the M0 commit's history; no history rewrite (owner decides).

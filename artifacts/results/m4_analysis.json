@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "4fcdbbae72d9cb86170d7f26846a1db1d97a4ebe",
+  "git_commit": "b2d20452d243a11743c45634d83f7398ec243be6",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-20T19:31:20+00:00",
+  "created": "2026-10-20T20:51:23+00:00",
   "eval_version": "eval_v1.2"
  },
  "results": {
@@ -42,15 +42,14 @@
      "present->uncertain:gt_neg": 1
     },
     "Lung Lesion": {
-     "present->uncertain:gt_pos": 1,
      "present->uncertain:gt_neg": 1
     },
     "Lung Opacity": {
-     "present->uncertain:gt_pos": 4
+     "present->uncertain:gt_pos": 3
     },
     "Other Abnormality": {
      "present->uncertain:gt_pos": 28,
-     "present->uncertain:gt_neg": 8
+     "present->uncertain:gt_neg": 7
     },
     "Pleural Other": {
      "present->uncertain:gt_neg": 1
@@ -61,8 +60,8 @@
     }
    },
    "total": {
-    "present->uncertain:gt_neg": 14,
-    "present->uncertain:gt_pos": 59
+    "present->uncertain:gt_neg": 13,
+    "present->uncertain:gt_pos": 57
    }
   },
   "atelectasis": {
@@ -75,9 +74,9 @@
      "fn": 59
     },
     "rule_baseline": {
-     "tp": 249,
+     "tp": 251,
      "fp": 8,
-     "fn": 8
+     "fn": 6
     },
     "llm_status_on_gt_positive": {
      "present": 198,
@@ -85,10 +84,10 @@
      "not_mentioned": 2
     },
     "rule_status_on_gt_positive": {
-     "present": 249,
-     "absent": 3,
+     "present": 251,
      "not_mentioned": 1,
-     "uncertain": 4
+     "uncertain": 4,
+     "absent": 1
     },
     "llm_fn_rule_tp": 57,
     "llm_fp_rule_tn": 4,
@@ -192,14 +191,12 @@
       3014
      ],
      "rule_fn": [
-      54,
       522,
       1372,
       2050,
       2266,
       2414,
-      3103,
-      3414
+      3103
      ],
      "rule_fp": [
       104,
@@ -232,8 +229,7 @@
     },
     "rule_status_on_gt_positive": {
      "present": 32,
-     "uncertain": 29,
-     "absent": 1
+     "uncertain": 30
     },
     "llm_fn_rule_tp": 12,
     "llm_fp_rule_tn": 5,
@@ -266,7 +262,7 @@
   },
   "verifier_fails": {
    "evidence_mentions_label": {
-    "fails": 227,
+    "fails": 226,
     "by_label": {
      "Consolidation": 64,
      "Support Devices": 57,
@@ -274,14 +270,14 @@
      "Lung Opacity": 25,
      "Pleural Other": 16,
      "Fracture": 16,
-     "Cardiomegaly": 14,
+     "Cardiomegaly": 13,
      "Atelectasis": 6,
      "Edema": 2,
      "Pneumothorax": 1
     },
     "by_llm_status": {
      "present": 119,
-     "uncertain": 108
+     "uncertain": 107
     },
     "by_label_status_gt": {
      "Support Devices": {
@@ -290,7 +286,7 @@
      },
      "Cardiomegaly": {
       "present:gt_pos": 6,
-      "uncertain:gt_neg": 7,
+      "uncertain:gt_neg": 6,
       "present:gt_neg": 1
      },
      "Atelectasis": {
@@ -332,20 +328,12 @@
     }
    },
    "negation_consistency": {
-    "fails": 23,
+    "fails": 16,
     "right": {
-     "llm": 20,
+     "llm": 13,
      "pipeline": 3
     },
     "rows": [
-     {
-      "report_id": 54,
-      "label": "Atelectasis",
-      "gt_v1": true,
-      "right": "llm",
-      "hedged_report": false,
-      "pilot": false
-     },
      {
       "report_id": 452,
       "label": "Other Abnormality",
@@ -363,23 +351,7 @@
       "pilot": true
      },
      {
-      "report_id": 884,
-      "label": "Other Abnormality",
-      "gt_v1": true,
-      "right": "llm",
-      "hedged_report": false,
-      "pilot": false
-     },
-     {
       "report_id": 1203,
-      "label": "Other Abnormality",
-      "gt_v1": true,
-      "right": "llm",
-      "hedged_report": false,
-      "pilot": false
-     },
-     {
-      "report_id": 1250,
       "label": "Other Abnormality",
       "gt_v1": true,
       "right": "llm",
@@ -413,14 +385,6 @@
      {
       "report_id": 1420,
       "label": "Other Abnormality",
-      "gt_v1": true,
-      "right": "llm",
-      "hedged_report": false,
-      "pilot": false
-     },
-     {
-      "report_id": 2492,
-      "label": "Fracture",
       "gt_v1": true,
       "right": "llm",
       "hedged_report": false,
@@ -467,22 +431,6 @@
       "pilot": false
      },
      {
-      "report_id": 3414,
-      "label": "Atelectasis",
-      "gt_v1": true,
-      "right": "llm",
-      "hedged_report": false,
-      "pilot": false
-     },
-     {
-      "report_id": 3497,
-      "label": "Other Abnormality",
-      "gt_v1": true,
-      "right": "llm",
-      "hedged_report": false,
-      "pilot": false
-     },
-     {
       "report_id": 3746,
       "label": "Support Devices",
       "gt_v1": false,
@@ -492,14 +440,6 @@
      },
      {
       "report_id": 3820,
-      "label": "Other Abnormality",
-      "gt_v1": true,
-      "right": "llm",
-      "hedged_report": false,
-      "pilot": false
-     },
-     {
-      "report_id": 3887,
       "label": "Other Abnormality",
       "gt_v1": true,
       "right": "llm",

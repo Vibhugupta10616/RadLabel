@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "4fcdbbae72d9cb86170d7f26846a1db1d97a4ebe",
+  "git_commit": "b2d20452d243a11743c45634d83f7398ec243be6",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1+strict",
   "fold": "oof",
-  "created": "2026-10-20T19:31:06+00:00",
+  "created": "2026-10-20T20:57:02+00:00",
   "system": "llm_verifier",
   "eval_version": "eval_v1.2",
   "llm": "gpt-4.1-mini",
@@ -63,8 +63,8 @@
     "Lung Opacity": {
      "f1": {
       "value": 0.83008356545961,
-      "lo": 0.7977937723625211,
-      "hi": 0.8593028343967025
+      "lo": 0.7988976868738169,
+      "hi": 0.8586413063376415
      },
      "precision": 0.9371069182389937,
      "recall": 0.745,
@@ -76,17 +76,17 @@
     },
     "Lung Lesion": {
      "f1": {
-      "value": 0.585635359116022,
-      "lo": 0.5058823529411764,
-      "hi": 0.6593436293436293
+      "value": 0.5934065934065934,
+      "lo": 0.5095482058788622,
+      "hi": 0.6666666666666666
      },
-     "precision": 0.6235294117647059,
-     "recall": 0.5520833333333334,
+     "precision": 0.627906976744186,
+     "recall": 0.5625,
      "n_pos": 96,
      "n_items": 2711,
-     "tp": 53,
+     "tp": 54,
      "fp": 32,
-     "fn": 43
+     "fn": 42
     },
     "Atelectasis": {
      "f1": {
@@ -132,30 +132,30 @@
     },
     "Support Devices": {
      "f1": {
-      "value": 0.8531468531468531,
-      "lo": 0.825294563745737,
-      "hi": 0.8807871974104928
+      "value": 0.8507670850767085,
+      "lo": 0.8221174519319369,
+      "hi": 0.8792729933627407
      },
-     "precision": 0.7682619647355163,
+     "precision": 0.7644110275689223,
      "recall": 0.9591194968553459,
      "n_pos": 318,
      "n_items": 2711,
      "tp": 305,
-     "fp": 92,
+     "fp": 94,
      "fn": 13
     },
     "Other Abnormality": {
      "f1": {
-      "value": 0.9375696767001115,
-      "lo": 0.9291552168968849,
-      "hi": 0.9451526446316949
+      "value": 0.9373084424630816,
+      "lo": 0.9288444188719076,
+      "hi": 0.9449592968454914
      },
-     "precision": 0.9444132509825941,
+     "precision": 0.9438832772166106,
      "recall": 0.9308245711123408,
      "n_pos": 1807,
      "n_items": 2711,
      "tp": 1682,
-     "fp": 99,
+     "fp": 100,
      "fn": 125
     },
     "Edema": {
@@ -216,9 +216,9 @@
     }
    },
    "macro_f1_headline": {
-    "value": 0.8560242860631123,
-    "lo": 0.8419178856859895,
-    "hi": 0.8693012760785466
+    "value": 0.8565943118390451,
+    "lo": 0.842015432818054,
+    "hi": 0.869518754168004
    },
    "rare_micro_f1": {
     "value": 0.8376068376068376,
@@ -272,17 +272,17 @@
     },
     "Lung Lesion": {
      "f1": {
-      "value": 0.5828571428571429,
-      "lo": 0.4999309392265193,
-      "hi": 0.6590940832910106
+      "value": 0.5909090909090909,
+      "lo": 0.5057408109132248,
+      "hi": 0.6666666666666666
      },
-     "precision": 0.6144578313253012,
-     "recall": 0.5543478260869565,
+     "precision": 0.6190476190476191,
+     "recall": 0.5652173913043478,
      "n_pos": 92,
      "n_items": 2707,
-     "tp": 51,
+     "tp": 52,
      "fp": 32,
-     "fn": 41
+     "fn": 40
     },
     "Atelectasis": {
      "f1": {
@@ -328,30 +328,30 @@
     },
     "Support Devices": {
      "f1": {
-      "value": 0.8113207547169812,
-      "lo": 0.7731381753455256,
-      "hi": 0.8485991714292547
+      "value": 0.8082706766917294,
+      "lo": 0.7704583051795243,
+      "hi": 0.8455440900562852
      },
-     "precision": 0.7003257328990228,
+     "precision": 0.6957928802588996,
      "recall": 0.9641255605381166,
      "n_pos": 223,
      "n_items": 2616,
      "tp": 215,
-     "fp": 92,
+     "fp": 94,
      "fn": 8
     },
     "Other Abnormality": {
      "f1": {
-      "value": 0.9375696767001115,
-      "lo": 0.9291552168968849,
-      "hi": 0.9451526446316949
+      "value": 0.9373084424630816,
+      "lo": 0.9288444188719076,
+      "hi": 0.9449592968454914
      },
-     "precision": 0.9444132509825941,
+     "precision": 0.9438832772166106,
      "recall": 0.9308245711123408,
      "n_pos": 1807,
      "n_items": 2711,
      "tp": 1682,
-     "fp": 99,
+     "fp": 100,
      "fn": 125
     },
     "Edema": {
@@ -412,9 +412,9 @@
     }
    },
    "macro_f1_headline": {
-    "value": 0.8576735550497587,
-    "lo": 0.8425014702577792,
-    "hi": 0.8716258258081817
+    "value": 0.8582002923597216,
+    "lo": 0.8429173446918681,
+    "hi": 0.8719057766194501
    },
    "rare_micro_f1": {
     "value": 0.8444444444444444,
@@ -424,9 +424,21 @@
   },
   "sensitivity_all_reports_incl_pilot": {
    "v1_macro_f1_headline": {
-    "value": 0.8560542735324521,
-    "lo": 0.8415705919778159,
-    "hi": 0.8691201055142496
+    "value": 0.8566185800449309,
+    "lo": 0.8419132347189255,
+    "hi": 0.869740048573837
+   }
+  },
+  "sensitivity_uncertain_as_present_all_labels": {
+   "v1_macro_f1_headline": {
+    "value": 0.852594725369383,
+    "lo": 0.8388454477017986,
+    "hi": 0.8657159127746172
+   },
+   "v1_rare_micro_f1": {
+    "value": 0.6796116504854369,
+    "lo": 0.6165263702735099,
+    "hi": 0.7353787402282326
    }
   },
   "n_pilot_excluded": 96,
@@ -464,8 +476,8 @@
      "Lung Opacity": {
       "f1": {
        "value": 0.83008356545961,
-       "lo": 0.7977937723625211,
-       "hi": 0.8593028343967025
+       "lo": 0.7988976868738169,
+       "hi": 0.8586413063376415
       },
       "precision": 0.9371069182389937,
       "recall": 0.745,
@@ -477,17 +489,17 @@
      },
      "Lung Lesion": {
       "f1": {
-       "value": 0.585635359116022,
-       "lo": 0.5058823529411764,
-       "hi": 0.6593436293436293
+       "value": 0.5934065934065934,
+       "lo": 0.5095482058788622,
+       "hi": 0.6666666666666666
       },
-      "precision": 0.6235294117647059,
-      "recall": 0.5520833333333334,
+      "precision": 0.627906976744186,
+      "recall": 0.5625,
       "n_pos": 96,
       "n_items": 2077,
-      "tp": 53,
+      "tp": 54,
       "fp": 32,
-      "fn": 43
+      "fn": 42
      },
      "Atelectasis": {
       "f1": {
@@ -533,37 +545,37 @@
      },
      "Support Devices": {
       "f1": {
-       "value": 0.8764367816091954,
-       "lo": 0.8507257545851722,
-       "hi": 0.9026798307475318
+       "value": 0.8739255014326648,
+       "lo": 0.8478194591728526,
+       "hi": 0.9001513353471423
       },
-      "precision": 0.8068783068783069,
+      "precision": 0.8026315789473685,
       "recall": 0.9591194968553459,
       "n_pos": 318,
       "n_items": 2077,
       "tp": 305,
-      "fp": 73,
+      "fp": 75,
       "fn": 13
      },
      "Other Abnormality": {
       "f1": {
-       "value": 0.9518958687040181,
-       "lo": 0.9445226574295061,
-       "hi": 0.9589662873979196
+       "value": 0.9516265912305516,
+       "lo": 0.9440318746224645,
+       "hi": 0.9584791563684297
       },
-      "precision": 0.9739432541980313,
+      "precision": 0.9733796296296297,
       "recall": 0.9308245711123408,
       "n_pos": 1807,
       "n_items": 2077,
       "tp": 1682,
-      "fp": 45,
+      "fp": 46,
       "fn": 125
      }
     },
     "macro_f1_headline": {
-     "value": 0.7611572541074481,
-     "lo": 0.7479539211564485,
-     "hi": 0.7740313154253652
+     "value": 0.7617117737341785,
+     "lo": 0.7483223577649823,
+     "hi": 0.7743669964851183
     }
    },
    "redaction_adjacent": {
@@ -599,8 +611,8 @@
      "Lung Opacity": {
       "f1": {
        "value": 0.8473520249221184,
-       "lo": 0.801230283911672,
-       "hi": 0.8871471250981088
+       "lo": 0.8038569945866743,
+       "hi": 0.8859102879959222
       },
       "precision": 0.9855072463768116,
       "recall": 0.7431693989071039,
@@ -697,8 +709,8 @@
     },
     "macro_f1_headline": {
      "value": 0.8460473233482532,
-     "lo": 0.8095751337422727,
-     "hi": 0.8750045775719096
+     "lo": 0.8098480228605275,
+     "hi": 0.875232608582321
     }
    },
    "hedged": {
@@ -1099,69 +1111,69 @@
    },
    "Cardiomegaly": {
     "present": 339,
-    "absent": 2519,
+    "absent": 2520,
     "uncertain": 108,
-    "not_mentioned": 120
+    "not_mentioned": 119
    },
    "Lung Opacity": {
     "present": 457,
-    "absent": 2376,
-    "uncertain": 143,
+    "absent": 2377,
+    "uncertain": 142,
     "not_mentioned": 110
    },
    "Lung Lesion": {
-    "present": 102,
-    "absent": 698,
-    "uncertain": 81,
-    "not_mentioned": 2205
+    "present": 103,
+    "absent": 697,
+    "uncertain": 80,
+    "not_mentioned": 2206
    },
    "Atelectasis": {
     "present": 231,
-    "absent": 762,
+    "absent": 757,
     "uncertain": 172,
-    "not_mentioned": 1921
+    "not_mentioned": 1926
    },
    "Pleural Effusion": {
     "present": 121,
-    "absent": 2475,
+    "absent": 2476,
     "uncertain": 71,
-    "not_mentioned": 419
+    "not_mentioned": 418
    },
    "Fracture": {
     "present": 102,
-    "absent": 989,
+    "absent": 994,
     "uncertain": 46,
-    "not_mentioned": 1949
+    "not_mentioned": 1944
    },
    "Support Devices": {
-    "present": 466,
-    "absent": 486,
-    "uncertain": 13,
+    "present": 468,
+    "absent": 485,
+    "uncertain": 12,
     "not_mentioned": 2121
    },
    "Other Abnormality": {
-    "present": 2016,
-    "absent": 225,
-    "uncertain": 61,
-    "not_mentioned": 784
+    "present": 2017,
+    "absent": 230,
+    "uncertain": 60,
+    "not_mentioned": 779
    },
    "Edema": {
     "present": 36,
-    "absent": 1513,
+    "absent": 1509,
     "uncertain": 59,
-    "not_mentioned": 1478
+    "not_mentioned": 1482
    },
    "Pleural Other": {
     "present": 61,
-    "absent": 572,
-    "uncertain": 24,
+    "absent": 573,
+    "uncertain": 23,
     "not_mentioned": 2429
    },
    "Consolidation": {
     "present": 32,
     "absent": 2114,
-    "uncertain": 84,
-    "not_mentioned": 856
+    "uncertain": 83,
+    "not_mentioned": 857
    },
    "Pneumothorax": {
     "present": 23,
@@ -1194,24 +1206,24 @@
    ],
    "content_filtered_scoring": "rule_baseline_fallback",
    "tier0_skipped": 0,
-   "reports_with_fail": 212,
-   "report_fail_rate": 0.06869734283862605,
-   "reports_with_flag": 2532,
-   "report_flag_rate": 0.8204795852235904,
-   "tier2_reports": 212,
-   "review_escalations": 790,
+   "reports_with_fail": 211,
+   "report_fail_rate": 0.06837329876863253,
+   "reports_with_flag": 2534,
+   "report_flag_rate": 0.8211276733635774,
+   "tier2_reports": 211,
+   "review_escalations": 785,
    "fails_by_check": {
-    "evidence_mentions_label": 227
+    "evidence_mentions_label": 226
    },
    "flags_by_check": {
-    "evidence_exists": 702,
-    "evidence_mentions_label": 5175,
-    "hedge_consistency": 150,
-    "negation_consistency": 23,
-    "section_rule": 909
+    "evidence_exists": 709,
+    "evidence_mentions_label": 5186,
+    "hedge_consistency": 147,
+    "negation_consistency": 16,
+    "section_rule": 911
    },
    "spend_this_run_usd": 0.0,
-   "llm_spend_total_usd": 2.0814459499999987,
+   "llm_spend_total_usd": 2.1206203499999976,
    "cached_responses": 3086,
    "tier0": {
     "min_count": 3,
