@@ -81,6 +81,20 @@ export const SAMPLE_REPORTS: Report[] = [
   ]),
 ]
 
+// One pasted report labelled by the rule checks alone (LLM unavailable, e.g. the cost cap): the "rules only" state.
+export const RULES_ONLY_REPORT: Report = {
+  ...report(1, 'Pasted report', {
+    indication: 'Cough.',
+    findings: ['Heart size is normal.', 'Small right pleural effusion.', 'No pneumothorax.'],
+    impression: ['Small right pleural effusion.'],
+  }, [
+    ['Pleural Effusion', 'present', 'unverified', null, ['F2', 'I1']],
+    ['Cardiomegaly', 'absent', 'unverified', null, ['F1']],
+    ['Pneumothorax', 'absent', 'unverified', null, ['F3']],
+  ]),
+  rules_only: true,
+}
+
 const ok = (answer: string, cites: [number, string][], sentences: number, reports: number): AskResult => ({
   answer, refusal: null, citations: cites.map(([report_no, sentence_id]) => ({ report_no, sentence_id })),
   retrieved_sentences: sentences, retrieved_reports: reports,

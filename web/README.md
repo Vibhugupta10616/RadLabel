@@ -15,6 +15,9 @@ sample patient from `src/mocks/`. `VITE_MOCK=false npm run dev` calls the real A
 `/api` to `http://localhost:8000` (`vite.config.ts`). `VITE_API_BASE` sets an absolute API origin for a build.
 In mock mode, uploading your own reports shows the error state on purpose.
 
+**Fonts** are self-hosted (`@fontsource/ibm-plex-sans`, `@fontsource/ibm-plex-mono`); the site makes no
+requests to Google.
+
 **Numbers.** Every number shown (0.887, 3,086, 94%, 39%, 50 files) lives in `src/numbers.ts`, which must match
 README §10.
 
@@ -47,6 +50,8 @@ frontend.
 - Empty sections are `[]`, not missing.
 - **Assumption: `rules_only: true`** when a report's labels come from the rule checks alone (LLM unavailable,
   e.g. the cost cap); the results page then shows a "Rules only" warning for that report.
+  **Assumption:** those labels come with `verification: "unverified"` (no LLM checked them); see
+  `RULES_ONLY_REPORT` in `src/mocks/sample.ts`.
 - Badge text is derived in the frontend: `verified_rules` / `verified` → "Verified" plus " · both sections",
   " · Findings only" or " · Impression only" from `corroboration`; `verified_impression_only` → "Verified ·
   Impression only"; `corrected` / `suggested` / `unverified` as named. `reason` is shown under the badge when

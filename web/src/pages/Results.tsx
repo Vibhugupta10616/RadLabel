@@ -5,7 +5,7 @@ import { api } from '../api'
 import type { AskResult, Citation, Label, LabelName, Report, Sentence, Status, TimelineRow } from '../contract'
 import { SAMPLE_SUGGESTIONS } from '../mocks/sample'
 import { useSession, type SessionState } from '../session'
-import { Badge, kindCount, LogoMark, STATUS_TEXT, StatusPill, Warn } from '../ui'
+import { Badge, kindCount, LogoMark, StatusGrid, StatusPill, Warn } from '../ui'
 
 type Mode = 'report' | 'all'
 type Turn = { q: string; res?: AskResult; error?: string }
@@ -22,10 +22,10 @@ export function Results() {
   return state.status === 'ready' ? <ResultsView {...state} /> : <Shell state={state}><Pending state={state} /></Shell>
 }
 
-function Shell({ state, picker, children }: { state: SessionState; picker?: React.ReactNode; children: React.ReactNode }) {
+function Shell({ state, picker, pad = 0, children }: { state: SessionState; picker?: React.ReactNode; pad?: number; children: React.ReactNode }) {
   const ready = state.status === 'ready'
   return (
-    <div className="min-h-screen font-sans text-ink bg-page pb-24 lg:pb-0">
+    <div className="min-h-screen font-sans text-ink bg-page" style={{ paddingBottom: pad }}>
       <header className="bg-white border-b border-line">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between flex-wrap gap-x-3 gap-y-2">
           <Link to="/" className="flex items-center gap-2.5 no-underline text-ink text-xl font-bold"><LogoMark />RadLabel</Link>
@@ -102,6 +102,17 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
   const [question, setQuestion] = useState('')
   const [timeline, setTimeline] = useState<TimelineRow[] | null>(null)
   const threadEnd = useRef<HTMLDivElement>(null)
+  const bar = useRef<HTMLFormElement>(null)
+  const [barHeight, setBarHeight] = useState(0)
+
+  // On phones the ask bar is pinned; pad the page by its height so the last content scrolls clear of it.
+  useEffect(() => {
+    const el = bar.current!
+    const measure = () => setBarHeight(getComputedStyle(el).position === 'fixed' ? el.offsetHeight : 0)
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   useEffect(() => {
     if (n > 1) api.timeline(sessionId).then((r) => setTimeline(r.timeline), () => setTimeline([]))
@@ -158,7 +169,7 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
   const fadeIn = { initial: reduce ? false : { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4, ease: 'easeOut' } } as const
 
   const picker = n > 1 && (
-    <span className="lg:hidden">
+    <span className="xl:hidden">
       <label htmlFor="pick" className="sr-only">Report</label>
       <select id="pick" value={rep} onChange={(e) => pickReport(Number(e.target.value))}
         className="min-h-10 border border-[#C9D1D9] rounded-lg px-2.5 font-sans text-sm bg-white text-ink">
@@ -168,10 +179,11 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
   )
 
   return (
-    <Shell state={{ status: 'ready', sessionId, reports, sample }} picker={picker}>
-      <div className="max-w-[1400px] mx-auto p-4 sm:p-6 flex flex-col lg:flex-row lg:flex-wrap gap-5 lg:items-start">
+    <Shell state={{ status: 'ready', sessionId, reports, sample }} picker={picker} pad={barHeight}>
+      {/* Phone: stacked, findings first. 768+: report text | findings, picker in the header. 1280+: report list on the left. */}
+      <div className={`max-w-[1400px] mx-auto p-4 sm:p-6 flex flex-col gap-5 md:grid md:items-start md:grid-cols-[minmax(0,3fr)_minmax(280px,2fr)] ${n > 1 ? 'xl:grid-cols-[minmax(200px,240px)_minmax(0,1fr)_minmax(340px,420px)]' : ''}`}>
         {n > 1 && (
-          <nav aria-label="Uploaded reports" className="hidden lg:flex flex-[1_1_200px] max-w-[240px] min-w-0 flex-col gap-2">
+          <nav aria-label="Uploaded reports" className="hidden xl:flex min-w-0 flex-col gap-2">
             <span className="text-xs font-semibold tracking-[0.06em] uppercase text-muted px-1">Your reports</span>
             {reports.map((r, i) => (
               <button key={r.report_no} type="button" onClick={() => pickReport(i)} aria-current={i === rep ? 'true' : undefined}
@@ -183,7 +195,7 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
           </nav>
         )}
 
-        <main className="order-2 lg:order-none flex-[999_1_520px] min-w-0 flex flex-col gap-5">
+        <main className="order-2 md:order-none min-w-0 flex flex-col gap-5">
           <section aria-labelledby="report-title" className={box}>
             <div className="flex justify-between items-baseline gap-3 flex-wrap mb-4">
               <h1 id="report-title" className="m-0 text-[22px]">Report {cur.report_no} <span className="text-sm font-normal text-muted">{cur.filename}</span></h1>
@@ -239,13 +251,13 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
               <div ref={threadEnd} />
             </motion.div>
 
-            <form onSubmit={(e: FormEvent) => { e.preventDefault(); ask(question) }}
-              className="fixed inset-x-0 bottom-0 z-20 flex gap-2 bg-white border-t border-line px-4 py-3 lg:static lg:p-0 lg:border-0 lg:bg-transparent">
+            <form ref={bar} onSubmit={(e: FormEvent) => { e.preventDefault(); ask(question) }}
+              className="fixed inset-x-0 bottom-0 z-20 flex gap-2 bg-white border-t border-line px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] md:static md:p-0 md:border-0 md:bg-transparent">
               <label htmlFor="q" className="sr-only">Your question</label>
               <input id="q" type="text" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={500} autoComplete="off"
                 placeholder={mode === 'all' ? 'Ask across all reports, e.g. Which reports mention cardiomegaly?' : 'Ask about this report, e.g. Is there a pneumothorax?'}
-                className="flex-1 min-w-0 min-h-12 border border-[#C9D1D9] rounded-[10px] lg:rounded-full px-3 lg:px-[18px] text-[15px] font-sans placeholder:text-[#6A7782]" />
-              <button type="submit" disabled={asking} className="min-h-12 px-[18px] lg:px-[22px] rounded-[10px] lg:rounded-full border-0 bg-teal text-white font-semibold text-[15px] cursor-pointer font-sans disabled:opacity-70 disabled:cursor-wait hover:bg-[#0B5A5A]">
+                className="flex-1 min-w-0 min-h-12 border border-[#C9D1D9] rounded-[10px] md:rounded-full px-3 md:px-[18px] text-[15px] font-sans placeholder:text-[#6A7782]" />
+              <button type="submit" disabled={asking} className="min-h-12 px-[18px] md:px-[22px] rounded-[10px] md:rounded-full border-0 bg-teal text-white font-semibold text-[15px] cursor-pointer font-sans disabled:opacity-70 disabled:cursor-wait hover:bg-[#0B5A5A]">
                 {asking ? 'Asking…' : 'Ask'}
               </button>
             </form>
@@ -253,9 +265,9 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
           </section>
         </main>
 
-        <aside aria-labelledby="findings-title" className="order-1 lg:order-none flex-[1_1_340px] lg:max-w-[420px] min-w-0 flex flex-col gap-2.5">
-          <div className="flex justify-between items-baseline gap-2">
-            <h2 id="findings-title" className="m-0 text-lg">Findings · Report {cur.report_no}</h2>
+        <aside aria-labelledby="findings-title" className="order-1 md:order-none min-w-0 flex flex-col gap-2.5">
+          <div className="flex justify-between items-baseline flex-wrap gap-x-2">
+            <h2 id="findings-title" className="m-0 text-lg whitespace-nowrap">Findings · Report {cur.report_no}</h2>
             <span className="text-[13px] text-muted">Click to see evidence</span>
           </div>
           {shown.length === 0 && <p className="m-0 text-sm text-body">No finding is mentioned in this report.</p>}
@@ -326,7 +338,7 @@ function LabelCard({ label: l, selected, onPick, sentences, fade }: {
       </span>
       {l.reason && <span className="text-[13px] leading-[1.45] text-body">{l.reason}</span>}
       {selected && ids.length > 0 && (
-        <span className="lg:hidden flex flex-col gap-1.5 w-full">
+        <span className="md:hidden flex flex-col gap-1.5 w-full">
           {sentences.filter((s) => ids.includes(s.id)).map((s) => (
             <span key={s.id} className="block bg-hl rounded-lg px-2.5 py-2 text-sm leading-normal">
               <span className="font-mono text-xs text-[#5F6C77]">{s.id}</span> {s.text}
@@ -338,37 +350,14 @@ function LabelCard({ label: l, selected, onPick, sentences, fade }: {
   )
 }
 
-const CELL: Record<Status, string> = {
-  present: 'bg-teal text-white', uncertain: 'bg-[#FFF1C9] text-[#6B4600]', absent: 'bg-[#F1F3F5] text-[#5F6C77]', not_mentioned: 'bg-[#F1F3F5] text-[#5F6C77]',
-}
-
 function Timeline({ rows, n }: { rows: TimelineRow[] | null; n: number }) {
-  const nos = Array.from({ length: n }, (_, i) => String(i + 1))
   const changing = (rows ?? []).filter((r) => r.label !== 'No Finding' && Object.values(r.statuses).some((s) => s === 'present' || s === 'uncertain'))
   return (
-    <div className="relative border border-line rounded-xl px-4 py-3.5 overflow-x-auto">
-      <p className="m-0 mb-2.5 text-[13px] font-semibold text-muted" id="timeline-title">Findings over time</p>
-      {!rows ? <p className="m-0 text-[13px] text-muted">Loading…</p> : !changing.length ? <p className="m-0 text-[13px] text-muted">No finding is present in any report.</p> : (
-        <table aria-labelledby="timeline-title" className="w-full min-w-[520px] border-separate border-spacing-1.5 -m-1.5 text-[13px] table-fixed">
-          <thead>
-            <tr>
-              <td className="w-[140px]" />
-              {nos.map((no) => <th key={no} scope="col" className="font-mono text-xs font-medium text-muted"><abbr title={`Report ${no}`} className="no-underline">R{no}</abbr></th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {changing.map((r) => (
-              <tr key={r.label}>
-                <th scope="row" className="text-left font-semibold py-1.5">{r.label}</th>
-                {nos.map((no) => {
-                  const s = r.statuses[no] ?? 'not_mentioned'
-                  return <td key={no} className={`text-center px-1 py-1.5 rounded-md text-xs font-semibold ${CELL[s]}`}>{s === 'not_mentioned' ? <><span aria-hidden="true">—</span><span className="sr-only">Not mentioned</span></> : STATUS_TEXT[s]}</td>
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+    <div className="border border-line rounded-xl px-4 py-3.5">
+      <p className="m-0 mb-2.5 text-[13px] font-semibold text-muted">Findings over time</p>
+      {!rows ? <p className="m-0 text-[13px] text-muted">Loading…</p>
+        : !changing.length ? <p className="m-0 text-[13px] text-muted">No finding is present in any report.</p>
+        : <StatusGrid rows={changing} n={n} label="Findings over time" />}
     </div>
   )
 }

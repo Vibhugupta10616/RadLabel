@@ -20,7 +20,7 @@ const json = (body: unknown): RequestInit => ({
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
 })
 
-const httpApi: Api = {
+export const httpApi: Api = {
   createSession: () => call('/session', { method: 'POST' }),
   uploadReports: (id, { text, files = [], sample }) => {
     const form = new FormData()

@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MACRO_F1, MAX_FILES, REPORTS_TESTED, UNVERIFIED_RIGHT, VERIFIED_RIGHT } from '../numbers'
 import { useSession } from '../session'
-import { Arrow, Check, GITHUB, LogoMark, Pop, Reveal, StatusPill, Up } from '../ui'
+import type { LabelName, Status } from '../contract'
+import { Arrow, Check, GITHUB, LogoMark, Pop, Reveal, StatusGrid, StatusPill, Up } from '../ui'
 
 const eyebrow = 'm-0 mb-2.5 text-sm font-semibold tracking-[0.06em] uppercase text-teal'
 const h2 = 'm-0 text-[32px] sm:text-[42px] tracking-[-0.025em] leading-[1.1]'
@@ -177,20 +178,25 @@ const featureCard = 'rl-card flex-[1_1_420px] min-w-0 bg-white border border-[#E
 const featureH3 = 'm-0 mb-3 text-2xl sm:text-[28px] tracking-[-0.015em]'
 const featureP = 'm-0 text-[17px] leading-[1.65] text-body'
 
-function Bar({ pct, color, delay = 0, vertical }: { pct: number; color: string; delay?: number; vertical?: boolean }) {
+function Bar({ pct, color, delay = 0 }: { pct: number; color: string; delay?: number }) {
   const reduce = useReducedMotion()
-  const axis = vertical ? 'scaleY' : 'scaleX'
   return (
-    <motion.div className={`rounded-full ${vertical ? 'w-full rounded-md origin-bottom' : 'h-full origin-left'}`}
-      style={vertical ? { height: pct, background: color } : { width: `${pct}%`, background: color }}
-      initial={reduce ? false : { [axis]: 0 }} whileInView={{ [axis]: 1 }} viewport={{ once: true }}
+    <motion.div className="h-full rounded-full origin-left" style={{ width: `${pct}%`, background: color }}
+      initial={reduce ? false : { scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
       transition={{ duration: 1.2, delay, ease: [0.2, 0.7, 0.2, 1] }} />
   )
 }
 
+// The sample patient's statuses (status, not severity: RadLabel doesn't extract severity).
+const grid = (label: LabelName, s: Status[]) => ({ label, statuses: Object.fromEntries(s.map((x, i) => [String(i + 1), x])) })
+const SAMPLE_GRID = [
+  grid('Pleural Effusion', ['present', 'present', 'present', 'present', 'absent']),
+  grid('Cardiomegaly', ['absent', 'present', 'present', 'present', 'present']),
+  grid('Support Devices', ['not_mentioned', 'not_mentioned', 'present', 'present', 'present']),
+]
+
 function Features() {
   const sentences: [string, string, boolean][] = [['F1', 'Heart size is normal.', false], ['F2', 'Small left pleural effusion.', true], ['F3', 'No pneumothorax.', false], ['I1', 'Small left pleural effusion.', true]]
-  const effusion: [string, number][] = [['R1', 30], ['R2', 70], ['R3', 70], ['R4', 30], ['R5', 0]]
   return (
     <section id="features" className="bg-[#F6F8F9] border-t border-[#E8ECEF] scroll-mt-20">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-16 sm:py-24 flex flex-col gap-16 sm:gap-[88px]">
@@ -248,15 +254,8 @@ function Features() {
           </Reveal>
           <Reveal className={`${featureCard} gap-4`}>
             <div aria-hidden="true" className="flex flex-col gap-4">
-              <p className="m-0 text-[13px] font-semibold text-muted">Pleural effusion over 5 reports</p>
-              <div className="grid grid-cols-5 gap-2 items-end h-24">
-                {effusion.map(([r, h], i) => (
-                  <div key={r} className="flex flex-col items-center gap-1.5">
-                    {h ? <Bar vertical pct={h} color={h > 50 ? '#0F6E6E' : '#9CCACA'} delay={i * 0.1} /> : <div className="w-full h-1 bg-[#DCE3E8] rounded-md" />}
-                    <span className={`${mono} text-[11px] text-muted`}>{r}</span>
-                  </div>
-                ))}
-              </div>
+              <p className="m-0 text-[13px] font-semibold text-muted">Findings over time</p>
+              <StatusGrid rows={SAMPLE_GRID} n={5} />
               <div className="bg-[#F3F8F8] border border-[#D3E6E6] rounded-xl px-3.5 py-3 text-sm leading-[1.6]">
                 Small in report 1, moderate in reports 2 and 3, smaller in report 4, and resolved by report 5.
                 <div className={`${mono} mt-1.5 text-xs text-teal-text`}>R1·F2 · R2·F2 · R3·F2 · R4·F2 · R5·F3</div>

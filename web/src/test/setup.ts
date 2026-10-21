@@ -1,8 +1,11 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
-import { afterEach } from 'vitest'
+import { afterEach, vi } from 'vitest'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 
 // Browser APIs jsdom lacks.
 Element.prototype.scrollIntoView = () => {}
@@ -13,3 +16,8 @@ window.IntersectionObserver ??= class {
   disconnect() {}
   takeRecords() { return [] }
 } as unknown as typeof IntersectionObserver
+window.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver

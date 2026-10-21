@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import type { ReactNode } from 'react'
-import type { Label, Status, Verification } from './contract'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import type { Label, Status, TimelineRow, Verification } from './contract'
 
 export const GITHUB = 'https://github.com/Vibhugupta10616/RadLabel'
 
@@ -98,3 +98,60 @@ export const Badge = ({ label }: { label: Pick<Label, 'verification' | 'corrobor
 }
 
 export const kindCount = (labels: Label[], kind: Kind) => labels.filter((l) => l.status !== 'not_mentioned' && kindOf(l.verification) === kind).length
+
+const CELL: Record<Status, string> = {
+  present: 'bg-teal text-white', uncertain: 'bg-[#FFF1C9] text-[#6B4600]', absent: 'bg-[#F1F3F5] text-[#5F6C77]', not_mentioned: 'bg-[#F1F3F5] text-[#5F6C77]',
+}
+
+// Status per report (rows = labels, columns = R1..Rn). Scrolls sideways when narrow: the label column stays put and a
+// fade + text cue show while columns are hidden. `label` makes it a named, keyboard-scrollable region.
+export function StatusGrid({ rows, n, label }: { rows: Pick<TimelineRow, 'label' | 'statuses'>[]; n: number; label?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [more, setMore] = useState(false)
+  useEffect(() => {
+    const el = ref.current!
+    const check = () => setMore(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+    check()
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    el.addEventListener('scroll', check, { passive: true })
+    return () => { ro.disconnect(); el.removeEventListener('scroll', check) }
+  }, [])
+  const nos = Array.from({ length: n }, (_, i) => String(i + 1))
+  return (
+    <div>
+      <div className="relative">
+        <div ref={ref} tabIndex={label ? 0 : undefined} role={label ? 'region' : undefined} aria-label={label && `${label} (scrolls sideways)`}
+          className="relative overflow-x-auto rounded-md">
+          <table aria-label={label} className="w-full border-collapse table-fixed text-[13px]" style={{ minWidth: 120 + n * 68 }}>
+            <thead>
+              <tr>
+                <td className="sticky left-0 z-[1] bg-white w-[120px] sm:w-[140px]" />
+                {nos.map((no) => <th key={no} scope="col" className="pb-1 font-mono text-xs font-medium text-muted"><abbr title={`Report ${no}`} className="no-underline">R{no}</abbr></th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.label}>
+                  <th scope="row" className="sticky left-0 z-[1] bg-white text-left font-semibold pr-2 py-[3px]">{r.label}</th>
+                  {nos.map((no) => {
+                    const s = r.statuses[no] ?? 'not_mentioned'
+                    return (
+                      <td key={no} className="p-[3px]">
+                        <span className={`block text-center px-1 py-1.5 rounded-md text-xs font-semibold ${CELL[s]}`}>
+                          {s === 'not_mentioned' ? <><span aria-hidden="true">—</span><span className="sr-only">Not mentioned</span></> : STATUS_TEXT[s]}
+                        </span>
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {more && <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent" />}
+      </div>
+      {more && <p className="m-0 mt-2 text-xs text-muted" aria-hidden="true">Scroll sideways to see all {n} reports →</p>}
+    </div>
+  )
+}
