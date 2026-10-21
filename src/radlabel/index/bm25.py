@@ -2,9 +2,9 @@
 idf * tf * (k1 + 1) / (tf + k1 * (1 - b + b * dl / avgdl)), query weights 1 per distinct term, so the dot product is
 the BM25 score.
 
-IDF is computed here, over the reports being indexed (idf = ln(1 + (N - df + 0.5) / (df + 0.5))), not by Qdrant's IDF
-modifier: Qdrant's statistics depended on its segment state at query time, which made BM25 scores differ between
-identical runs (found after M8)."""
+IDF is computed here, over the reports being indexed (idf = ln(1 + (N - df + 0.5) / (df + 0.5))), so the scores do not
+depend on the server's statistics. (Run-to-run differences seen after M8 came from tied scores, not from IDF: see
+store._top.)"""
 
 from __future__ import annotations
 

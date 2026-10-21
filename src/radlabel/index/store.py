@@ -14,6 +14,7 @@ from radlabel.index.points import IndexPoint
 
 DENSE, SPARSE = "dense", "bm25"
 RRF_K = 60
+TIE_LIMIT = 20_000  # upper bound when fetching every point tied at the cut-off score
 
 
 def create(client: QdrantClient, name: str, dim: int) -> None:
@@ -50,32 +51,41 @@ def _kind(kind: str, exclude_negation_only: bool = False) -> models.Filter:
     return models.Filter(must=must, must_not=must_not)
 
 
+def _top(client: QdrantClient, name: str, query: object, using: str, flt: models.Filter,
+         k: int) -> list[tuple[str, str, float]]:
+    """Top k hits as (report_id, point id, score), deterministic under ties: every point scoring at least the k-th
+    score is fetched and sorted by (score, report id, point id). Qdrant returns tied points in no fixed order, which
+    made BM25 (many identical scores for short queries) differ between identical runs (found after M8)."""
+    def q(limit: int, threshold: float | None = None) -> list[models.ScoredPoint]:
+        return client.query_points(name, query=query, using=using, query_filter=flt, limit=limit,
+                                   score_threshold=threshold, with_payload=["report_id"]).points  # type: ignore[arg-type]
+    hits = q(k)
+    if len(hits) == k:
+        hits = q(TIE_LIMIT, hits[-1].score)
+    out = sorted(((h.payload["report_id"], str(h.id), h.score) for h in hits if h.payload),
+                 key=lambda x: (-x[2], x[0], x[1]))
+    return out[:k]
+
+
 def search_bm25(client: QdrantClient, name: str, text: str, k: int) -> list[tuple[str, float]]:
     idx, val = bm25.query_vector(text)
     if not idx:
         return []
-    hits = client.query_points(name, query=models.SparseVector(indices=idx, values=val), using=SPARSE,
-                               query_filter=_kind("report"), limit=k, with_payload=["report_id"]).points
-    return [(h.payload["report_id"], h.score) for h in hits if h.payload]
+    return [(r, s) for r, _, s in _top(client, name, models.SparseVector(indices=idx, values=val), SPARSE,
+                                       _kind("report"), k)]
 
 
 def search_reports(client: QdrantClient, name: str, vec: np.ndarray, k: int) -> list[tuple[str, float]]:
-    hits = client.query_points(name, query=vec.tolist(), using=DENSE, query_filter=_kind("report"), limit=k,
-                               with_payload=["report_id"]).points
-    return [(h.payload["report_id"], h.score) for h in hits if h.payload]
+    return [(r, s) for r, _, s in _top(client, name, vec.tolist(), DENSE, _kind("report"), k)]
 
 
 def search_sentences(client: QdrantClient, name: str, vec: np.ndarray, k: int, n_sentences: int = 200,
                      exclude_negation_only: bool = False) -> list[tuple[str, float]]:
     """Top sentence hits aggregated to reports by max score."""
-    hits = client.query_points(name, query=vec.tolist(), using=DENSE,
-                               query_filter=_kind("sentence", exclude_negation_only), limit=n_sentences,
-                               with_payload=["report_id"]).points
     best: dict[str, float] = {}
-    for h in hits:
-        if h.payload:
-            rid = h.payload["report_id"]
-            best[rid] = max(best.get(rid, -1.0), h.score)
+    for rid, _, score in _top(client, name, vec.tolist(), DENSE, _kind("sentence", exclude_negation_only),
+                              n_sentences):
+        best[rid] = max(best.get(rid, -1.0), score)
     return sorted(best.items(), key=lambda x: (-x[1], x[0]))[:k]
 
 
