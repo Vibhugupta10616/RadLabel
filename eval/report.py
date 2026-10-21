@@ -184,6 +184,12 @@ def render() -> str:
                   "Per fold, each fold's reports indexed alone; pooled over (query, fold) pairs with 95% bootstrap "
                   "CIs; spec frozen before the run (`eval/queries/retrieval_v1.yaml`).", "",
                   retrieval.render(ret).rstrip()]
+    ft = load_result("retrieval_finetuned")
+    if ft is not None:
+        lines += ["", "## Embedding fine-tuning (M9, SPEC §8.2)", "",
+                  retrieval.render_finetuned(ft, load_result("embedding_training"),
+                                             load_result("embedding_serving_model")).rstrip(), "",
+                  "### All rows, fine-tuning run", "", retrieval.render(ft).rstrip()]
     return "\n".join(lines) + "\n"
 
 
@@ -206,9 +212,21 @@ def summary() -> str:
         f"- Verified labels are right far more often than unverified ones: precision "
         f"**{g['verified_or_verified_rules']['precision']:.3f} vs {g['unverified']['precision']:.3f}**.",
         f"- Only **{_pct(r['unverified_report_rate'])}** of reports end with any unverified label.",
-        f"- Search baseline ({SHORT_NAMES.get(best, retrieval.NAMES[best])}, nDCG@10 over {b['n_pairs']} query–fold "
-        f"pairs): "
-        f"**{b['ndcg']['value']:.3f}**. Negation-aware fine-tuning is in progress."]) + "\n"
+        search_line(best, b)]) + "\n"
+
+
+def search_line(best: str, b: dict[str, Any]) -> str:
+    ft = load_result("retrieval_finetuned")
+    if ft is None:
+        return (f"- Search baseline ({SHORT_NAMES.get(best, retrieval.NAMES[best])}, nDCG@10 over {b['n_pairs']} "
+                f"query–fold pairs): **{b['ndcg']['value']:.3f}**. Negation-aware fine-tuning is in progress.")
+    v, u = ft["variants"], ft["use_rule"]
+    f, base = v["ft_sentence"]["all"], v["dense_sentence"]["all"]
+    return (f"- Search with negation-aware fine-tuned embeddings: nDCG@10 **{f['ndcg']['value']:.3f}** vs "
+            f"{base['ndcg']['value']:.3f} for the base model ({b['n_pairs']} query–fold pairs), negation contamination "
+            f"{f['contamination']['value']:.3f} vs {base['contamination']['value']:.3f}; "
+            + ("the fine-tuned model is used for search." if u["use_finetuned_for_search"]
+               else "the base model stays in use (pre-committed rule not met)."))
 
 
 def main() -> None:

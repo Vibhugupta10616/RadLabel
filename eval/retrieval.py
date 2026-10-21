@@ -355,6 +355,61 @@ def _best_sentence(out: dict[str, Any]) -> str:
             "reference for the M9 full-system comparison.")
 
 
+SET_NAMES = {"seen_label": "seen labels", "heldout_label": "held-out labels", "heldout_alias": "held-out aliases",
+             "attribute": "attribute", "compositional": "compositional", "report_to_report": "report-to-report",
+             "all": "all (pooled)"}
+
+
+def _d(d: dict[str, float]) -> str:
+    return f"{d['value']:+.3f} ({d['lo']:+.3f} to {d['hi']:+.3f})"
+
+
+def render_finetuned(ft: dict[str, Any], tr: dict[str, Any] | None, sv: dict[str, Any] | None) -> str:
+    """Docs block for M9 (docs/RESULTS.md): reading, paired comparisons, training; every number from the results."""
+    v, p, u = ft["variants"], ft["paired"], ft["use_rule"]
+    prim, sec = p["ft_sentence_minus_dense_sentence"], p["ft_sentence_filter_minus_dense_sentence_filter"]
+
+    def verdict(d: dict[str, float]) -> str:
+        return "better" if d["lo"] > 0 else "worse" if d["hi"] < 0 else "no clear difference"
+    by_set = "; ".join(f"{SET_NAMES[s]} {_d(prim[s]['ndcg'])}, {verdict(prim[s]['ndcg'])}" for s in SETS)
+    c = u["contamination_difference"]
+    lines = [f"**Reading (M9).** Fine-tuning on plain sentences changes pooled nDCG@10 by {_d(u['ndcg_difference'])} "
+             f"against the base model (paired, same query–fold pairs) and negation contamination@10 by {_d(c)}. "
+             f"By query set: {by_set}. The pre-committed use rule (nDCG@10 difference not significantly negative and "
+             f"contamination not higher) **{'passes' if u['use_finetuned_for_search'] else 'fails'}**, so search and "
+             f"session RAG use the **{'fine-tuned' if u['use_finetuned_for_search'] else 'base'}** model; the verifier "
+             f"agent keeps the base model. With the negated-sentence filter on both sides: {_d(sec['all']['ndcg'])} "
+             f"pooled ({verdict(sec['all']['ndcg'])}). Held-out labels were never in training, so the held-out-label "
+             "row is the test of generalisation to unseen findings.", "",
+             "| Query set | Base plain | Fine-tuned plain | Difference (95% CI) | Base + filter | Fine-tuned + filter "
+             "| Difference (95% CI) |", "|---|---|---|---|---|---|---|"]
+    for s in (*SETS, "all"):
+        lines.append(f"| {SET_NAMES[s]} | {v['dense_sentence'][s]['ndcg']['value']:.3f} | "
+                     f"{v['ft_sentence'][s]['ndcg']['value']:.3f} | {_d(prim[s]['ndcg'])} | "
+                     f"{v['dense_sentence_filter'][s]['ndcg']['value']:.3f} | "
+                     f"{v['ft_sentence_filter'][s]['ndcg']['value']:.3f} | {_d(sec[s]['ndcg'])} |")
+    lines.append(f"| *negation contamination@10, all* | {v['dense_sentence']['all']['contamination']['value']:.3f} | "
+                 f"{v['ft_sentence']['all']['contamination']['value']:.3f} | {_d(prim['all']['contamination'])} | "
+                 f"{v['dense_sentence_filter']['all']['contamination']['value']:.3f} | "
+                 f"{v['ft_sentence_filter']['all']['contamination']['value']:.3f} | "
+                 f"{_d(sec['all']['contamination'])} |")
+    lines += ["", "nDCG@10; paired 95% bootstrap CIs over (query, fold) pairs; model k evaluated on fold k only.", ""]
+    if tr is not None:
+        f = tr["folds"]
+        cp = tr["compute"]
+        inner = ", ".join(f"{f[k]['inner_val_ndcg_base']:.3f} → {max(f[k]['inner_val_ndcg_by_epoch']):.3f}"
+                          for k in sorted(f))
+        lines.append("Training (training folds only; inner validation for epoch selection): best epochs "
+                     + ", ".join(str(f[k]["best_epoch"]) for k in sorted(f))
+                     + f"; inner-validation nDCG@10 base → fine-tuned {inner}; about {f['0']['triplets']:,} triplets "
+                     f"per fold; {cp.get('gpu', cp['device'])}, torch {cp['torch']}, CUDA {cp['cuda']}, driver "
+                     f"{cp.get('driver')}.")
+    if sv is not None:
+        lines.append(f"Serving model: all reports, {sv['epochs_trained']} epochs, {sv['triplets']:,} triplets; stored "
+                     "privately (MODEL_STORE), never in the repository.")
+    return "\n".join(lines) + "\n"
+
+
 def render(out: dict[str, Any], sets: tuple[str, ...] = (*SETS, "all")) -> str:
     def f(d: dict[str, float] | None) -> str:
         return "–" if d is None else f"{d['value']:.3f} ({d['lo']:.3f}–{d['hi']:.3f})"
