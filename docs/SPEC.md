@@ -1,8 +1,8 @@
 # RadLabel
 
-**Radiology report intelligence: a verified labelling pipeline, negation-aware hybrid search and a tool-using query agent over chest X-ray reports.**
+**Chest X-ray report intelligence: verified findings with evidence, and questions answered with citations, over the user's own reports. Full specification for development; the short overview is the [README](../README.md).**
 
-**Status:** done: M0–M5 (v1: data, folds, rule baseline, Tier 1 LLM labelling + verifier, Tier 2 repair agent), M6–M8 (v2: report parser and single `run_pipeline` entry point, ReAct verifier agent, search index and retrieval evaluation). Planned: M9 website (backend, evaluation, frontend), M10 negation-aware embedding fine-tuning, M11 public deployment. See the roadmap (§12).
+**Status:** done: M0–M8 (v1 labelling M3–M5; v2 parser, single `run_pipeline` entry point and ReAct verifier agent M6–M7; evaluation search index and retrieval evaluation M8). Next: M9 negation-aware embedding fine-tuning (planned, not done), M10 website (M10a backend, M10b evaluation, M10c frontend, started on branch `m9c-frontend`), M11 deployment (Vercel + Hugging Face). Results: [RESULTS.md](RESULTS.md); roadmap §12.
 
 > Engineering and research project. **Not a medical device and not for clinical use.** Labels are derived from report text, not from images.
 
@@ -10,23 +10,16 @@
 
 ## 1. What this project is
 
-Hospitals and research teams store thousands of chest X-ray reports as free text. They need to:
-- **structure** them into findings,
-- **search** them by meaning ("reports like this one"), and
-- **ask questions** ("how many reports show effusion together with cardiomegaly?").
-
-RadLabel does all three.
-
-**Product.** Users upload one report or a patient series and get the 13 findings for each report, with sentence-level evidence and verification badges. They can then ask questions about one report or across all of them, answered with citations. The Indiana University reports are the test bed for search and evaluation; **user uploads are never stored**.
+**Product.** A user uploads one chest X-ray report or a patient series. For each report RadLabel returns the 13 findings (§4.4) with sentence-level evidence and a verification badge per label. The user can then ask questions about one report, or across all of their own uploads (RAG over the session), answered with report-and-sentence citations. **Uploads are processed in memory and never stored.** The Indiana University (IU) reports and their index are the **evaluation test bed only**; users never search them.
 
 | Component | What it does |
 |---|---|
 | **Labelling pipeline** | Takes raw report text, splits it into sections, and extracts findings with sentence-level evidence. Free deterministic checks and a rule-based second reader check every label; a **ReAct verifier agent** handles only the reports where they fail or disagree, and marks every label **verified, corrected, suggested or unverified**. |
-| **Negation-aware search** | Hybrid dense + BM25 search over reports and sentences. The embedding model is **fine-tuned so that "no effusion" is not retrieved for "effusion"**. |
-| **Query agent** | Chooses between SQL (counts and filters) and filtered vector search, uses the indication ("why was this exam done?"), cites `report_id:sentence_id` for every claim, and refuses when the evidence is weak. |
-| **Website and serving** | FastAPI backend (uploads go through `run_pipeline`, questions through the query agent), a web frontend with evidence highlighting and verification badges, Redis cache and rate limit, tracing, CI with cached regression evals (M9); public deployment on Azure with safeguards (M11). |
+| **Questions** | About one report: the LLM answers from that report's sentences. Across all uploads: **session RAG** retrieves the user's own sentences (dense embeddings + BM25) and the LLM answers from them. Every answer cites `report_no:sentence_id`, checked in code, or refuses. |
+| **Negation-aware embeddings** (M9, planned) | bge-small fine-tuned on plain sentences so that "no effusion" is not retrieved for "effusion"; evaluated on the IU test bed (§8.2) and used for search and RAG only if it passes the pre-committed rule. Not done yet. |
+| **Website** | FastAPI session API and a React frontend (§6.5, M10); deployed on Vercel (frontend) and a Hugging Face Docker Space (backend) (M11). |
 
-Every component is evaluated against **expert-coded ground truth** using **stratified 5-fold cross-validation**.
+Every component is evaluated against **expert-coded ground truth** on the IU reports using **stratified 5-fold cross-validation**.
 
 ## 2. Research context
 
@@ -108,7 +101,7 @@ CC BY-NC-ND allows using and adapting the data privately, but not **sharing** ad
   - a **private** Hugging Face repo
 
   Never a public registry or public image.
-- **Allowed through the API and demo:** labels, answers, report IDs, and **unchanged** report text with attribution. The attribution notice is shown in the demo footer and in API responses (`source_attribution` field): *"Indiana University Chest X-ray Collection (Open-i, NLM), CC BY-NC-ND 4.0."* Evidence highlighting is a UI overlay on unchanged text. The demo is free (non-commercial).
+- **The website serves the user's own uploads only.** IU material appears only in the built-in sample (unchanged report text, with attribution) and in aggregate results. The attribution notice is shown in the website footer: *"Indiana University Chest X-ray Collection (Open-i, NLM), CC BY-NC-ND 4.0."* Evidence highlighting is a UI overlay on unchanged text. The website is free (non-commercial).
 - A public **model card without weights** (`docs/model_card.md`) documents training data, method, results and why the weights are private.
 - Not legal advice; this is the cautious reading of the licence.
 
@@ -128,7 +121,7 @@ CC BY-NC-ND allows using and adapting the data privately, but not **sharing** ad
 - In the product (v2), uncertainty's job is **escalation to the verifier agent** (§6.2). There is no human-review queue: a label the agent can't confirm stays in the output marked `unverified`. Measured:
   - **escalation rate and unverified rate on hedged vs clear reports** (should be much higher on hedged)
   - **escalation precision**: the share of escalated reports where the Tier 1 answer disagreed with the expert codes
-  - v1 (M5) measured the same with a review queue (the v1 review rate in §10).
+  - v1 (M5) measured the same with a review queue (the v1 review rate in [RESULTS.md](RESULTS.md)).
 - Future work: RadGraph's radiologist-annotated test set (PhysioNet) for real uncertainty and span accuracy.
 
 ### 4.4 Label set and mapping v1 (D4, D5)
@@ -195,15 +188,14 @@ All subsets live in `eval/subsets.py`, are computed once in M1, and are saved as
 - **negspacy termset extension (pre-registered):** the default termset doesn't treat resolution language as negation. Add these as following negations: "has resolved", "have resolved", "resolved", "no longer seen", "no longer visualized", "has cleared", "have cleared", "removed". Without them, "effusion has resolved" would count as a clear positive mention and inflate the noise-adjusted score (§4.6).
 - **Eval lexicon additions (pre-registered):** the mapping audit showed missing synonyms, e.g. devices ("ICD", "AICD", "pacemaker", "prosthetic valve", "valve replacement", "monitor leads", "ECG leads", "spinal stimulator", "port", "PICC", "sternotomy wires") and pneumothorax variants ("hydropneumothorax", "hemopneumothorax"). Add these to `eval/lexicon.yaml` with a one-line reason each.
 - **Freeze:** `eval/lexicon.yaml` and the negspacy termset are versioned `eval_v1` and **frozen at the end of M1, before any model output exists**. Any later change needs owner approval and a changelog entry. The pipeline's own alias list is written separately from general clinical knowledge and is **never copied from the eval lexicon**, to keep the two independent.
-- M1 writes the pair counts per label (all, and abnormal-only) to `data_card.json`. There are no README reference numbers for these, so they become the reference once the owner approves them.
+- M1 writes the pair counts per label (all, and abnormal-only) to `data_card.json`. There are no SPEC reference numbers for these, so they become the reference once the owner approves them.
 
 ---
 
 ## 5. Architecture
 
 ```
-raw report text ──► Ingestion worker: asyncio queue + Postgres `jobs`/`report_status` tables
-                    (status, attempts, tenacity retries with backoff, cost ledger, resumable)
+upload (one report or a series: pasted text, .txt or .pdf) ──► session (in memory, expires; nothing stored)
                          │  each report = one run_pipeline() call
                          ▼
      ┌──────────────── run_pipeline(raw_text) (per report) ─────────────────────┐
@@ -227,32 +219,32 @@ raw report text ──► Ingestion worker: asyncio queue + Postgres `jobs`/`rep
      │        ▼                                                                   │
      │ Verifier agent (ReAct, tools, bounded loop) → per label:                   │
      │   verified · corrected · suggested · unverified   (no human-review queue)  │
-     └──────────────┬──────────────────────────────────────┬────────────────────┘
-                    ▼                                      ▼
-     Postgres `labels` (PREDICTED only,            Qdrant collection
-     with verification state + evidence)           - report points + contextual sentence points
-                    │                              - dense (fine-tuned bge-small) + sparse BM25
-                    │                              - payload: report_id, sentence_id, section,
-                    │                                predicted labels + verification state,
-                    │                                pipeline negation tag; indication as a
-                    │                                separate field (Q&A only)
-                    └──────────────┬───────────────┘
-                                   ▼
-question ──► Redis cache (key: question + index_version + label_model_version)
-                                   ▼
-             Query agent (LangGraph): sql_count · filtered_search · get_report · get_sentences
-             → hybrid retrieval (RRF) → optional cross-encoder reranker
-             → evidence check → answer with citations, or "not enough evidence"
-                                   ▼
-             FastAPI · Docker Compose · rate limit · tracing · CI · Gradio demo
+     └───────────────────────────────────┬──────────────────────────────────────┘
+                                         ▼
+     session: reports, sentences, final labels (status, evidence, verification, corroboration)
+            │                                              │
+            ▼                                              ▼
+   question, scope "report"                        question, scope "all"
+   → LLM over that report's sentences              → session RAG: dense (bge-small; fine-tuned after
+     and labels                                       M9 if it passes §8.2) + BM25 over the session's
+            │                                         sentences, RRF → top sentences → LLM
+            └──────────────────┬───────────────────────────┘
+                               ▼
+            answer with citations (report_no:sentence_id, checked in code), or a refusal
+                               ▼
+     FastAPI session API (Hugging Face Docker Space)  ◄──►  React frontend (Vercel)
+
+Evaluation test bed (offline, never served): IU reports → Postgres `labels` + Qdrant index (M8)
+→ retrieval evaluation (§8.2) and embedding fine-tuning (§6.3).
 ```
 
 Invariants:
-1. **Serving never reads expert labels.** The `labels` table, the Qdrant payloads, `run_pipeline` and the verifier agent see pipeline predictions and report text only. Unit tests enforce this.
-2. **One entry point.** `run_pipeline(raw_text)` is the only way labels are produced: the evaluation script, the ingestion worker and the API all call it. Evaluation feeds it joined report text with the expert codes hidden (§8.1).
-3. **Evaluation models vs serving model.** CV trains 5 evaluation embedding models (one per fold) for honest metrics. The serving model is trained once on all reports after evaluation and stored privately.
+1. **Serving never reads expert labels.** The session API, `run_pipeline`, the verifier agent and session RAG see report text and pipeline predictions only; so do the evaluation index's tables and payloads. Unit tests enforce this.
+2. **One entry point.** `run_pipeline(raw_text)` is the only way labels are produced: the evaluation scripts and the session API both call it. Evaluation feeds it joined report text with the expert codes hidden (§8.1).
+3. **Evaluation models vs serving model.** CV trains 5 evaluation embedding models (one per fold) for honest metrics (M9). The serving model is trained once on all reports after evaluation and stored privately. The verifier agent always uses the base model.
 4. **Every LLM call is cached**, keyed by (model snapshot, prompt hash, input hash), so evaluation is reproducible and CI needs no API calls.
-5. **No separate LLM-judge steps** anywhere in the pipeline or in retrieval. Judgment happens inside the verifier agent and the query agent, with their tools.
+5. **No separate LLM-judge steps** anywhere in the pipeline or in retrieval. Judgment happens inside the verifier agent (with its tools) and in the answer step, whose citations are checked in code.
+6. **Uploads are never stored.** Sessions live in process memory and expire; no database writes and no logs of report text.
 
 ## 6. Component specifications
 
@@ -292,13 +284,13 @@ Invariants:
 - `suggested`: a finding the tagger missed, added by the agent.
 - `unverified`: the agent could not confirm the label (with `reason`). This replaces v1's human-review queue.
 
-`corroboration` (M7, code only; never used for routing), for every `present` or `suggested` label: whether its evidence comes from `both` sections, `findings` only, `impression` only, or `none` (no evidence sentence). Precision by level is reported in §10.
+`corroboration` (M7, code only; never used for routing), for every `present` or `suggested` label: whether its evidence comes from `both` sections, `findings` only, `impression` only, or `none` (no evidence sentence). Precision by level is reported in [RESULTS.md](RESULTS.md).
 
 Evidence is always sentence IDs that exist in the report, and the sentence text is returned verbatim (string-checked), so evidence can't be invented. Evidence proves the sentence exists, not that it caused the label.
 - **Output vs evaluation policy.**
   - System output is four-valued: `present | uncertain | absent | not_mentioned`, representing what the report text says.
-  - Headline evaluation binarises it: `present` = positive, everything else = negative, against the expert codes. The "`uncertain` = positive" row in §10 is a sensitivity check, not the headline metric (on the `hedged` subset both policies are reported, §4.3).
-  - The verifier's hedge downgrade (`present` → `uncertain`) is product policy. In v1 its cost in the headline metric (LLM + verifier − LLM only in §10) came mostly from "borderline cardiomegaly". The Tier 1 label definitions state that mild or borderline enlargement **is** Cardiomegaly, so in v2 the hedge check no longer treats wording that a label's definition counts as present ("borderline", "mild") as a hedge. This is a consistency fix between two existing rules, not tuning on test results.
+  - Headline evaluation binarises it: `present` = positive, everything else = negative, against the expert codes. The "`uncertain` = positive" row in [RESULTS.md](RESULTS.md) is a sensitivity check, not the headline metric (on the `hedged` subset both policies are reported, §4.3).
+  - The verifier's hedge downgrade (`present` → `uncertain`) is product policy. In v1 its cost in the headline metric (LLM + verifier − LLM only in [RESULTS.md](RESULTS.md)) came mostly from "borderline cardiomegaly". The Tier 1 label definitions state that mild or borderline enlargement **is** Cardiomegaly, so in v2 the hedge check no longer treats wording that a label's definition counts as present ("borderline", "mild") as a hedge. This is a consistency fix between two existing rules, not tuning on test results.
   - The `verification` field is **not** scored. It is evaluated separately: are `verified` labels more accurate than `unverified` ones (§8.1)?
   - The Atelectasis gap to the rule baseline comes from the LLM's own `uncertain` outputs (e.g. "scarring or atelectasis"), not from the verifier.
   - The absent-evidence rules (`absent` with no or generic evidence → flag) affect routing only, never scores: only `present` is scored.
@@ -317,7 +309,7 @@ Evidence is always sentence IDs that exist in the report, and the sentence text 
 | No Finding exclusivity | No Finding `present` ⇒ every other label ≠ `present`. No Finding is **derived in code** (present iff no other label is present/uncertain, else not_mentioned); a model's No Finding value is ignored (M4). | — (by construction) |
 | Section rule | Impression overrides Findings **only on an explicit same-label contradiction**. "No acute cardiopulmonary abnormality" does **not** cancel specific Findings. Unit test: Findings "mild cardiomegaly" + Impression "no acute disease" → Cardiomegaly stays `present`. A disagreement is a **flag**, not a fail: on the M4 pilot the LLM was right in 26 of 39 such disagreements (owner's pre-committed rule; `docs/evaluation_notes.md`). | escalates |
 
-- **Free checks, part 2: recall scan** (v2, M7). The rule labeller (`src/radlabel/labelling/rules.py`, also the rule baseline: aliases + pipeline negation, no LLM) runs on every report as a cheap second reader. For each label where the rules say `present` and the tagger says `absent` or `not_mentioned`, the report escalates. This targets the tagger's real weakness: its precision is ~0.99 on several labels, but its recall is lower (§10). The rules have their own errors (e.g. "upper limits of normal" read as enlargement), which is why the agent decides, not the rules.
+- **Free checks, part 2: recall scan** (v2, M7). The rule labeller (`src/radlabel/labelling/rules.py`, also the rule baseline: aliases + pipeline negation, no LLM) runs on every report as a cheap second reader. For each label where the rules say `present` and the tagger says `absent` or `not_mentioned`, the report escalates. This targets the tagger's real weakness: its precision is ~0.99 on several labels, but its recall is lower ([RESULTS.md](RESULTS.md)). The rules have their own errors (e.g. "upper limits of normal" read as enlargement), which is why the agent decides, not the rules.
 - **Free checks, part 3: normal check** (v2, M7; code, no LLM). A predicted No Finding is an **unconfirmed claim** and is always checked, because many reports with a "no acute" impression still carry abnormal codes (e.g. borderline cardiomegaly, granulomas). When No Finding comes out `present`:
   - **coverage:** the report has normal statements covering at least the **heart and lungs** (pleura, mediastinum and bones are recorded when stated, but not required, since many normal reports never mention them);
   - **nothing abnormal:** the rule scan finds no `present` or `uncertain` label, including Other Abnormality cues, in any sentence.
@@ -328,13 +320,13 @@ Evidence is always sentence IDs that exist in the report, and the sentence text 
 - **Verifier agent** (v2, M7; `verifier_agent.py`, LangGraph ReAct): runs **only on escalated reports**. Everything else ends as `verified_rules`.
   - **Model:** the agent deployment (gpt-5-mini), with its own prompt, not the tagger's.
   - **Input:** the report's sentences, the tagger's labels **without the tagger's evidence** (blind first: the agent finds evidence itself), and the escalation reasons (check messages, recall-scan disagreements). Never expert codes, folds, eval mentions or metrics (leakage test).
-  - **Tools:** `find_by_alias(label)`, `find_by_meaning(label)` (sentence embeddings; base model until M10, then the fine-tuned one), `check_negation(sentence_id)`, `compare_sections(label)`, `check_redaction(sentence_id)`, `get_label_definition(label)` (the frozen label policy, the same definitions as the tagger prompt), `normal_check()` (the same check as free-check part 3, returning which regions are covered and which sentences look abnormal), `submit(labels)`.
+  - **Tools:** `find_by_alias(label)`, `find_by_meaning(label)` (sentence embeddings; always the base model, since the agent is frozen), `check_negation(sentence_id)`, `compare_sections(label)`, `check_redaction(sentence_id)`, `get_label_definition(label)` (the frozen label policy, the same definitions as the tagger prompt), `normal_check()` (the same check as free-check part 3, returning which regions are covered and which sentences look abnormal), `submit(labels)`.
   - **Output:** for each label it was asked about: `verified`, `corrected`, `suggested` or `unverified`, with evidence IDs (string-checked) and a one-line reason. Labels it wasn't asked about keep `verified_rules`.
   - **Limits:** at most 8 tool calls and a token cap per report; on hitting a cap, or the budget, the open labels end `unverified` with the reason.
   - **Empty Findings:** it uses the text that exists; No Finding confirmed from the Impression alone is `verified_impression_only`.
   - **Prompt development** only on the **dev slice** (the 102 Tier 1 pilot reports, already excluded from headline metrics). The prompt is frozen (hash test) before the full run. Label definitions come from the frozen policy; no rule is added from looking at test-fold errors.
   - **Independence:** the agent shares the report text with the tagger, so `verified` is a consistency check by a second model with different tools, not independent proof. Reported: how often the agent's evidence matches the tagger's.
-- **v1, historical (M5):** a Tier 2 repair agent (`repair_agent.py`) fixed FAIL labels only, and anything still failing or flagged went to a `review` table (Tier 3). Its results stay in §10 as the comparison column. v2 replaces both with the verifier agent.
+- **v1, historical (M5):** a Tier 2 repair agent (`repair_agent.py`) fixed FAIL labels only, and anything still failing or flagged went to a `review` table (Tier 3). Its results stay in [RESULTS.md](RESULTS.md) as the comparison column. v2 replaces both with the verifier agent.
 
 **Baselines** (`eval/baselines/`):
 - `rule_baseline.py`: alias match + pipeline negation, no LLM. Always available. A thin wrapper around `src/radlabel/labelling/rules.py`, so pipeline code never imports from `eval/`.
@@ -342,55 +334,45 @@ Evidence is always sentence IDs that exist in the report, and the sentence text 
 - LLM extractor without the verifier and repair (ablation).
 - No QLoRA / local-model tagger (dropped 21 Oct 2026).
 
-### 6.3 Index and embeddings (`src/radlabel/index/`, `training/`)
-- **Points:** one per report (Findings + Impression) and one per sentence, each with its section name. Sentence text is prefixed with a context line built from **predicted** labels: `"[Findings | report also mentions: cardiomegaly] No pleural effusion."` If the parser found no sections, sentences are indexed with section `unknown`.
-- **Payload:** report_id, sentence_id, section, predicted labels with their `verification` state (so filters can require verified labels), pipeline negation tag, and the evidence sentence IDs per label.
-- **Indication** is stored as a separate field per report for the query agent ("why was this exam done?"; empty or mostly `[REDACTED]` → "not stated"). It is **never** embedded into report or sentence points and never used in retrieval-evaluation queries, because it can hint at the label.
-- **Retrieval:** dense (cosine) + BM25 sparse in Qdrant, fused with RRF (k = 60). Optional cross-encoder `BAAI/bge-reranker-base` over the top 50. No LLM-judge stage.
-- **Aggregation:** sentence hits → reports by **max score per report**, then deduplicated.
+### 6.3 Index, embeddings and fine-tuning (`src/radlabel/index/`, `training/`)
+The IU index is the **evaluation test bed** (M8, §8.2) and the source of training pairs; users never search it.
+- **Points:** one per report (Findings + Impression) and one per sentence, each with its section name (`unknown` if the parser found no sections). **Sentences are embedded without the predicted-label prefix**: in M8, plain sentences scored pooled nDCG@10 0.564 vs 0.491 with the prefix ([RESULTS.md](RESULTS.md)). The prefix and filter rows stay in the evaluation as comparisons. (The M8 index builder still writes prefixed sentence points; switching it is part of M9.)
+- **Payload:** report_id, sentence_id, section, predicted labels with their `verification` state, pipeline negation tags, and the evidence sentence IDs per label.
+- **Indication:** stored only in Postgres (`reports.indication`); never embedded, never in an index point, never in a retrieval-evaluation query.
+- **Retrieval:** dense (cosine) + BM25 (sparse vectors with IDF computed at index time), fused with RRF (k = 60); deterministic tie-breaking. Optional cross-encoder reranker. No LLM-judge stage.
+- **Aggregation:** sentence hits → reports by **max score per report**.
 
-**Embedding fine-tuning** (`training/build_pairs.py`, `training/train_embeddings.py`):
+**Embedding fine-tuning (M9, planned)** (`training/build_pairs.py`, `training/train_embeddings.py`):
 - Base model `BAAI/bge-small-en-v1.5`; `--device auto` (CPU works; GPU is faster).
-- Pairs are built **from training folds only**, with expert codes for relevance and the pipeline negation tags for hard negatives:
+- Pairs are built **from training folds only**, on **plain sentences (no prefix)**, with expert codes for relevance and the pipeline negation tags for hard negatives:
   - query → report: positive = coded finding; hard negative = report mentioning it only negated
-  - query → sentence, using the **same contextual prefix format** as the index
+  - query → sentence
   - report → report, sampled **from abnormal reports only**: positive = same label set; hard negative = similar wording with a negated key finding
 - Queries come from label names plus **non-held-out** aliases. **Held-out labels** (Fracture, Lung Lesion, Pleural Other) are never used in training.
 - **Loss:** `CachedGISTEmbedLoss` with the base model as guide, which filters in-batch false negatives. Fallback: `MultipleNegativesRankingLoss` with a sampler allowing each label once per batch.
 - 1–3 epochs, selected by inner-validation nDCG@10.
 - Output: `models/eval/fold_{k}/` and `models/serving/`, **private, git-ignored**.
+- **Use:** the fine-tuned model is for **search and session RAG only**, and only if it passes the pre-committed rule of §8.2. The verifier agent's `find_by_meaning` stays on the base model.
 
-### 6.4 Query agent (`src/radlabel/agent/`)
-| Tool | Contract |
-|---|---|
-| `sql_count(filters: {label: status}, verified_only?, section?)` | parameterised read-only SQL over `labels`; returns count + up to 20 example report IDs |
-| `filtered_search(query, filters?, verified_only?, k=10)` | the hybrid retrieval of §6.3; returns `report_id`, `sentence_id`, score, text |
-| `get_report(report_id)` | unchanged report text + attribution, sections as parsed |
-| `get_indication(report_id)` | the indication text, or "not stated" |
-| `get_sentences(report_id, ids)` | the cited sentences |
-| `get_label_evidence(report_id, label)` | the label's status, verification state and evidence sentences ("what supports cardiomegaly in this report?") |
+### 6.4 Questions: one report or session RAG (`src/radlabel/api/`)
+- **Scope "report":** the question, that report's sentences (with IDs) and its final labels go to the LLM (the Tier 1 deployment, gpt-4.1-mini); it answers or refuses, citing sentence IDs.
+- **Scope "all":** **session RAG** over the user's own uploads: the session's sentences are embedded (plain, no prefix; base bge-small, or the fine-tuned model once M9 passes §8.2) and BM25-indexed in memory, fused with RRF; the top sentences, with their `report_no`, go to the LLM, which answers with `report_no:sentence_id` citations or refuses.
+- **Guardrails:** every citation is checked in code (the sentence exists in that report; otherwise the answer becomes a refusal); refusal when retrieval finds nothing relevant; out-of-scope refusal (CT, age, which is redacted, treatment or diagnosis advice); questions of at most 500 characters; every LLM call through `radlabel.llm` (cached, cost-capped).
+- There is no query agent over the IU corpus and no SQL over the evaluation tables.
 
-**Guardrails:**
-- Every claim cites `report_id:sentence_id`, and a post-check verifies each citation exists and mentions the finding asked about.
-- Refusal ("not enough evidence") below a relevance threshold **tuned on inner validation**.
-- Out-of-scope refusal (CT, age, which is redacted, treatment or diagnosis advice).
-- Schema-validated tool arguments; read-only database role; input length limit.
-
-### 6.5 Ingestion, API, operations (`src/radlabel/ingest/`, `src/radlabel/api/`)
-- **Ingestion worker:** asyncio queue with bounded concurrency, tenacity retries with exponential backoff, a Postgres status per report, a `MAX_LLM_USD` cost cap (when reached, escalated labels end `unverified` with reason "budget" instead of calling the agent), and resume-from-status after a crash. Each report goes through `run_pipeline`.
-- **API:** `POST /ingest`, `GET /jobs/{id}`, `POST /label` (raw report text → `run_pipeline`), `GET /reports/{id}/labels`, `POST /ask`, `GET /health`. No review endpoints: unverified labels are visible in the output and in the demo.
-- Redis: answer cache (versioned key) + embedding cache + rate limiting.
-- Tracing via Langfuse or Arize Phoenix (`TRACING_BACKEND`); one trace per request, with tier, tool calls, verifier messages and latency per step.
-- Docker Compose services: `api`, `worker`, `postgres`, `qdrant`, `redis`, optional `phoenix`. Models are mounted from the private `MODEL_STORE`.
-- Deployment files (`deploy/`), CPU-only. Default target: **Azure Container Apps** (API + demo, scale-to-zero), with Qdrant and Redis as containers and Postgres Flexible Server (Burstable). Fallback: a single small Azure VM running Docker Compose with **auto-shutdown** enabled. Actual deployment requires the owner's credentials; keep it stopped or scaled to zero when not demoing, to save student credit.
-- **Production checklist** (part of M10/M11):
-  - **Dockerfile:** multi-stage, slim Python base, non-root user, `HEALTHCHECK` on `/health`. The image contains **no data and no model weights**; models are mounted from `MODEL_STORE` at runtime (§4.1).
-  - **Database migrations** with Alembic, not ad-hoc `CREATE TABLE`.
-  - **Config** via pydantic-settings. Secrets only from environment variables (Container Apps secrets or Key Vault in Azure); never baked into images.
-  - **API:** request IDs, structured JSON logs, consistent error schema, request size limits, `/health` (liveness) and `/ready` (Postgres, Qdrant and Redis reachable).
-  - **CI:** lint (ruff), type check (mypy on `src/`), tests, cached regression eval, and a Docker build. **CD** (manual trigger) pushes the image to a **private** registry (GHCR private or Azure Container Registry) and updates the Container App.
-  - **Smoke test** after deploy: `/health`, one `/label` and one `/ask` call against the deployed URL.
-- **Demo** (`demo/app.py`, Gradio): paste a report and see its labels with verification badges (verified / corrected / suggested / unverified) and evidence highlighted; ask a question, see the answer with clickable citations, view the unchanged report with evidence highlighted as an overlay, and the attribution footer.
+### 6.5 Session API, frontend, deployment (`src/radlabel/api/`, `web/`)
+- **Session API** (FastAPI). The contract is in `web/README.md` on branch `m9c-frontend`:
+  - `POST /api/session` → `{session_id}`
+  - `POST /api/session/{id}/reports` (multipart: pasted text, `.txt` / `.pdf` files up to 50, or the built-in sample) → the reports with their sections, sentences and all 13 labels (status, verification, corroboration, evidence, reason)
+  - `POST /api/session/{id}/ask` with `scope: "report" | "all"` (`report_no` for scope "report") → an answer or a refusal, with citations
+  - `GET /api/session/{id}/timeline` → each label's status across the session's reports
+  - `GET /health`, `GET /ready`; errors as `{detail}` in plain language
+- **In memory, nothing stored:** sessions are held in process memory and expire; no Postgres or Redis writes of report text; logs carry no report text.
+- **Cost:** every LLM call goes through `radlabel.llm` with the `MAX_LLM_USD` cap. When the cap is reached, a report gets the rule labeller's labels (`unverified`, `rules_only: true`) instead of LLM calls.
+- **Limits:** per-client rate limits and request-size limits.
+- **Frontend** (React + Vite + TypeScript + Tailwind; branch `m9c-frontend`, M10c): landing, upload and results pages; labels with verification badges and evidence highlighted on the unchanged text; findings over time across a series; questions with clickable citations; attribution footer and a "not a medical device" notice.
+- **Deployment (M11):** frontend on **Vercel**; backend on a **Hugging Face Docker Space** (FastAPI). Azure OpenAI keys are **Space secrets**, never in the image or the repository. Private models (fine-tuned weights) are **never baked into the image**; they are pulled at startup from a private store. The IU data and the LLM caches are never deployed.
+- **Production checklist:** multi-stage slim Dockerfile, non-root user, `HEALTHCHECK` on `/health`, no data or weights in the image; config via pydantic-settings; CI with ruff, mypy, tests and the cached regression evaluation; smoke test after deploy (`/health`, one upload, one ask).
 
 ---
 
@@ -401,7 +383,7 @@ All settings live in **`.env.example`** at the repo root (committed, no secrets)
 | Group | Variables |
 |---|---|
 | Provider | `LLM_PROVIDER`, `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`, `OPENAI_API_KEY` |
-| Deployments per role (§7.1) | `AZURE_OPENAI_DEPLOYMENT` (Tier 1), `…_FALLBACK_DEPLOYMENT`, `…_REPAIR_DEPLOYMENT` (agents: verifier agent, query agent; the name is kept from v1), `…_CHEAP_DEPLOYMENT` (paraphrasing), `…_EMBED_DEPLOYMENT` (baseline row only), plus a `…_VERSION` for each |
+| Deployments per role (§7.1) | `AZURE_OPENAI_DEPLOYMENT` (Tier 1), `…_FALLBACK_DEPLOYMENT`, `…_REPAIR_DEPLOYMENT` (the verifier agent; the name is kept from v1), `…_CHEAP_DEPLOYMENT` (paraphrasing), `…_EMBED_DEPLOYMENT` (baseline row only), plus a `…_VERSION` for each |
 | Pilot | `PILOT_DEPLOYMENTS` |
 | Limits and budget | `TIER1_TPM`, `REPAIR_TPM`, `CHEAP_TPM` (deployment allocations), `TIER1_MAX_TOKENS`, `LLM_MAX_CONCURRENCY`, `MAX_LLM_USD`, `LLM_CACHE_DIR` |
 | Local models | `EMBED_BASE_MODEL`, `RERANKER_MODEL`, `DEVICE`, `MODEL_STORE` |
@@ -418,14 +400,14 @@ Keep `.env.example` in sync whenever a setting is added.
 - The LLM client retries 429s with exponential backoff, honours `Retry-After`, and keeps concurrency below the deployment's TPM. A 429 is never treated as a failed label; the report stays queued.
 - `MAX_LLM_USD` is enforced in code (currently 20): fresh LLM calls stop when the cost ledger reaches **50% of it ($10)**; cache hits are always free. The owner sets an Azure Cost Management budget alert (e.g. $20) as a second safeguard.
 
-**Version pinning.** Each deployment uses version update policy **"Upgrade when expired"** (`OnceCurrentVersionExpired`). The version stays fixed for the whole project, and only at retirement does the deployment move to the new default instead of failing with HTTP 410. ("No auto upgrade" would make the demo break at retirement.) The LLM client also logs the `model` field returned by **every response** and raises a warning if it changes between calls, which catches silent upgrades. Retirement dates are checked in each deploy dialog before use.
+**Version pinning.** Each deployment uses version update policy **"Upgrade when expired"** (`OnceCurrentVersionExpired`). The version stays fixed for the whole project, and only at retirement does the deployment move to the new default instead of failing with HTTP 410. ("No auto upgrade" would make the website break at retirement.) The LLM client also logs the `model` field returned by **every response** and raises a warning if it changes between calls, which catches silent upgrades. Retirement dates are checked in each deploy dialog before use.
 
 **LLM deployments** (all Global Standard; the model version is recorded in every results file):
 
 | Deployment | Quota (TPM) | Used for | Why |
 |---|---|---|---|
-| `gpt-4.1-mini` | 5M | Tier 1 labelling (~3,100 reports) | Non-reasoning, temperature 0, reliable structured output, cheap → reproducible bulk work |
-| `gpt-5-mini` (already deployed, 375K TPM allocated) | 1M | Verifier agent (v2; Tier 2 repair agent in v1), query agent | Reasoning model, better at multi-step tool use; runs only on escalated reports |
+| `gpt-4.1-mini` | 5M | Tier 1 labelling (~3,100 reports) and answers to questions (ask) | Non-reasoning, temperature 0, reliable structured output, cheap → reproducible bulk work |
+| `gpt-5-mini` (already deployed, 375K TPM allocated) | 1M | Verifier agent (v2; Tier 2 repair agent in v1) | Reasoning model, better at multi-step tool use; runs only on escalated reports |
 | `gpt-5.4-mini` (fallback for Tier 1) | 1M | Tier 1 if gpt-4.1-mini is unavailable or retiring | Newer; check in the pilot whether it supports temperature 0 and reliable structured output. (gpt-4o-mini 2024-07-18 was reported retired on 1 Oct 2026, so it isn't used.) |
 | `gpt-4.1-nano` or `gpt-5.4-nano` | 5M | Paraphrasing agent questions | Cheapest option for simple rewriting |
 | `text-embedding-3-small` | 1M | Optional retrieval baseline row ("API embeddings vs our fine-tuned model") | Not used in serving |
@@ -441,14 +423,14 @@ Not used:
 - **Newer models without verified pricing**: check prices before using them for bulk work.
 - **Third-party models on Azure** (Anthropic, xAI, DeepSeek models): small quotas, possibly billed outside student credit.
 
-**LLM spend:** $2.38 after M5 (Tier 1 full run $0.59 + re-run, pilots, mapping cross-checks, Tier 2 $0.26). The free checks are code, so they reuse cached outputs. The verifier agent's cost is **estimated on the dev slice before the full run** (M7); the owner decides at that point. Query agent and its evaluation: estimated before running. Hard stop: $10 total (above).
+**LLM spend:** $5.43 in total, from the cost ledger (`artifacts/llm_cache/ledger.jsonl`), all milestones up to M8 (M8 made no LLM calls). The free checks are code, so they reuse cached outputs. The website evaluation (M10b) is estimated before any paid run. Hard stop: $10 total (above).
 
 **GPU accelerator quota** (8 each of A100 80GB, H100 80GB, H200 141GB, MI300 192GB). **The quota isn't the constraint; the credit is**, since GPU time costs several dollars per hour. Policy:
 
 | Task | Compute | Note |
 |---|---|---|
 | Embedding fine-tuning (bge-small, 5 folds + serving model) | CPU or Kaggle T4 by default; **optionally 1× A100 80GB** as an Azure ML job | Small model; an A100 finishes all runs in minutes. Use a compute cluster with **min nodes = 0**, so it scales to zero after the job. |
-| Serving the API and demo | **No GPU** | The deployed system uses the Azure OpenAI APIs and CPU embeddings. |
+| Serving the website (API and session RAG) | **No GPU** | The deployed system uses the Azure OpenAI APIs and CPU embeddings. |
 | H100, H200 | Not used | Overkill for these model sizes, and pricier. |
 | MI300 (AMD) | Not used | ROCm setup is more fiddly; not worth the time. |
 
@@ -473,7 +455,7 @@ All metrics use **out-of-fold predictions** from the stratified 5-fold CV (§4.2
   - final-label macro-F1 vs LLM only and vs LLM + verifier + Tier 2 (paired bootstrap). The agent is **kept** only if its F1 vs LLM + verifier + Tier 2 is not significantly lower.
   - labels changed: wrong → right vs right → wrong, per label; `suggested` labels that are correct vs wrong (the recall effect).
   - **the key result:** precision and F1 of `verified` / `verified_rules` labels vs `unverified` labels. If unverified labels are not clearly less accurate, the verification state carries no information, and that is reported.
-  - escalation rate (share of reports sent to the agent), escalation precision, and the share of labels and reports ending `unverified`, on hedged vs clear reports. This replaces the v1 review rate in §10.
+  - escalation rate (share of reports sent to the agent), escalation precision, and the share of labels and reports ending `unverified`, on hedged vs clear reports. This replaces the v1 review rate in [RESULTS.md](RESULTS.md).
   - evidence agreement: how often the agent's evidence matches the tagger's (blind-first design).
   - No Finding precision before and after the normal check and the agent, and the number of predicted normals withheld, right vs wrong (secondary).
   - cost per report and in total; tool calls per report; caps hit.
@@ -486,7 +468,7 @@ All metrics use **out-of-fold predictions** from the stratified 5-fold CV (§4.2
   - seen-label queries
   - **held-out-label** queries
   - **held-out-alias** queries
-  - 30 hand-written attribute and compositional queries in `eval/queries/handwritten.yaml`
+  - 30 hand-written attribute and compositional queries in `eval/queries/retrieval_v1.yaml` (spec frozen before the first run; query list in `retrieval_v1_queries.json`)
   - **report-to-report ("reports like this one"):** the query is a short Findings snippet of an **abnormal** report. A result is relevant if it shares **at least one abnormal label** with the query report (No Finding doesn't count, otherwise every normal report would be relevant to every other one). nDCG gain = the overlap of the two abnormal label sets (Jaccard). The query report and its exact duplicates are removed from the results. Normal-report queries are not scored.
 - **Relevance always comes from expert codes, on the evaluation side only.** Indication text is never part of a query.
 - **Metrics:** recall@10, nDCG@10, and **negation contamination@10** (the share of top-10 results whose only mentions of the finding are negated, per the eval detector). Measured **after each stage**: dense, +BM25, +rerank.
@@ -496,31 +478,33 @@ All metrics use **out-of-fold predictions** from the stratified 5-fold CV (§4.2
 | BM25 | | | |
 | base bge-small, report-level | | | |
 | base bge-small, sentences without prefix (pure embedding) | | | |
-| base bge-small, contextual sentences | | | |
-| base bge-small + negated-sentence payload filter (no training) | | | |
+| base bge-small, no prefix + negated-sentence filter | | | |
+| base no-prefix sentences + BM25 (RRF) | | | |
+| base bge-small, contextual sentences (predicted-label prefix) | | | |
+| base bge-small + prefix + negated-sentence filter | | | |
 | base contextual sentences + BM25 (RRF) | | | |
 | fine-tuned, sentences without prefix (pure embedding) | | | |
-| fine-tuned + prefix + negated-sentence filter (full system) | | | |
-| fine-tuned + BM25 (RRF) | | | |
-| + reranker | | | |
+| fine-tuned + the best base combination's setup (full system) | | | |
+| + reranker (optional) | | | |
 
-**How fine-tuning (M10) is judged, two ways (owner, 22 Oct 2026):**
-- **Pure embedding effect:** base vs fine-tuned, both **without** the predicted-label prefix (sentence text only).
-- **Full system:** fine-tuned + prefix + negated-sentence filter vs the current best row, base + prefix + filter.
+**Best base combination** (owner rule, fixed before the run): the base row with the highest pooled nDCG@10; if the top two are within each other's 95% CI they are tied and the simpler one is chosen (order in `eval/queries/retrieval_v1.yaml`). The result is in [RESULTS.md](RESULTS.md).
 
-The contextual prefix names the **predicted** labels, so the prefix and filter rows partly reflect the labelling pipeline's output, not only the embeddings: once the "No X" sentences are filtered out, sentences whose prefix mentions X come from reports predicted positive for X. If the fine-tuned model beats neither comparison, that is reported as a negative result. It is expected to help most on held-out and free-text queries and on report-to-report similarity.
+**How fine-tuning (M9) is judged, two ways (owner, 22 Oct 2026):**
+- **Pure embedding effect:** fine-tuned vs base, both on sentences **without** the predicted-label prefix.
+- **Full system:** fine-tuned with the best base combination's setup vs the best base combination.
 
-### 8.3 Agent
-- **Question set** (`eval/agent_questions/`):
-  - templates for counts, filters, similarity and unanswerable questions, each LLM-paraphrased into 3–5 variants
-  - **40 hand-written** questions, including borderline unanswerable ones (age is redacted), "why was this exam done?" (indication) and "what supports <label> in report X?" (evidence)
-- Run twice: against an **expert-label** table (isolates agent errors) and against the **out-of-fold predicted-label** table (end-to-end).
-- **Metrics:** exact-answer accuracy, tool-choice accuracy, citation validity (checked in code), refusal precision/recall. No LLM-judged metrics.
+**Pre-committed use rule:** the fine-tuned model is used for search and session RAG only if its pooled nDCG@10 paired difference vs base (no prefix) is **not significantly negative** (95% CI upper bound ≥ 0) **and** its negation contamination@10 is **not higher**. Otherwise the base model stays, and that is reported as a negative result.
 
-### 8.4 System
-- Cost per 1,000 reports, tiered vs "LLM for everything", on **all** and on **abnormal** reports.
-- p50/p95 latency per endpoint.
-- Crash-and-resume log: kill the worker mid-job and restart it.
+The contextual prefix names the **predicted** labels, so the prefix and filter rows partly reflect the labelling pipeline's output, not only the embeddings: once the "No X" sentences are filtered out, sentences whose prefix mentions X come from reports predicted positive for X. Fine-tuning is expected to help most on held-out and free-text queries and on report-to-report similarity.
+
+### 8.3 Website evaluation (M10b)
+- **Single-report questions** on the dev slice (the 102 Tier 1 pilot reports, never in headline metrics): the **20 frozen questions** in `docs/m9b_handwritten_questions.md` (fixed before any results), each with its expected answer derived from the expert codes (v1, `present` = positive). Scored automatically: answer accuracy, correct refusal or "not stated" on unanswerable questions, citation validity (checked in code).
+- **Cross-report questions:** session RAG vs **all reports in the prompt**, on synthetic batches of **3, 10, 30 and 50** out-of-fold reports (fixed seed), with the scope-"all" questions of the same file: accuracy, citation validity, tokens and cost per request. This shows from which batch size RAG is needed.
+- No LLM-judged metrics. Cost is estimated before any paid run.
+
+### 8.4 Latency and cost
+- p50/p95 latency per request: upload (per report), ask scope "report", ask scope "all" by batch size.
+- Cost per request and per 1,000 reports: tiered (agent only on escalated reports, from the M7 ledger) vs the agent on every report.
 
 **Null results** are reported as they are. Headline claims focus on the abnormal and negation subsets.
 
@@ -540,15 +524,15 @@ radlabel/
 │   ├── labelling/          # extractor.py, verifier.py, rules.py, verifier_agent.py (v2), repair_agent.py (v1),
 │   │                       # schema.py, tier0.py, normal_phrases.yaml
 │   ├── pipeline.py         # run_pipeline(raw_text), the single entry point (v2)
-│   ├── index/  agent/  ingest/  api/  llm/  db/
-│   └── config.py, labels.py, results.py
+│   ├── index/  api/  llm/  db/
+│   └── config.py, embeddings.py, labels.py, results.py
 ├── training/               # build_pairs.py, train_embeddings.py
-├── eval/                   # cv.py, labelling.py, retrieval.py, agent.py, system.py, bootstrap.py,
+├── eval/                   # cv.py, labelling.py, retrieval.py, index_build.py, verifier_agent.py, bootstrap.py,
 │   │                       # subsets.py, entry_point.py, report.py, pilot.py, m4_analysis.py, repair.py (v1),
-│   │                       # lexicon.yaml, negex_termset.yaml, baselines/, queries/, agent_questions/
-├── demo/app.py
-├── deploy/
-├── docs/model_card.md
+│   │                       # lexicon.yaml, negex_termset.yaml, baselines/, queries/
+├── web/                    # React frontend (M10c; branch m9c-frontend)
+├── deploy/                 # Dockerfile for the Hugging Face Space, Vercel settings (M11)
+├── docs/                   # SPEC.md, RESULTS.md (generated), evaluation_notes.md, STATUS.md, model_card.md
 ├── tests/
 ├── artifacts/              # results/*.json, tables/*.md, mapping audit (git-ignored if it holds text)
 ├── models/                 # private, git-ignored
@@ -564,310 +548,25 @@ radlabel/
 
 ## 10. Results
 
-_Generated from `artifacts/results/*.json` by `python -m eval.report` (`make report`). No number in this section is typed by hand._
+All results are generated into [RESULTS.md](RESULTS.md) by `python -m eval.report` (`make report`) from `artifacts/results/*.json`; the README carries a short generated summary. No number in either is typed by hand.
 
-_The results below are the v1 pipeline (M3–M5), including its human-review routing. v2 rows (parser, verifier agent) are added by M6 and M7._
-
-<!-- results:start: generated by `python -m eval.report` from artifacts/results/*.json; do not edit -->
-
-**Claim scope.** Supported, on this dataset under this evaluation protocol: the LLM labelling pipeline improves over the implemented rule baseline; the v2 pipeline (LLM + free checks + verifier agent) improves over v1 (LLM + verifier + Tier 2) and over LLM only; verified labels are far more accurate than unverified ones. Not supported: clinical reliability; "verified" means checked to faithfully reflect the report text, not that the report or the coding is right.
-
-Limitations that bound these numbers (details in §11):
-- One institution (Indiana University, Open-i); reports from around 2013.
-- Expert codes are positive-only.
-- Hedged reports (279 unique texts) are excluded from the headline metrics.
-- The mapping from MeSH codes to the 13 labels is lossy (results under mapping v1 and strict).
-- Rare labels have small support, hence wide CIs.
-- 7 reports refused by the Azure content filter are scored with the rule baseline's labels.
-- The ground truth misses some clearly stated findings, so scores are a lower bound.
-- Labels describe the report text, not the images.
-- Review volume is 30.5% of reports (hedged 57.7%, clear 27.8%), too high for production use; reducing it is future work.
-
-### Labelling (§8.1)
-
-Out-of-fold, one report per exact text; hedged and Tier 1 pilot reports excluded unless stated; 95% bootstrap CIs over clusters. Scoring: `present` = positive, except in the sensitivity row.
-
-| Metric | Rule baseline | LLM only | LLM + verifier | LLM + verifier + Tier 2 | run_pipeline, clean join (M6) | run_pipeline, 30% varied joins (M6) | LLM + free checks + verifier agent (v2) |
-|---|---|---|---|---|---|---|---|
-| Headline macro-F1, 9 labels (v1) | 0.838 (0.823–0.850) | 0.862 (0.848–0.875) | 0.860 (0.845–0.873) | 0.866 (0.851–0.878) | 0.860 (0.845–0.873) | 0.848 (0.833–0.861) | 0.887 (0.874–0.899) |
-| Headline macro-F1, 9 labels (strict) | 0.829 (0.814–0.843) | 0.863 (0.848–0.877) | 0.861 (0.846–0.875) | 0.868 (0.853–0.881) | 0.861 (0.846–0.875) | 0.850 (0.835–0.865) | 0.883 (0.869–0.895) |
-| Pooled rare micro-F1 (v1) | 0.742 (0.677–0.805) | 0.831 (0.771–0.882) | 0.838 (0.777–0.889) | 0.829 (0.769–0.882) | 0.838 (0.777–0.889) | 0.824 (0.764–0.875) | 0.783 (0.723–0.832) |
-| Abnormal subset: headline macro-F1 (v1) | 0.761 (0.748–0.773) | 0.767 (0.754–0.781) | 0.765 (0.752–0.778) | 0.771 (0.758–0.783) | 0.765 (0.752–0.778) | 0.757 (0.744–0.770) | 0.792 (0.780–0.804) |
-| negation_only FP rate (pooled) | 41 / 6164 (0.0067) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 14 / 6164 (0.0023) |
-| *Sensitivity, not headline:* macro-F1 (v1) with `uncertain` = positive for all labels | 0.839 (0.825–0.852) | 0.853 (0.839–0.866) | 0.853 (0.839–0.866) | 0.861 (0.848–0.874) | 0.853 (0.839–0.866) | 0.841 (0.828–0.855) | 0.880 (0.867–0.893) |
-| *Sensitivity, not headline:* macro-F1 (v1), all reports incl. Tier 1 pilot | 0.837 (0.823–0.850) | 0.862 (0.848–0.876) | 0.860 (0.846–0.873) | 0.866 (0.852–0.878) | 0.860 (0.846–0.873) | 0.848 (0.834–0.861) | 0.889 (0.876–0.900) |
-| *Sensitivity, not headline:* macro-F1 (v1), `suggested` labels ignored | – | – | – | – | – | – | 0.875 (0.862–0.888) |
-
-Per-label tables: `artifacts/tables/labelling_*.md`.
-
-### Paired differences
-
-Headline macro-F1 (9 labels, v1), same out-of-fold reports and the same 1,000 cluster resamples for both systems.
-
-| Comparison | Difference (95% CI) | CI excludes 0 |
-|---|---|---|
-| LLM only − rule baseline | 0.025 (0.010–0.040) | yes |
-| LLM + verifier − LLM only | -0.002 (-0.004–-0.001) | yes |
-| LLM + verifier + Tier 2 − LLM + verifier | 0.006 (0.003–0.009) | yes |
-| LLM + verifier + Tier 2 − rule baseline | 0.028 (0.013–0.043) | yes |
-| LLM + verifier + Tier 2 − LLM only | 0.003 (0.000–0.007) | no |
-| run_pipeline, clean join − LLM + verifier | 0.000 (0.000–0.000) | no |
-| run_pipeline, varied joins − clean join | -0.012 (-0.017–-0.007) | yes |
-| LLM + free checks + verifier agent (v2) − LLM only | 0.025 (0.016–0.035) | yes |
-| v2 − LLM + verifier + Tier 2 | 0.022 (0.013–0.031) | yes |
-| v2 − rule baseline | 0.050 (0.037–0.063) | yes |
-
-**Reading.** The verifier's hedge downgrade costs 0.002 macro-F1 and Tier 2 recovers 0.006, so the full pipeline **matches** LLM-only macro-F1 (difference 0.003 (0.000–0.007); the 95% CI includes 0). The guardrails do not improve F1 over LLM only. What the guardrails add is label-level correction (Tier 2: 29 labels wrong → right vs 5 right → wrong) and routing of uncertain cases to human review (30.5% of reports).
-
-### Pipeline
-
-- Tier 1: 3,086 unique report texts labelled by gpt-4.1-mini-2025-04-14 (prompt `tier1-v1`, temperature 0); invalid outputs 0; content-filtered 7.
-- Tier 0: 0 out-of-fold matches (exact duplicates share a fold).
-- Verifier FAIL → Tier 2: 211 reports (6.8%).
-- Tier 2 repair agent (gpt-5-mini-2025-08-07, prompt `repair-v1`): fix accepted after re-verification for 78 of 211 (37.0%); mean tool calls 1.97; labels changed 75: wrong → right 29, right → wrong 5 (present = positive vs expert codes).
-- Routing: Tier 1 accepted 2,104, Tier 2 repaired 42, review 940 (30.5%).
-- Review rate: hedged 57.7% vs clear 27.8%. Escalation precision (Tier 1 labels disagree with the expert codes): Tier 2 64.9%, review 50.5%, base rate 25.0%.
-- LLM spend: Tier 2 calls $0.26. Reruns are served from the cache at $0.
-
-### Through the entry point (M6)
-
-Labels produced by `run_pipeline(raw_text)` (parse → tag → verifier), as an upload would be. Without headers the parser can't separate sections, so the whole text, including the indication, is read as Findings.
-
-3,086 unique reports joined into text with headers (codes hidden) and run through `run_pipeline`; 926 of them (30.0%, seed 13) also with a varied join. Clean joins whose labels differ from the LLM + verifier column: 1. Tagger inputs that differ from M4's, so not served by the M4 cache: 1387 (no headers 309, drop section 151, clean 1, heldout headers 926; correctly parsed clean joins: 0), whose calls cost $0.81. All LLM calls so far (cost ledger): $3.37.
-
-| Join | Reports | Sentences in the right section | Fully parsed | No sections found |
-|---|---|---|---|---|
-| clean | 3086 | 100.0% | 3083 (99.9%) | 0 |
-| alt headers | 307 | 100.0% | 307 (100.0%) | 0 |
-| no headers | 309 | 62.6% | 0 (0.0%) | 308 |
-| drop section | 310 | 100.0% | 310 (100.0%) | 0 |
-| heldout headers | 926 | 50.3% | 0 (0.0%) | 926 |
-
-Dropped sections: findings 70, impression 81, indication 81, comparison 78.
-
-Headline macro-F1 (v1) on the varied reports: the same reports with the clean vs the varied join:
-
-| Variant | Scored reports | Clean join | Varied join |
-|---|---|---|---|
-| alt headers | 267 | 0.815 (0.751–0.862) | 0.815 (0.751–0.862) |
-| no headers | 263 | 0.858 (0.810–0.899) | 0.864 (0.818–0.904) |
-| drop section | 276 | 0.873 (0.825–0.907) | 0.756 (0.690–0.807) |
-| heldout headers | 806 | 0.850 (0.822–0.873) | 0.850 (0.822–0.874) |
-
-Section subsets (as parsed; headline macro-F1, v1, hedged + pilot excluded):
-
-| Subset | Clean: reports (scored) | Clean macro-F1 | Varied: reports (scored) | Varied macro-F1 |
-|---|---|---|---|---|
-| empty findings | 426 (371) | 0.827 (0.769–0.864) | 452 (396) | 0.777 (0.716–0.819) |
-| empty impression | 6 (5) | 0.633 (0.500–1.000) | 396 (337) | 0.820 (0.773–0.861) |
-| sections not identified | 0 (0) | – | 308 (263) | 0.864 (0.818–0.904) |
-
-**Normal-claim count.** 1302 unique reports have an Impression made only of "no acute"-type statements; the expert codes are normal-only for 467, ignored-only for 2, and **not normal for 833 (64.0%)**. Positive labels among those: Cardiomegaly 30, Lung Opacity 48, Lung Lesion 28, Atelectasis 40, Pleural Effusion 1, Fracture 31, Support Devices 111, Other Abnormality 742, Pleural Other 4, Pneumothorax 2. The tagger predicted No Finding for 3 of the 833 (LLM only; after the verifier 3) and for 418 of the 467 normal-only ones.
-
-**Hedge-check fix** ("borderline"/"mild" are not a hedge where the label definition counts them as present), v1 results from cache, before → after:
-
-| Metric | Before | After |
-|---|---|---|
-| Hedge conversions (present → uncertain) | 147 | 125 |
-| LLM + verifier: headline macro-F1 (v1) | 0.857 (0.842–0.870) | 0.860 (0.845–0.873) |
-| LLM + verifier: Cardiomegaly F1 | 0.914 (0.890–0.937) | 0.944 (0.924–0.961) |
-| LLM + verifier − LLM only | -0.006 (-0.008–-0.003) | -0.002 (-0.004–-0.001) |
-| LLM + verifier + Tier 2: headline macro-F1 (v1) | 0.862 (0.848–0.875) | 0.866 (0.851–0.878) |
-| LLM + verifier + Tier 2 − LLM only | 0.000 (-0.004–0.004) | 0.003 (0.000–0.007) |
-| v1 review rate | 30.9% | 30.5% |
-
-### Verifier agent (M7, v2)
-
-**Reading (M7).** On this dataset and protocol, v2 improves headline macro-F1 over v1 (LLM + verifier + Tier 2) by 0.022 (0.013–0.031), 95% CI excludes 0, and over LLM only by 0.025 (0.016–0.035), 95% CI excludes 0. Most of the gain comes from Lung Lesion (+0.016 of the macro-F1); it holds without Other Abnormality (0.028 (0.018–0.039), 95% CI excludes 0). Verified labels are far more accurate than unverified ones: precision 0.938 (verified + verified_rules) vs 0.393 (unverified). The agent changes many labels in both directions (194 wrong → right vs 121 right → wrong), and its suggested labels have precision 0.54. Reports with any unverified label: 2.9% vs the v1 review rate of 30.5%. This is not like for like: v1 sent the whole report to human review for any remaining failure or escalating flag, while v2 marks only the labels the agent could not settle after checking the report itself, so the two rates count different things. The normal check does not separate right from wrong normals (tagger wrong in 1.1% of passed vs 0.7% of failed checks). "Blind first" is only partly blind: recall-scan hints carry the rule labeller's sentence IDs, and in 142 of 617 recall-scan escalations such an ID is a sentence the tagger also cited.
-
-**Keep/drop (pre-committed):** v2 − LLM + verifier + Tier 2 = 0.022 (0.013–0.031) → keep the verifier agent: **yes** (keep iff v2 − LLM + verifier + Tier 2 is not significantly negative (CI hi >= 0)).
-
-Escalated to the agent: 1,290 reports (41.8%; hedged 67.0% vs clear 39.3%). Reports with any `unverified` label: 90 (2.9%; hedged 3.2% vs clear 2.9%); unverified labels 183 (0.5%). v1 review rate: 30.5%, so v2 **reduced** the share of reports needing attention.
-
-Label changes vs LLM + verifier (scored reports; present = positive vs the codes): 445 status changes, wrong → right 194, right → wrong 121. Per label: No Finding 10/3; Cardiomegaly 2/3; Lung Opacity 55/45; Lung Lesion 33/15; Atelectasis 14/3; Pleural Effusion 6/0; Fracture 0/4; Support Devices 23/2; Other Abnormality 47/24; Edema 2/1; Pleural Other 1/3; Consolidation 0/18; Pneumothorax 1/0.
-
-**Verified vs unverified** (scored reports, all labels; present = positive):
-
-| Verification | Labels | Predicted present | Precision | Recall | F1 | Accuracy |
-|---|---|---|---|---|---|---|
-| verified rules | 33,711 | 3380 | 0.954 | 0.946 | 0.950 | 0.990 |
-| verified | 956 | 469 | 0.829 | 0.772 | 0.800 | 0.796 |
-| corrected | 264 | 121 | 0.612 | 0.902 | 0.729 | 0.792 |
-| suggested | 171 | 153 | 0.536 | 0.932 | 0.680 | 0.550 |
-| unverified | 135 | 61 | 0.393 | 0.727 | 0.511 | 0.659 |
-| verified or verified rules | 34,667 | 3849 | 0.938 | 0.924 | 0.931 | 0.985 |
-
-Suggested labels: 171 (153 present, 18 uncertain); precision of the present ones 0.536.
-
-**Normal check** (tagger No Finding after the deterministic verifier, scored reports):
-
-| Check | Tagger vs codes | Reports | Kept, right | Kept, wrong | Withheld, right | Withheld, wrong |
-|---|---|---|---|---|---|---|
-| failed | right | 266 | 264 | 0 | 0 | 2 |
-| failed | wrong | 2 | 0 | 1 | 1 | 0 |
-| passed | right | 282 | 282 | 0 | 0 | 0 |
-| passed | wrong | 3 | 0 | 3 | 0 | 0 |
-
-No Finding precision 0.991 before (recall 0.873) → 0.991 after (recall 0.884).
-
-**Section corroboration** of final `present` labels (scored reports):
-
-| Level | Labels | Precision |
-|---|---|---|
-| both | 1,151 | 0.943 |
-| single | 2,972 | 0.903 |
-| none | 0 | – |
-| unverified | 61 | 0.393 |
-
-Headline micro-F1 if only these levels count as present: both 0.411, both or single 0.919, all but unverified 0.919, all 0.918.
-
-Agent: prompt `verifier-v2` (frozen), 1,290 runs, mean tool calls 2.12; tools {'check_negation': 272, 'check_redaction': 95, 'compare_sections': 55, 'find_by_alias': 827, 'find_by_meaning': 79, 'get_label_definition': 21, 'normal_check': 101, 'submit': 1285}; stops {'content_filtered': 1, 'submitted': 1285, 'tool_cap': 4}; caps hit 4, content-filter refusals 1, budget stops 0; cost $2.12 ($0.0016 per report); embeddings: BAAI/bge-small-en-v1.5 (sentence-transformers 6.1.0).
-
-#### Per label, suggested labels and the normal-check ablation (after M7)
-
-| Label | LLM only F1 (P / R) | v1 Tier 2 F1 (P / R) | v2 F1 (P / R) | v2 vs LLM only: wrong → right / right → wrong | Share of the macro-F1 gain |
-|---|---|---|---|---|---|
-| No Finding | 0.928 (0.991 / 0.873) | 0.926 (0.987 / 0.873) | 0.934 (0.991 / 0.884) | 10 / 3 | +0.001 |
-| Cardiomegaly | 0.946 (0.993 / 0.903) | 0.944 (0.993 / 0.900) | 0.943 (0.983 / 0.906) | 2 / 4 | -0.000 |
-| Lung Opacity | 0.835 (0.938 / 0.752) | 0.836 (0.949 / 0.748) | 0.863 (0.844 / 0.882) | 53 / 46 | +0.003 |
-| Lung Lesion | 0.590 (0.621 / 0.562) | 0.614 (0.675 / 0.562) | 0.731 (0.679 / 0.792) | 34 / 15 | +0.016 |
-| Atelectasis | 0.857 (0.966 / 0.770) | 0.855 (0.980 / 0.759) | 0.880 (0.959 / 0.813) | 15 / 6 | +0.003 |
-| Pleural Effusion | 0.932 (1.000 / 0.873) | 0.932 (1.000 / 0.873) | 0.962 (1.000 / 0.927) | 6 / 0 | +0.003 |
-| Fracture | 0.872 (0.783 / 0.985) | 0.884 (0.802 / 0.985) | 0.850 (0.747 / 0.985) | 0 / 4 | -0.003 |
-| Support Devices | 0.856 (0.765 / 0.972) | 0.861 (0.784 / 0.956) | 0.879 (0.796 / 0.981) | 21 / 3 | +0.003 |
-| Other Abnormality | 0.944 (0.941 / 0.946) | 0.937 (0.944 / 0.931) | 0.945 (0.933 / 0.957) | 34 / 32 | +0.000 |
-| Edema (rare) | 0.903 (0.966 / 0.848) | 0.903 (0.966 / 0.848) | 0.923 (0.938 / 0.909) | 2 / 1 | – |
-| Pleural Other (rare) | 0.682 (0.569 / 0.853) | 0.675 (0.571 / 0.824) | 0.674 (0.558 / 0.853) | 2 / 3 | – |
-| Consolidation (rare) | 0.923 (0.857 / 1.000) | 0.923 (0.857 / 1.000) | 0.696 (0.533 / 1.000) | 1 / 18 | – |
-| Pneumothorax (rare) | 0.919 (1.000 / 0.850) | 0.919 (1.000 / 0.850) | 0.947 (1.000 / 0.900) | 1 / 0 | – |
-
-Without Other Abnormality (macro-F1 over the other 8 headline labels): v2 − LLM only 0.028 (0.018–0.039) (CI excludes 0).
-
-Suggested labels per label (scored reports): Cardiomegaly 2 (present 2, precision 0.000); Lung Opacity 69 (present 65, precision 0.415); Lung Lesion 33 (present 32, precision 0.656); Atelectasis 1 (present 1, precision 1.000); Pleural Effusion 1 (present 0, precision –); Support Devices 5 (present 5, precision 0.600); Other Abnormality 51 (present 45, precision 0.667); Edema 5 (present 0, precision –); Pleural Other 4 (present 3, precision 0.000).
-
-Known issue: Consolidation, v2 vs LLM + verifier wrong → right 0, right → wrong 18; candidate for a future prompt version developed on a new dev slice.
-
-**Normal-check ablation (chosen after seeing the results; v2 stays the headline):** the 160 reports escalated only by the normal check skip the agent (tagger labels, No Finding `unverified`). Macro-F1 (v1) 0.887 (0.874–0.899); ablation − v2 0.000 (0.000–0.000); saves 160 agent runs (250 calls, $0.25); reports with an unverified label rise to 250 (8.1%), because those normals stay unconfirmed. Not significantly worse: **yes**. Serving configuration: **v2** (v2: the ablation changes no label but would show ~99%-correct normals as unverified (owner, 2026-10-22)).
-
-#### Escalation before any agent call, and the dev slice
-
-Free checks on all 3,086 unique reports (clean join, tagger from cache, no agent call, $0): **1,290 reports escalate (41.8%)**; hedged 67.0% vs clear 39.3%; 1,777 labels. 7 content-filtered reports end `unverified` without an agent call.
-
-| Reason | Reports | Labels | Reports with only this reason |
-|---|---|---|---|
-| section rule | 778 | 911 | 153 |
-| recall scan | 576 | 617 | 0 |
-| evidence mentions label | 424 | 463 | 265 |
-| normal check | 278 | 278 | 160 |
-| hedge consistency | 105 | 125 | 58 |
-| negation consistency | 14 | 16 | 8 |
-
-Escalation precision (tagger labels disagree with the codes): reports 44.3%, labels 32.6%; base rate 25.0%; not escalated 11.2% (201 reports). Predicted No Finding 577: normal check passed 299 (precision 99.0%), failed 278 (precision 99.3%).
-
-Verifier agent on the **dev slice only** (38 escalated of 102 Tier 1 pilot reports; not a headline result), prompt `verifier-v2` (frozen): labels changed vs the codes wrong → right 11, right → wrong 3; suggested correct 3, wrong 3; verified 24, corrected 11, unverified 4; mean tool calls 1.87; $0.0017 per report. Estimated full run: 1,252 reports, $2.10.
-
-### Retrieval (M8, §8.2): base models
-
-Serving index from the M7 v2 outputs (predicted labels only): Postgres 3,086 reports and 40,118 labels; Qdrant 3,086 report and 19,006 contextual sentence points (BAAI/bge-small-en-v1.5). Checks on the stored points: payload keys whitelisted yes; indication text in a point 0 of 2,192 tested (4 reports repeat the indication's words in their own Findings/Impression).
-
-**Reading (M8).** Best variant by nDCG@10: seen label base bge-small + negated-sentence payload filter (no training) (0.871); heldout label base bge-small + negated-sentence payload filter (no training) (0.643); heldout alias base bge-small + negated-sentence payload filter (no training) (0.671); attribute base contextual sentences + BM25 (RRF) (0.816); compositional base bge-small + negated-sentence payload filter (no training) (0.523); report to report BM25 (0.470); all base bge-small, sentences without prefix (pure embedding) (0.564). The negated-sentence filter lowers negation contamination on the label queries (seen labels 0.310 → 0.070). Part of its gain comes from the contextual prefix, which names the PREDICTED v2 labels: once the "No X" sentences are filtered out, sentences whose prefix mentions X come from reports predicted positive for X, so this row partly measures the labelling pipeline, not only the embeddings. It is the baseline the fine-tuned model must beat (M10, judged two ways, README §8.2). Base models only; no held-out effect is expected before fine-tuning.
-
-Per fold, each fold's reports indexed alone; pooled over (query, fold) pairs with 95% bootstrap CIs; spec frozen before the run (`eval/queries/retrieval_v1.yaml`).
-
-**seen label** (40 query–fold pairs)
-
-| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
-|---|---|---|---|
-| BM25 | 0.463 (0.347–0.573) | 0.481 (0.367–0.592) | 0.407 (0.290–0.515) |
-| base bge-small, report-level | 0.643 (0.549–0.741) | 0.672 (0.581–0.764) | 0.310 (0.205–0.415) |
-| base bge-small, sentences without prefix (pure embedding) | 0.729 (0.650–0.805) | 0.731 (0.655–0.804) | 0.208 (0.120–0.300) |
-| base bge-small, contextual sentences | 0.647 (0.562–0.734) | 0.637 (0.549–0.725) | 0.310 (0.205–0.410) |
-| base bge-small + negated-sentence payload filter (no training) | 0.868 (0.831–0.908) | 0.871 (0.830–0.913) | 0.070 (0.032–0.118) |
-| base contextual sentences + BM25 (RRF) | 0.659 (0.559–0.756) | 0.683 (0.581–0.779) | 0.310 (0.202–0.415) |
-
-**heldout label** (15 query–fold pairs)
-
-| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
-|---|---|---|---|
-| BM25 | 0.253 (0.160–0.360) | 0.253 (0.154–0.363) | 0.140 (0.060–0.227) |
-| base bge-small, report-level | 0.260 (0.187–0.327) | 0.265 (0.193–0.340) | 0.120 (0.047–0.220) |
-| base bge-small, sentences without prefix (pure embedding) | 0.387 (0.287–0.500) | 0.406 (0.306–0.525) | 0.053 (0.007–0.113) |
-| base bge-small, contextual sentences | 0.633 (0.540–0.733) | 0.638 (0.527–0.751) | 0.033 (0.013–0.060) |
-| base bge-small + negated-sentence payload filter (no training) | 0.633 (0.533–0.733) | 0.643 (0.532–0.759) | 0.013 (0.000–0.033) |
-| base contextual sentences + BM25 (RRF) | 0.433 (0.333–0.540) | 0.463 (0.349–0.573) | 0.053 (0.007–0.107) |
-
-**heldout alias** (90 query–fold pairs)
-
-| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
-|---|---|---|---|
-| BM25 | 0.450 (0.380–0.514) | 0.494 (0.422–0.558) | 0.148 (0.096–0.204) |
-| base bge-small, report-level | 0.619 (0.552–0.677) | 0.644 (0.581–0.700) | 0.089 (0.049–0.132) |
-| base bge-small, sentences without prefix (pure embedding) | 0.643 (0.577–0.703) | 0.670 (0.607–0.728) | 0.104 (0.061–0.151) |
-| base bge-small, contextual sentences | 0.625 (0.555–0.691) | 0.647 (0.581–0.710) | 0.108 (0.068–0.151) |
-| base bge-small + negated-sentence payload filter (no training) | 0.651 (0.580–0.719) | 0.671 (0.602–0.737) | 0.073 (0.040–0.111) |
-| base contextual sentences + BM25 (RRF) | 0.641 (0.569–0.700) | 0.669 (0.601–0.727) | 0.108 (0.067–0.151) |
-
-**attribute** (100 query–fold pairs)
-
-| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
-|---|---|---|---|
-| BM25 | 0.739 (0.700–0.779) | 0.734 (0.695–0.772) | 0.135 (0.095–0.182) |
-| base bge-small, report-level | 0.599 (0.552–0.648) | 0.613 (0.569–0.662) | 0.131 (0.089–0.177) |
-| base bge-small, sentences without prefix (pure embedding) | 0.787 (0.746–0.826) | 0.803 (0.768–0.840) | 0.038 (0.022–0.058) |
-| base bge-small, contextual sentences | 0.786 (0.746–0.823) | 0.777 (0.739–0.813) | 0.075 (0.051–0.103) |
-| base bge-small + negated-sentence payload filter (no training) | 0.802 (0.763–0.836) | 0.792 (0.754–0.826) | 0.023 (0.011–0.037) |
-| base contextual sentences + BM25 (RRF) | 0.825 (0.789–0.859) | 0.816 (0.783–0.847) | 0.062 (0.035–0.094) |
-
-**compositional** (49 query–fold pairs)
-
-| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
-|---|---|---|---|
-| BM25 | 0.285 (0.215–0.354) | 0.288 (0.216–0.359) | 0.355 (0.249–0.463) |
-| base bge-small, report-level | 0.304 (0.230–0.386) | 0.293 (0.219–0.376) | 0.316 (0.218–0.416) |
-| base bge-small, sentences without prefix (pure embedding) | 0.343 (0.258–0.428) | 0.370 (0.283–0.458) | 0.310 (0.212–0.412) |
-| base bge-small, contextual sentences | 0.379 (0.295–0.469) | 0.395 (0.310–0.485) | 0.308 (0.204–0.414) |
-| base bge-small + negated-sentence payload filter (no training) | 0.534 (0.438–0.625) | 0.523 (0.426–0.616) | 0.163 (0.106–0.222) |
-| base contextual sentences + BM25 (RRF) | 0.341 (0.265–0.421) | 0.352 (0.270–0.436) | 0.343 (0.235–0.447) |
-
-**report to report** (200 query–fold pairs)
-
-| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
-|---|---|---|---|
-| BM25 | 0.720 (0.681–0.760) | 0.470 (0.439–0.502) | – |
-| base bge-small, report-level | 0.590 (0.546–0.632) | 0.392 (0.358–0.427) | – |
-| base bge-small, sentences without prefix (pure embedding) | 0.674 (0.636–0.712) | 0.421 (0.392–0.450) | – |
-| base bge-small, contextual sentences | 0.442 (0.394–0.494) | 0.262 (0.230–0.297) | – |
-| base bge-small + negated-sentence payload filter (no training) | 0.432 (0.383–0.482) | 0.257 (0.224–0.294) | – |
-| base contextual sentences + BM25 (RRF) | 0.579 (0.531–0.627) | 0.360 (0.329–0.394) | – |
-
-**all** (494 query–fold pairs)
-
-| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
-|---|---|---|---|
-| BM25 | 0.597 (0.565–0.627) | 0.504 (0.476–0.531) | 0.224 (0.185–0.263) |
-| base bge-small, report-level | 0.563 (0.534–0.593) | 0.492 (0.465–0.518) | 0.178 (0.146–0.213) |
-| base bge-small, sentences without prefix (pure embedding) | 0.654 (0.627–0.681) | 0.564 (0.537–0.589) | 0.140 (0.108–0.174) |
-| base bge-small, contextual sentences | 0.561 (0.531–0.592) | 0.491 (0.462–0.519) | 0.164 (0.134–0.198) |
-| base bge-small + negated-sentence payload filter (no training) | 0.598 (0.567–0.630) | 0.528 (0.497–0.559) | 0.074 (0.056–0.092) |
-| base contextual sentences + BM25 (RRF) | 0.618 (0.589–0.649) | 0.537 (0.511–0.567) | 0.169 (0.135–0.203) |
-
-<!-- results:end -->
+---
 
 ## 11. Limitations
 
-- **Claim scope:** the results support, on this dataset under this evaluation protocol, that the LLM labelling pipeline improves over the implemented rule baseline, that the v2 pipeline (LLM + free checks + verifier agent) improves over v1 and over LLM only, and that verified labels are far more accurate than unverified ones (§10). They do **not** support clinical reliability.
+- **Claim scope:** the results support, on this dataset under this evaluation protocol, that the LLM labelling pipeline improves over the implemented rule baseline, that the v2 pipeline (LLM + free checks + verifier agent) improves over v1 and over LLM only, and that verified labels are far more accurate than unverified ones ([RESULTS.md](RESULTS.md)). They do **not** support clinical reliability.
 - Single institution (Indiana University, Open-i), reports from around 2013.
 - Expert codes are positive-only; hedged findings are coded inconsistently. Uncertainty accuracy and evidence-span accuracy are **not claimed**.
 - Hedged reports are excluded from the headline metrics (§4.3); they are reported separately under both uncertainty policies.
 - Mapping v1 is lossy, and two standard labels are dropped. Results are shown under v1 and strict.
 - Some clearly stated findings were not coded, so the raw scores are a lower bound (§4.6).
 - Reports refused by the Azure content filter get no LLM output; they are scored with the rule baseline's labels (v1: routed to review; v2: their labels are `unverified`).
-- v1 routed too many reports to human review for production use (the v1 review rate in §10). v2 replaces the review queue with the verifier agent and an `unverified` mark. The mark is informative (verified labels are far more accurate than unverified ones), and far fewer reports carry it than went to v1 review, but the two rates are **not like for like**: v1 sent a whole report to review for any remaining failure or escalating flag, while v2 marks only the labels the agent could not settle after checking the report (§10).
-- The verifier agent changes many labels **in both directions** (more wrong → right than right → wrong, but many of both), and its `suggested` labels are right only about half the time (precision in §10). Known issue: on Consolidation it breaks far more labels than it fixes (§10); a candidate for a future prompt version developed on a new dev slice, not changed after seeing these results.
-- The normal check does **not** separate right from wrong predicted normals (§10). An ablation chosen after seeing the results (reports escalated only by the normal check skip the agent) leaves every label unchanged and saves agent calls, but would show those ~99%-correct normals as `unverified` (the share of reports with an unverified label nearly triples, §10). That would mislead users, so serving keeps the evaluated v2 configuration (owner, 22 Oct 2026).
-- "Blind first" is only partly blind: the recall scan's hints include the rule labeller's sentence IDs, and in some cases (§10) those are sentences the tagger also cited.
+- v1 routed too many reports to human review for production use (the v1 review rate in [RESULTS.md](RESULTS.md)). v2 replaces the review queue with the verifier agent and an `unverified` mark. The mark is informative (verified labels are far more accurate than unverified ones), and far fewer reports carry it than went to v1 review, but the two rates are **not like for like**: v1 sent a whole report to review for any remaining failure or escalating flag, while v2 marks only the labels the agent could not settle after checking the report ([RESULTS.md](RESULTS.md)).
+- The verifier agent changes many labels **in both directions** (more wrong → right than right → wrong, but many of both), and its `suggested` labels are right only about half the time (precision in [RESULTS.md](RESULTS.md)). Known issue: on Consolidation it breaks far more labels than it fixes ([RESULTS.md](RESULTS.md)); a candidate for a future prompt version developed on a new dev slice, not changed after seeing these results.
+- The normal check does **not** separate right from wrong predicted normals ([RESULTS.md](RESULTS.md)). An ablation chosen after seeing the results (reports escalated only by the normal check skip the agent) leaves every label unchanged and saves agent calls, but would show those ~99%-correct normals as `unverified` (the share of reports with an unverified label nearly triples, [RESULTS.md](RESULTS.md)). That would mislead users, so serving keeps the evaluated v2 configuration (owner, 22 Oct 2026).
+- "Blind first" is only partly blind: the recall scan's hints include the rule labeller's sentence IDs, and in some cases ([RESULTS.md](RESULTS.md)) those are sentences the tagger also cited.
 - Verification cross-checks the tagger with different methods (rules, and a second model with tools), but all of them read the same report text. So it catches **reading errors**, not errors in the report text itself or in the expert coding; those are out of scope for a text-only verifier. `verified` means "checked to faithfully reflect the report text", not independent proof. Verbatim evidence shows the sentence exists, not that it caused the label.
-- The evaluation joins IU's pre-split sections into one text; real uploads are messier, so the varied-join test only partly measures the parser (a held-out set of header names the parser doesn't know is reported separately, §10).
+- The evaluation joins IU's pre-split sections into one text; real uploads are messier, so the varied-join test only partly measures the parser (a held-out set of header names the parser doesn't know is reported separately, [RESULTS.md](RESULTS.md)).
 - When the parser finds no sections, the whole text is read as Findings, so the tagger **also reads the indication** (it can't be separated). Such outputs carry `sections_identified: false`, visible to the verifier agent and in the UI.
 - About 11% of reports have redactions next to finding terms.
 - Subsets and noise adjustment depend on a rule-based eval detector, deliberately separate from the pipeline's own.
@@ -891,14 +590,14 @@ Per fold, each fold's reports indexed alone; pooled over (query, fold) pairs wit
 | **M6** | Parser (`parser.py`), `run_pipeline(raw_text)` (parse → tag → current verifier until M7), evaluation through the entry point with clean and varied joins, empty-section counts and subsets, normal-claim count ("no acute" impressions with non-normal codes), hedge-check consistency fix ("borderline"/"mild" not a hedge where the label definition counts it as present) | Parser accuracy and clean vs varied macro-F1 in results; leakage test covers `run_pipeline`; correctly parsed reports hit the Tier 1 cache ($0) | done |
 | **M7** | Free checks with v2 escalation rules + recall scan (rule baseline as second reader) + normal check on every predicted No Finding; ReAct verifier agent (tools, blind first, caps); dev-slice prompt development and freeze; cost estimate before the full run | §8.1 v2 rows: F1 and paired bootstrap vs v1 columns, verified vs unverified accuracy, escalation and unverified rates, change counts; leakage test for the agent | done |
 | **M8** | Postgres `labels` (with verification state and evidence) from out-of-fold v2 outputs; Qdrant indexing (report + contextual sentence points, sections, indication field, BM25); RRF; aggregation; retrieval eval incl. report-to-report queries | BM25 / base / contextual / filter rows of §8.2; test asserting no expert labels or indication in the index points | done |
-| **M9a** | Website backend: FastAPI `POST /label` (one report or a patient series → `run_pipeline` per report; **uploads never stored**), `POST /ask` (query agent with tools and guardrails, §6.4: questions about the uploaded report(s), held in memory for the request, or across the IU index with SQL counts, filtered search and citations), `GET /health`, `/ready`; Redis cache and rate limit; read-only database role | Endpoints work locally against Docker Compose; a test shows uploads are not persisted; leakage tests cover the backend and the agent; CI green | planned |
-| **M9b** | Website evaluation: query-agent evaluation (§8.3: templates + paraphrases + 40 hand-written questions, against the expert-label and predicted-label tables), system metrics (§8.4: p50/p95 latency per endpoint, cost per 1,000 reports), upload paths (single report, patient series) | §8.3 table and §8.4 numbers in results; cost estimated before any paid run | planned |
-| **M9c** | Website frontend: upload one report or a series, the 13 findings with evidence highlighted on the unchanged text and verification badges, questions with clickable citations, attribution footer, "not a medical device" notice | Runs locally against the backend; end-to-end smoke test (upload → findings → question with citations) | planned |
-| **M10** | Negation-aware embedding fine-tuning: pairs from training folds, `CachedGISTEmbedLoss` per fold, held-out evaluation, serving model on all data (stored privately); swapped into the same search (and the agent's `find_by_meaning`); cross-report retrieval evaluation re-run | §8.2 fine-tuned rows, judged two ways (pure embedding without the prefix; full system vs the best filter row), seen vs held-out split | planned |
-| **M11** | Public deployment on Azure (Container Apps, scale to zero) with safeguards: rate and request-size limits, LLM cost cap, no storage of uploads, attribution, abuse limits, private image registry and CD, model card | Deployed URL passes the smoke test (`/health`, one `/label`, one `/ask`); budget alert set; scaled to zero when idle | planned |
+| **M9** | Negation-aware embedding fine-tuning on plain sentences: pairs from training folds, `CachedGISTEmbedLoss` per fold, held-out evaluation, serving model on all data (stored privately); switch the evaluation index to plain sentence points | §8.2 fine-tuned rows judged two ways (pure embedding vs base without prefix; full system vs the best base combination), seen vs held-out split; pre-committed use rule applied | planned |
+| **M10a** | Website backend: session API (`/api/session`, `/reports`, `/ask` with scope report or all, `/timeline`), in memory and nothing stored; single-report answers and session RAG with citations checked in code; cost cap with the rules-only fallback | Endpoints match the frontend contract (`web/README.md`); a test shows nothing is stored; leakage tests cover the API; CI green | planned |
+| **M10b** | Website evaluation (§8.3, §8.4): the 20 frozen questions on the dev slice, session RAG vs all reports in the prompt on batches of 3/10/30/50, latency and cost | Results file and tables; cost estimated before any paid run | planned |
+| **M10c** | Website frontend (React; started on branch `m9c-frontend`) | Runs against the real backend; end-to-end smoke test (upload → findings → question with citations) | in progress |
+| **M11** | Deployment: frontend on Vercel, backend as a Hugging Face Docker Space (Azure OpenAI keys as Space secrets; no private models or data in the image), rate and size limits, cost cap, attribution, model card | Deployed URLs pass the smoke test (`/health`, one upload, one ask); budget alert set | planned |
 | *Stretch* | CheXpert labeler Docker baseline; noise-adjusted scores; delete-the-cited-sentence test (does the label change?); CheXpert Plus scale ingest (machine labels, throughput and cost only, never accuracy) | — | planned |
 
-The roadmap was revised on 21 Oct 2026 (v2): the old M6–M11 (index, embedding training, reranker + LLM judge, query agent, serving) were reordered after the new parser and verifier-agent milestones; the LLM-judge stage, the review table and the QLoRA extension were dropped. Revised again on 22 Oct 2026 (owner): after M8, M9 is the website (backend, evaluation, frontend; the query agent moves into M9a), M10 the embedding fine-tuning, swapped into the same search with the retrieval evaluation re-run, and M11 the public deployment.
+The roadmap was revised on 21 Oct 2026 (v2): the old M6–M11 (index, embedding training, reranker + LLM judge, query agent, serving) were reordered after the new parser and verifier-agent milestones; the LLM-judge stage, the review table and the QLoRA extension were dropped. Revised again on 22 Oct 2026 (owner, after M8): M9 embedding fine-tuning, M10 website (backend, evaluation, frontend), M11 deployment on Vercel + Hugging Face. The IU-corpus query agent, the ingestion worker that stored uploads, the Redis answer cache and the Gradio demo were dropped: questions are about the user's own uploads, which are never stored.
 
 ---
 

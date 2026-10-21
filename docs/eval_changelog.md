@@ -4,7 +4,7 @@ The eval lexicon (`eval/lexicon.yaml`) and negspacy termset (`eval/negex_termset
 version. Any change needs owner approval, an entry here, and new hashes in `tests/test_eval_freeze.py`.
 
 ## eval_v1 (M1, 2026-10-19; before any model output exists)
-- Lexicon: hand-written aliases for the 11 pathology labels, plus additions pre-registered in README §4.8
+- Lexicon: hand-written aliases for the 11 pathology labels, plus additions pre-registered in SPEC §4.8
   from the M1 mapping audit: devices (icd, aicd, prosthetic valve, valve replacement, monitor leads,
   ecg leads, spinal stimulator; pacemaker, port, picc, sternotomy wires were already present) and
   pneumothorax variants (hydropneumothorax, hemopneumothorax).

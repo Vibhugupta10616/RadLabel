@@ -2,7 +2,7 @@
 
 Decisions that shape how numbers are computed. Results come only from `eval/` scripts.
 
-## Output vs evaluation policy (same text as README §6.2)
+## Output vs evaluation policy (same text as SPEC §6.2)
 - System output is four-valued: `present | uncertain | absent | not_mentioned`, representing what the report text says.
 - Headline evaluation binarises it: `present` = positive, everything else = negative, against the expert codes.
   The "`uncertain` = positive" row is a sensitivity check, not the headline metric (on the `hedged` subset both
@@ -39,7 +39,7 @@ Decisions that shape how numbers are computed. Results come only from `eval/` sc
 - Tier 1 model: gpt-4.1-mini, chosen on the pilot (CIs overlap; not "significantly better").
 
 ## Not computed
-- Noise-adjusted scores (README §4.6, Stretch), owner decision D7.
+- Noise-adjusted scores (SPEC §4.6, Stretch), owner decision D7.
 
 ## Verifier rule C (section_rule): decided by ground truth (M4)
 Pre-committed owner rule: if the LLM is right in at least half of the pilot's section_rule disagreements, section_rule becomes a FLAG (review) instead of a FAIL (repair). Cache-only, $0. Generated from `artifacts/results/section_rule_check.json` (`python -m eval.pilot section-rule`).
@@ -195,7 +195,7 @@ After the changes below: **211 reports with a fail (6.8%) → Tier 2**, all from
   significant interval change", "not seen on the previous exam", "normal thoracic kyphosis", "does not look
   like …" (3103, 1365, 3820, 3942, 3997).
   **Owner's pre-committed rule applied: negation_consistency is a FLAG (→ review), not a FAIL**, so Tier 2 does
-  not "fix" correct answers. Tests and README §6.2 updated.
+  not "fix" correct answers. Tests and SPEC §6.2 updated.
 - After the splitter fix: 16 cases, LLM right in 13, pipeline right in 3 (the same three). The LLM's status did
   not change on any of the 23.
 
@@ -289,7 +289,7 @@ Generated in `artifacts/results/pipeline_m6.json` (`normal_claim`, `python -m ev
 statement. Over all 3,086 unique texts: **1,302** such reports; expert codes normal-only 467, ignored-only 2, **not
 normal-only 833 (64.0%)** (mostly Other Abnormality 742 and Support Devices 111). The tagger predicted No Finding for
 **3 of the 833** (and for 418 of the 467 normal-only ones). Decision: the tagger does not confuse "nothing acute" with
-"fully normal", so **no intermediate label** is added. The normal check (README §6.2, free checks part 3) still runs on
+"fully normal", so **no intermediate label** is added. The normal check (SPEC §6.2, free checks part 3) still runs on
 every predicted No Finding.
 
 ## Verifier agent full run (M7; owner, 2026-10-22, pre-committed before the run)
