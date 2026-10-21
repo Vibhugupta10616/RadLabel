@@ -12,7 +12,12 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; numbers at M3 (pre-splitter): macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. Current, after the M4 splitter fix: v1 0.838, strict 0.829, rare 0.742 (README §10). |
 | M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
 | M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
-| M6–M11 | planned | |
+| M6 | **next** | Parser (`parser.py`), `run_pipeline(raw_text)` (parse → tag → current verifier until M7), evaluation through the entry point (clean + ~30% varied joins), empty-section counts and subsets, normal-claim count, hedge-check consistency fix. |
+| M7 | planned | Free checks with v2 escalation + recall scan (rule labeller as second reader) + normal check; ReAct verifier agent (blind first, caps); dev-slice prompt development and freeze; cost estimate before the full run. |
+| M8 | planned | Postgres `labels` (verification state + evidence), Qdrant index (report + contextual sentence points, indication field, BM25), RRF, retrieval eval incl. report-to-report. |
+| M9 | planned | Negation-aware embedding fine-tuning per fold (`CachedGISTEmbedLoss`), held-out eval vs the filter baseline; serving model; agent's `find_by_meaning` switches to it. |
+| M10 | planned | Query agent + tools + guardrails, question set, agent eval on expert and predicted label tables. |
+| M11 | planned | Ingestion worker, FastAPI, Redis, tracing, Gradio demo with verification badges, deploy files, model card, CI regression eval. |
 
 ## Decisions (owner)
 - **D1 (2026-10-20): nothing is tuned per label.** Every tuned parameter (Tier 0 patterns, refusal threshold, embedding checkpoint, any rule-baseline setting) is ONE global value, selected on a pooled metric (macro-F1 or nDCG over the 9 headline labels) on inner validation. Rare labels are never used for selection.
@@ -22,6 +27,15 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - **D5 (M3): pipeline/eval vocabulary overlap accepted** (README §11 limitation). The pipeline alias list is **frozen** at the M3 commit (alias-set hash pinned in `tests/test_alias_freeze.py`); any later change needs owner OK and may only be based on training-fold error analysis, never on out-of-fold or test results.
 - D6 (M3): `hedged` is excluded from rare-label scores and from the abnormal / redaction_adjacent subset scores, as for headline scores.
 - D7 (M3): noise-adjusted scores (README §4.6, Stretch) skipped for now.
+
+### v2 plan (owner, 2026-10-21; README §5, §6.2, §12)
+- **D8:** the Tier 2 repair agent and the human-review queue (Tier 3) are replaced by one **ReAct verifier agent** that runs only on escalated reports (check FAIL, escalating flag, recall-scan disagreement) and marks each label `verified_rules | verified | verified_impression_only | corrected | suggested | unverified`. No review table, no review endpoints. v1 (M3–M5) results stay in README §10 as comparison columns.
+- **D9:** QLoRA / local-model tagger **dropped**.
+- **D10:** **no separate LLM-judge steps** anywhere (no LLM verifier judge, no retrieval reranking judge, no error audit, no RAGAS). Judgment happens only inside the verifier agent and the query agent.
+- **D11:** the **indication** is never a tagger or verifier input; it is used only in RAG / Q&A (a separate index field and a query-agent tool), never embedded and never in retrieval-evaluation queries.
+- **D12:** label set (13 labels, mapping v1 + strict) and **5-fold CV** over duplicate clusters are **unchanged**.
+- **D13:** **every predicted No Finding goes through the normal check** (README §6.2, free checks part 3): heart + lungs covered by normal statements and no `present`/`uncertain` rule-scan label; otherwise the report escalates to the agent, which confirms or withholds it. No extra "intermediate" training label unless the M6 normal-claim count shows the tagger confusing "nothing acute" with "fully normal", and only with the owner's OK.
+- **D14:** one entry point: labels are produced only through `run_pipeline(raw_text)`; evaluation joins each report's sections into text, hides the codes and calls it like an upload.
 
 ## M1 results (`make data`, clean `data/processed`)
 | Check | Result |
@@ -79,7 +93,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Owner rules (2026-10-20): Tier 2 only on FAIL reports (211); agent never sees expert codes / eval mentions / folds / metrics (`tests/test_repair_leakage.py`); $3 new-spend cap for the run (the client's stop at 50% of MAX_LLM_USD = $10 total also applied; an earlier note said $5, which was wrong); pre-committed evaluation and keep/drop rule (`docs/evaluation_notes.md`); Tier 1 prompt and pipeline rules unchanged.
 - LangGraph runs the loop only; model calls go through `radlabel.llm`, extended with native tool calling (cache key gains `tools` only when used, so Tier 1 cache entries are unchanged).
 - Smoke test on 3 never-scored FAIL reports (pilot/hedged) before the full run: plumbing/cost only, no prompt change.
-- Review table: rows (report id + reasons) in `artifacts/review/review.jsonl` (git-ignored). Kept as JSONL for now (owner); the Postgres `review` table and `POST /review/{id}` come with M6.
+- Review table: rows (report id + reasons) in `artifacts/review/review.jsonl` (git-ignored). Kept as JSONL (owner). The Postgres `review` table and `POST /review/{id}` are dropped in v2 (D8).
 - First cache rerun showed byte differences only in per-report bookkeeping (`cost_usd`, `cached_calls`) and file order; fixed (sorted file, call cost kept on cache hits); labels/routes were identical.
 
 ## Blocked (owner action)
