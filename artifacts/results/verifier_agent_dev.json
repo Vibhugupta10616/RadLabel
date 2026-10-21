@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "33e266795e476da3ed6dd325a64b0553af75e53a",
+  "git_commit": "abc918b271d5ec375ae1bbe694eee8c74916f2e6",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "dev_slice",
-  "created": "2026-10-21T14:19:31+00:00",
+  "created": "2026-10-21T17:10:20+00:00",
   "eval_version": "eval_v1.2",
   "llm": "gpt-5-mini",
   "prompt": "verifier-v2"

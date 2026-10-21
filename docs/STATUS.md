@@ -13,8 +13,8 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
 | M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
 | M6 | **Done** (code `567b093`; results rerun from cache at that commit, $0) | Through `run_pipeline`: clean join headline macro-F1 (v1) 0.860 (0.845–0.873), identical to LLM + verifier (paired 0.000; 1 report differs: IU text with inner "Impression:" headers); 30% varied joins 0.848, paired varied − clean −0.012 (−0.017 to −0.007). Parser: clean 100.0% of sentences in the right section, 3,083/3,086 fully parsed; alternative headers 100%; no headers 62.6% (308/309 no sections found). Correctly parsed clean joins: 0 new tagger inputs (all from the M4 cache). Hedge fix: conversions 147 → 125, LLM + verifier 0.857 → 0.860, Cardiomegaly F1 0.914 → 0.944. Normal-claim count: 833 of 1,302 (64.0%) "no acute" impressions have non-normal codes; the tagger predicted No Finding for 3 of them. Spend $0.25 (461 new tagger inputs); total $2.63. |
-| M7 | **in progress: full run done, waiting for owner review** (code `77e8abd`, `6729cb0`, `33e2667`) | Full run (prompt `verifier-v2`, owner-approved): headline macro-F1 (v1) **0.887** (0.874–0.899), strict 0.883; paired v2 − LLM + verifier + Tier 2 +0.022 (0.013–0.031), v2 − LLM only +0.025 (0.016–0.035), v2 − rule baseline +0.050 (0.037–0.063) → agent **kept** (pre-committed rule). Verified + verified_rules labels precision 0.938 vs unverified 0.393. Reports with any unverified label 2.9% (v1 review rate 30.5%). Escalated 1,290 (41.8%). Agent cost $2.07 new ($2.12 incl. the cached dev reports); rerun from cache $0, byte-identical. |
-| M8 | planned | Postgres `labels` (verification state + evidence), Qdrant index (report + contextual sentence points, indication field, BM25), RRF, retrieval eval incl. report-to-report. |
+| M7 | **Done** (owner-accepted 2026-10-22; tag `m7-verifier-agent`) (code `77e8abd`, `6729cb0`, `33e2667`) | Full run (prompt `verifier-v2`, owner-approved): headline macro-F1 (v1) **0.887** (0.874–0.899), strict 0.883; paired v2 − LLM + verifier + Tier 2 +0.022 (0.013–0.031), v2 − LLM only +0.025 (0.016–0.035), v2 − rule baseline +0.050 (0.037–0.063) → agent **kept** (pre-committed rule). Verified + verified_rules labels precision 0.938 vs unverified 0.393. Reports with any unverified label 2.9% (v1 review rate 30.5%). Escalated 1,290 (41.8%). Agent cost $2.07 new ($2.12 incl. the cached dev reports); rerun from cache $0, byte-identical. |
+| M8 | **next** | Postgres `labels` (verification state + evidence), Qdrant index (report + contextual sentence points, indication field, BM25), RRF, retrieval eval incl. report-to-report. |
 | M9 | planned | Negation-aware embedding fine-tuning per fold (`CachedGISTEmbedLoss`), held-out eval vs the filter baseline; serving model; agent's `find_by_meaning` switches to it. |
 | M10 | planned | Query agent + tools + guardrails, question set, agent eval on expert and predicted label tables. |
 | M11 | planned | Ingestion worker, FastAPI, Redis, tracing, Gradio demo with verification badges, deploy files, model card, CI regression eval. |
@@ -171,6 +171,19 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Agent runs 1,290: submitted 1,285, tool cap 4, content-filter refusal 1; mean tool calls 2.12.
 - Unverified reasons are stored as fixed categories (the agent's free-text reasons quote report wording).
 - Results tallies are key-sorted (set iteration order made reruns differ in key order only; fixed in `33e2667`).
+
+## After M7 (owner decisions 2026-10-22; analyses from cache, $0; `verifier_agent_analysis.json`)
+- v2 stays the headline; no prompt or rule change. Recall scan kept (its hints go into the agent's input).
+- Gain over LLM only (+0.025) comes mostly from Lung Lesion (+0.016 of the macro-F1; recall 0.56 → 0.79); Fracture
+  −0.003. Without Other Abnormality (8 headline labels): +0.028 (0.018–0.039).
+- Suggested labels per label: Lung Opacity 65 present (precision 0.42), Other Abnormality 45 (0.67), Lung Lesion 32
+  (0.66), others small.
+- Known issue: Consolidation, v2 vs LLM + verifier 0 wrong → right, 18 right → wrong (F1 0.923 → 0.696); candidate
+  for a future prompt version developed on a new dev slice.
+- **Normal-check ablation (chosen after seeing the results):** the 160 reports escalated only by the normal check
+  skip the agent. Every label identical (macro-F1 difference 0.000), saves 160 agent runs / 250 calls / $0.25; reports
+  with an unverified label 2.9% → 8.1% (those normals stay unconfirmed). Not significantly worse → **serving
+  configuration** (`run_pipeline` default; `normal_check_escalates=True` reproduces the evaluated v2).
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.

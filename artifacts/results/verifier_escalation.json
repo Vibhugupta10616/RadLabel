@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "33e266795e476da3ed6dd325a64b0553af75e53a",
+  "git_commit": "abc918b271d5ec375ae1bbe694eee8c74916f2e6",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-21T14:17:55+00:00",
+  "created": "2026-10-21T17:00:39+00:00",
   "eval_version": "eval_v1.2",
   "llm": "cache only, no agent"
  },
@@ -134,6 +134,8 @@
   "disagreement_rate_not_escalated": 0.11191536748329621,
   "escalation_precision_labels": 0.32639279684862127,
   "missed_disagreements_not_escalated": 201,
+  "recall_scan_escalations": 617,
+  "recall_scan_ids_also_cited_by_tagger": 142,
   "no_finding": {
    "predicted": 577,
    "normal_check_passed": 299,
