@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RadLabel results</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F6F7F9}
+a{color:#0F5F5F}a:hover{color:#0A4444}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #0F6E6E;outline-offset:2px}
+@keyframes rlIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rl-in{animation:rlIn .4s ease-out both}
+.rl-hover{transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+.rl-hover:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(20,32,43,.08)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #14202B; background: #F6F7F9">
+
+<header style="background: #FFFFFF; border-bottom: 1px solid #E1E5EA">
+<div style="max-width: 1400px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px">
+<a href="Landing.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #14202B">
+<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="7" fill="#0F6E6E"></rect><path d="M8 9h7a3.5 3.5 0 0 1 0 7H8zM8 16v4M14 16l4 4" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span style="font-size: 20px; font-weight: 700">RadLabel</span>
+</a>
+<div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+<span style="font-size: 13px; color: #5A6772">Sample patient · 5 reports · processed in memory, not stored</span>
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #9FC2C2; color: #0F5F5F; font-weight: 600; font-size: 14px; text-decoration: none">New upload</a>
+</div>
+</div>
+</header>
+
+<div style="max-width: 1400px; margin: 0 auto; padding: 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<nav aria-label="Uploaded reports" style="flex: 1 1 200px; max-width: 240px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #5A6772; padding: 0 4px">Your reports</span>
+<sc-for list="{{reports}}" as="r" hint-placeholder-count="5">
+<button type="button" class="rl-hover" onClick="{{r.pick}}" aria-current="{{r.current}}" style="{{r.style}}">
+<span style="display: block; font-size: 14px; font-weight: 600; color: #14202B">{{r.name}}</span>
+<span style="display: block; font-size: 12px; color: #5A6772">{{r.sub}}</span>
+</button>
+</sc-for>
+</nav>
+
+<main style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<section aria-label="Report text" style="background: #FFFFFF; border: 1px solid #E1E5EA; border-radius: 16px; padding: 24px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px">
+<h1 style="margin: 0; font-size: 22px">{{repName}}</h1>
+<span style="font-size: 13px; color: #5A6772">Showing evidence for <strong style="color: #14202B">{{focusName}}</strong></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div>
+<h2 style="margin: 0 0 6px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A6772">Indication <span style="font-weight: 400; text-transform: none; letter-spacing: 0">(used for questions, not for labels)</span></h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #45535F">{{indication}}</p>
+</div>
+<div>
+<h2 style="margin: 0 0 6px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A6772">Findings</h2>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{findings}}" as="s" hint-placeholder-count="4">
+<div style="{{s.style}}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6A7782; width: 28px; flex: none; padding-top: 3px">{{s.id}}</span><span>{{s.text}}</span></div>
+</sc-for>
+</div>
+</div>
+<div>
+<h2 style="margin: 0 0 6px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A6772">Impression</h2>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{impression}}" as="s" hint-placeholder-count="2">
+<div style="{{s.style}}"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6A7782; width: 28px; flex: none; padding-top: 3px">{{s.id}}</span><span>{{s.text}}</span></div>
+</sc-for>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-label="Ask questions" style="background: #FFFFFF; border: 1px solid #E1E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; gap: 8px; flex-wrap: wrap" role="tablist">
+<button type="button" role="tab" aria-selected="{{isOne}}" onClick="{{setOne}}" style="{{tabOneStyle}}">Ask about this report</button>
+<button type="button" role="tab" aria-selected="{{isAll}}" onClick="{{setAll}}" style="{{tabAllStyle}}">Ask across all 5 reports</button>
+</div>
+
+<sc-if value="{{isOne}}" hint-placeholder-val="{{ false }}">
+<div class="rl-in" style="display: flex; flex-direction: column; gap: 10px">
+<div style="align-self: flex-end; max-width: 80%; background: #EEF1F4; border-radius: 12px 12px 4px 12px; padding: 10px 14px; font-size: 15px">{{oneQ}}</div>
+<div style="max-width: 90%; background: #F3F8F8; border: 1px solid #D3E6E6; border-radius: 12px 12px 12px 4px; padding: 12px 14px; font-size: 15px; line-height: 1.6">{{oneA}}
+<div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap">
+<sc-for list="{{oneCites}}" as="c" hint-placeholder-count="2">
+<button type="button" onClick="{{c.pick}}" style="min-height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid #9FC2C2; background: #FFFFFF; color: #0F5F5F; font-family: 'IBM Plex Mono', monospace; font-size: 13px; cursor: pointer">{{c.label}}</button>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isAll}}" hint-placeholder-val="{{ true }}">
+<div class="rl-in" style="display: flex; flex-direction: column; gap: 14px">
+<div style="border: 1px solid #E1E5EA; border-radius: 12px; padding: 14px 16px; overflow-x: auto">
+<p style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: #5A6772">Findings over time</p>
+<div style="display: grid; grid-template-columns: 140px repeat(5, minmax(64px, 1fr)); gap: 6px; font-size: 13px; min-width: 520px">
+<span></span>
+<sc-for list="{{timeHead}}" as="h" hint-placeholder-count="5"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5A6772; text-align: center">{{h}}</span></sc-for>
+<sc-for list="{{timeline}}" as="row" hint-placeholder-count="3">
+<span style="font-weight: 600; padding: 6px 0">{{row.name}}</span>
+<sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="5"><span style="{{cell.style}}">{{cell.text}}</span></sc-for>
+</sc-for>
+</div>
+</div>
+
+<div style="align-self: flex-end; max-width: 80%; background: #EEF1F4; border-radius: 12px 12px 4px 12px; padding: 10px 14px; font-size: 15px">How did the pleural effusion change across the reports?</div>
+<div style="max-width: 92%; background: #F3F8F8; border: 1px solid #D3E6E6; border-radius: 12px 12px 12px 4px; padding: 12px 14px; font-size: 15px; line-height: 1.6">
+It was small in report 1, increased to moderate in report 2, stayed moderate in report 3, decreased in report 4, and had resolved by report 5.
+<div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap">
+<sc-for list="{{allCites1}}" as="c" hint-placeholder-count="5">
+<button type="button" onClick="{{c.pick}}" style="min-height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid #9FC2C2; background: #FFFFFF; color: #0F5F5F; font-family: 'IBM Plex Mono', monospace; font-size: 13px; cursor: pointer">{{c.label}}</button>
+</sc-for>
+</div>
+<p style="margin: 8px 0 0; font-size: 12px; color: #6A7782">Retrieved 6 sentences from 5 reports</p>
+</div>
+
+<div style="align-self: flex-end; max-width: 80%; background: #EEF1F4; border-radius: 12px 12px 4px 12px; padding: 10px 14px; font-size: 15px">When was the pacemaker first described?</div>
+<div style="max-width: 92%; background: #F3F8F8; border: 1px solid #D3E6E6; border-radius: 12px 12px 12px 4px; padding: 12px 14px; font-size: 15px; line-height: 1.6">
+In report 3, as a new pacemaker with leads in expected position. Reports 1 and 2 don't mention one.
+<div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap">
+<sc-for list="{{allCites2}}" as="c" hint-placeholder-count="2">
+<button type="button" onClick="{{c.pick}}" style="min-height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid #9FC2C2; background: #FFFFFF; color: #0F5F5F; font-family: 'IBM Plex Mono', monospace; font-size: 13px; cursor: pointer">{{c.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="align-self: flex-end; max-width: 80%; background: #EEF1F4; border-radius: 12px 12px 4px 12px; padding: 10px 14px; font-size: 15px">Should the patient start antibiotics?</div>
+<div style="max-width: 92%; background: #FAFBFC; border: 1px solid #E1E5EA; border-radius: 12px 12px 12px 4px; padding: 12px 14px; font-size: 15px; line-height: 1.6; color: #45535F">I can only answer what the reports say, not give treatment advice. Report 3 notes that infection at the left base cannot be excluded <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #0F5F5F">R3·I3</span>.</div>
+</div>
+</sc-if>
+
+<div style="display: flex; gap: 8px">
+<label for="q" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Your question</label>
+<input id="q" type="text" placeholder="{{placeholder}}" style="flex: 1; min-width: 0; min-height: 48px; border: 1px solid #C9D1D9; border-radius: 999px; padding: 0 18px; font-size: 15px; font-family: inherit">
+<button type="button" style="min-height: 48px; padding: 0 22px; border-radius: 999px; border: none; background: #0F6E6E; color: #FFFFFF; font-weight: 600; font-size: 15px; cursor: pointer">Ask</button>
+</div>
+<p style="margin: 0; font-size: 12px; color: #5A6772">Answers cite report and sentence. Questions about diagnosis or treatment are declined.</p>
+</section>
+</main>
+
+<aside aria-label="Findings" style="flex: 1 1 340px; max-width: 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 18px">Findings · {{repShort}}</h2>
+<span style="font-size: 13px; color: #5A6772">Click to see evidence</span>
+</div>
+
+<sc-for list="{{labels}}" as="l" hint-placeholder-count="5">
+<button type="button" class="rl-hover rl-in" onClick="{{l.pick}}" aria-pressed="{{l.selected}}" style="{{l.cardStyle}}">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap">
+<span style="font-size: 16px; font-weight: 600; color: #14202B">{{l.name}}</span>
+<span style="{{l.statusStyle}}">{{l.status}}</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+<span style="{{l.badgeStyle}}">
+<sc-if value="{{l.isVerified}}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></sc-if>
+<sc-if value="{{l.isCorrected}}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></sc-if>
+<sc-if value="{{l.isSuggested}}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></sc-if>
+<sc-if value="{{l.isUnverified}}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg></sc-if>
+{{l.badge}}
+</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #45535F">{{l.evidence}}</span>
+</div>
+<sc-if value="{{l.hasNote}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; line-height: 1.45; color: #45535F; text-align: left">{{l.note}}</span></sc-if>
+</button>
+</sc-for>
+
+<div style="background: #FFFFFF; border: 1px solid #E1E5EA; border-radius: 12px; padding: 14px 16px">
+<span style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px">Not mentioned</span>
+<span style="font-size: 13px; line-height: 1.5; color: #5A6772">{{notMentioned}}</span>
+</div>
+
+<details style="background: #FFFFFF; border: 1px solid #E1E5EA; border-radius: 12px; padding: 12px 16px; font-size: 13px; line-height: 1.5; color: #2E3B46">
+<summary style="font-weight: 600; cursor: pointer; min-height: 28px">What the badges mean</summary>
+<p style="margin: 8px 0 0"><strong>Verified</strong>: the checks (rules, or a second AI model with tools) found supporting sentences. <strong>Corrected</strong>: the check changed the first answer. <strong>Suggested</strong>: a finding the first pass missed. <strong>Unverified</strong>: couldn't be confirmed; read the evidence yourself. "Both sections" means Findings and Impression agree.</p>
+</details>
+</aside>
+</div>
+
+<footer style="border-top: 1px solid #E1E5EA; background: #FFFFFF; margin-top: 8px">
+<div style="max-width: 1400px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: #5A6772">
+<span><strong style="color: #8A2C0D">Not a medical device.</strong> Labels describe the report text, not the image. The sample patient is made up.</span>
+<span>Reference data: Indiana University Chest X-ray Collection (Open-i, NLM), CC BY-NC-ND 4.0</span>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ALL = ['No Finding', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Atelectasis', 'Pleural Effusion', 'Fracture', 'Support Devices', 'Other Abnormality', 'Edema', 'Pleural Other', 'Consolidation', 'Pneumothorax'];
+    const V = (name, status, badge, ev, note) => ({ name, status, kind: 'verified', badge, ev, note: note || '' });
+    const R = [
+      { name: 'Report 1', sub: 'exam_1.txt · effusion', ind: 'Shortness of breath.',
+        F: [['F1', 'Heart size is normal.'], ['F2', 'Small left pleural effusion.'], ['F3', 'No pneumothorax.'], ['F4', 'The lungs are otherwise clear.']],
+        I: [['I1', 'Small left pleural effusion.']],
+        L: [V('Pleural Effusion', 'Present', 'Verified · both sections', ['F2', 'I1']), V('Cardiomegaly', 'Absent', 'Verified', ['F1']), V('Pneumothorax', 'Absent', 'Verified', ['F3'])],
+        q: 'Is there a pneumothorax?', a: 'No. The report states there is no pneumothorax.', c: ['F3'] },
+      { name: 'Report 2', sub: 'exam_2.txt · 1 corrected', ind: 'Worsening shortness of breath.',
+        F: [['F1', 'The cardiac silhouette is mildly enlarged.'], ['F2', 'Moderate left pleural effusion, increased from the prior study.'], ['F3', 'Patchy left basilar opacity, possibly atelectasis.'], ['F4', 'No pneumothorax.']],
+        I: [['I1', 'Mild cardiomegaly.'], ['I2', 'Increased moderate left pleural effusion.'], ['I3', 'Left basilar opacity, likely atelectasis.']],
+        L: [V('Cardiomegaly', 'Present', 'Verified · both sections', ['F1', 'I1']), V('Pleural Effusion', 'Present', 'Verified · both sections', ['F2', 'I2']),
+            { name: 'Lung Opacity', status: 'Present', kind: 'suggested', badge: 'Suggested', ev: ['F3', 'I3'], note: 'The first pass missed this; the check found it in two sentences.' },
+            { name: 'Atelectasis', status: 'Uncertain', kind: 'corrected', badge: 'Corrected', ev: ['F3', 'I3'], note: 'Changed from present: the report hedges ("possibly", "likely").' },
+            V('Pneumothorax', 'Absent', 'Verified', ['F4'])],
+        q: 'What supports cardiomegaly?', a: 'The heart is described as mildly enlarged, and the impression states mild cardiomegaly.', c: ['F1', 'I1'] },
+      { name: 'Report 3', sub: 'exam_3.pdf · 1 unverified', ind: 'Pacemaker placement.',
+        F: [['F1', 'A left chest wall pacemaker is present with leads in expected position.'], ['F2', 'Moderate left pleural effusion, unchanged.'], ['F3', 'The heart remains mildly enlarged.'], ['F4', 'No pneumothorax.']],
+        I: [['I1', 'New pacemaker in expected position.'], ['I2', 'Stable moderate left pleural effusion.'], ['I3', 'Infection at the left base cannot be excluded.']],
+        L: [V('Support Devices', 'Present', 'Verified · both sections', ['F1', 'I1']), V('Pleural Effusion', 'Present', 'Verified · both sections', ['F2', 'I2']), V('Cardiomegaly', 'Present', 'Verified · Findings only', ['F3']),
+            { name: 'Consolidation', status: 'Uncertain', kind: 'unverified', badge: 'Unverified', ev: ['I3'], note: 'Possible infection is mentioned, but no sentence names consolidation. Check it yourself.' },
+            V('Pneumothorax', 'Absent', 'Verified', ['F4'])],
+        q: 'Is the pacemaker in the right place?', a: 'The report describes the leads in expected position.', c: ['F1', 'I1'] },
+      { name: 'Report 4', sub: 'exam_4.txt · improving', ind: 'Follow-up.',
+        F: [['F1', 'Pacemaker leads unchanged.'], ['F2', 'Small left pleural effusion, decreased.'], ['F3', 'Heart size mildly enlarged, stable.'], ['F4', 'No pneumothorax.']],
+        I: [['I1', 'Decreasing small left pleural effusion.'], ['I2', 'Stable mild cardiomegaly.']],
+        L: [V('Support Devices', 'Present', 'Verified · Findings only', ['F1']), V('Pleural Effusion', 'Present', 'Verified · both sections', ['F2', 'I1']), V('Cardiomegaly', 'Present', 'Verified · both sections', ['F3', 'I2']), V('Pneumothorax', 'Absent', 'Verified', ['F4'])],
+        q: 'Is the effusion getting better?', a: 'The report describes it as small and decreased.', c: ['F2', 'I1'] },
+      { name: 'Report 5', sub: 'exam_5.txt · resolved', ind: 'Follow-up.',
+        F: [['F1', 'Pacemaker in place.'], ['F2', 'Heart size is borderline.'], ['F3', 'No pleural effusion.'], ['F4', 'The lungs are clear.']],
+        I: [['I1', 'Resolved left pleural effusion.'], ['I2', 'No acute cardiopulmonary abnormality.']],
+        L: [V('Support Devices', 'Present', 'Verified · Findings only', ['F1']), V('Cardiomegaly', 'Present', 'Verified · Findings only', ['F2'], 'Borderline enlargement counts as present by the label definition.'), V('Pleural Effusion', 'Absent', 'Verified · both sections', ['F3', 'I1'])],
+        q: 'Is there still an effusion?', a: 'No. There is no pleural effusion, and the impression calls it resolved.', c: ['F3', 'I1'] }
+    ];
+    const badgeColors = { verified: 'color: #0B5C55; background: #E1F2EF', corrected: 'color: #1D4E89; background: #E4ECF7', suggested: 'color: #4E3590; background: #EEE8F8', unverified: 'color: #8A4300; background: #FCEBD9' };
+    const statusColors = { Present: 'background: #14202B; color: #FFFFFF', Uncertain: 'background: #FFF1C9; color: #6B4600', Absent: 'background: #E9EDF1; color: #34424D' };
+
+    const rep = this.state.rep ?? 1;
+    const mode = this.state.mode ?? 'all';
+    const cur = R[rep];
+    const sel = this.state.sel && cur.L.find((x) => x.name === this.state.sel) ? this.state.sel : cur.L[0].name;
+    const cite = this.state.cite ?? null;
+    const selLabel = cur.L.find((x) => x.name === sel);
+    const hl = cite ? [cite] : selLabel.ev;
+    const go = (r, id) => () => this.setState({ rep: r, cite: id });
+
+    const reports = R.map((x, i) => ({
+      name: x.name, sub: x.sub, current: i === rep ? 'true' : 'false',
+      pick: () => this.setState({ rep: i, cite: null, sel: null }),
+      style: 'text-align: left; min-height: 56px; padding: 10px 12px; border-radius: 12px; background: #FFFFFF; cursor: pointer; ' + (i === rep ? 'border: 1.5px solid #0F6E6E' : 'border: 1px solid #E1E5EA')
+    }));
+    const labels = cur.L.map((x) => {
+      const selected = x.name === sel && !cite;
+      return {
+        name: x.name, status: x.status, badge: x.badge, evidence: 'Evidence: ' + x.ev.join(', '),
+        note: x.note, hasNote: x.note !== '', selected,
+        isVerified: x.kind === 'verified', isCorrected: x.kind === 'corrected', isSuggested: x.kind === 'suggested', isUnverified: x.kind === 'unverified',
+        pick: () => this.setState({ sel: x.name, cite: null }),
+        cardStyle: 'display: flex; flex-direction: column; gap: 8px; text-align: left; width: 100%; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; cursor: pointer; font-family: inherit; ' + (selected ? 'border: 2px solid #0F6E6E; box-shadow: 0 2px 10px rgba(15,110,110,0.12)' : 'border: 1px solid #E1E5EA'),
+        statusStyle: 'font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; ' + statusColors[x.status],
+        badgeStyle: 'display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; ' + badgeColors[x.kind]
+      };
+    });
+    const row = (s) => ({ id: s[0], text: s[1],
+      style: 'display: flex; gap: 10px; padding: 6px 10px; border-radius: 8px; font-size: 15px; line-height: 1.55; transition: background-color .3s ease; ' + (hl.indexOf(s[0]) >= 0 ? 'background: #FFEFB8; color: #14202B; font-weight: 500' : 'background: transparent; color: #2E3B46') });
+    const named = cur.L.map((x) => x.name);
+
+    const cellStyle = (lvl) => 'text-align: center; padding: 6px 4px; border-radius: 6px; font-size: 12px; font-weight: 600; ' +
+      (lvl === 2 ? 'background: #0F6E6E; color: #FFFFFF' : lvl === 1 ? 'background: #CFE6E6; color: #0B4A4A' : 'background: #F1F3F5; color: #6A7782');
+    const cells = (arr) => arr.map((c) => ({ text: c[0], style: cellStyle(c[1]) }));
+    const timeline = [
+      { name: 'Pleural Effusion', cells: cells([['Small', 1], ['Moderate', 2], ['Moderate', 2], ['Small', 1], ['None', 0]]) },
+      { name: 'Cardiomegaly', cells: cells([['No', 0], ['Mild', 1], ['Mild', 1], ['Mild', 1], ['Borderline', 1]]) },
+      { name: 'Support Devices', cells: cells([['—', 0], ['—', 0], ['New', 2], ['Yes', 1], ['Yes', 1]]) }
+    ];
+    const tab = (on) => 'min-height: 40px; padding: 0 16px; border-radius: 999px; font-weight: 600; font-size: 14px; cursor: pointer; ' + (on ? 'border: 1px solid #14202B; background: #14202B; color: #FFFFFF' : 'border: 1px solid #C9D1D9; background: #FFFFFF; color: #2E3B46');
+
+    return {
+      reports, labels,
+      repName: cur.name, repShort: cur.name, indication: cur.ind,
+      findings: cur.F.map(row), impression: cur.I.map(row),
+      focusName: cite ? 'citation ' + cur.name + ' · ' + cite : sel,
+      notMentioned: ALL.filter((n) => named.indexOf(n) < 0).join(' · '),
+      isOne: mode === 'one', isAll: mode === 'all',
+      setOne: () => this.setState({ mode: 'one', cite: null }),
+      setAll: () => this.setState({ mode: 'all', cite: null }),
+      tabOneStyle: tab(mode === 'one'), tabAllStyle: tab(mode === 'all'),
+      oneQ: cur.q, oneA: cur.a,
+      oneCites: cur.c.map((id) => ({ label: id, pick: go(rep, id) })),
+      timeHead: ['R1', 'R2', 'R3', 'R4', 'R5'], timeline,
+      allCites1: [[0, 'F2'], [1, 'F2'], [2, 'F2'], [3, 'F2'], [4, 'F3']].map((p) => ({ label: 'R' + (p[0] + 1) + '·' + p[1], pick: go(p[0], p[1]) })),
+      allCites2: [[2, 'F1'], [2, 'I1']].map((p) => ({ label: 'R' + (p[0] + 1) + '·' + p[1], pick: go(p[0], p[1]) })),
+      placeholder: mode === 'all' ? 'Ask across all reports, e.g. Which reports mention cardiomegaly?' : 'Ask about this report, e.g. Is there a pneumothorax?'
+    };
+  }
+}
+</script>
+</body>
+</html>

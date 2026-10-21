@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RadLabel landing page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#0F5F5F}a:hover{color:#0A4444}
+a:focus-visible,summary:focus-visible{outline:2px solid #0F6E6E;outline-offset:3px}
+@keyframes rlUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes rlMark{from{background-size:0% 100%}to{background-size:100% 100%}}
+@keyframes rlPop{0%{opacity:0;transform:scale(.86)}70%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:none}}
+@keyframes rlFloat{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-8px) rotate(-1.2deg)}}
+@keyframes rlType{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes rlPulse{0%{box-shadow:0 0 0 0 rgba(15,110,110,.35)}100%{box-shadow:0 0 0 12px rgba(15,110,110,0)}}
+@keyframes rlGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.rl-up{animation:rlUp .8s cubic-bezier(.2,.7,.2,1) both}
+.rl-mark{background-image:linear-gradient(#FFE38A,#FFE38A);background-repeat:no-repeat;background-size:0% 100%;animation:rlMark .9s ease-out forwards}
+.rl-pop{animation:rlPop .55s ease-out both}
+.rl-float{animation:rlFloat 7s ease-in-out infinite}
+.rl-type{animation:rlType 1.8s steps(48,end) both}
+.rl-pulse{animation:rlPulse 2.2s ease-out infinite}
+.rl-bar{transform-origin:left center;animation:rlGrow 1.2s cubic-bezier(.2,.7,.2,1) both}
+.rl-card{transition:transform .25s ease,box-shadow .25s ease}
+.rl-card:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(20,32,43,.10)}
+.rl-btn{transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease}
+.rl-btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(15,110,110,.25)}
+@supports (animation-timeline: view()){.rl-reveal{animation:rlUp linear both;animation-timeline:view();animation-range:entry 0% entry 45%}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.rl-mark{background-size:100% 100%}}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #14202B; background: #FFFFFF; overflow-x: hidden">
+
+<header style="position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid #E8ECEF">
+<div style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="7" fill="#0F6E6E"></rect><path d="M8 9h7a3.5 3.5 0 0 1 0 7H8zM8 16v4M14 16l4 4" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">RadLabel</span>
+</div>
+<nav style="display: flex; gap: 22px; align-items: center; font-size: 15px; flex-wrap: wrap">
+<a href="#how" style="text-decoration: none; color: #2E3B46">How it works</a>
+<a href="#features" style="text-decoration: none; color: #2E3B46">Features</a>
+<a href="https://github.com/Vibhugupta10616/RadLabel" style="text-decoration: none; color: #2E3B46">GitHub</a>
+<a href="Main.dc.html" class="rl-btn" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #0F6E6E; color: #FFFFFF; font-weight: 600; text-decoration: none">Try it free</a>
+</nav>
+</div>
+</header>
+
+<section style="background-color: #F3F7F7; background-image: radial-gradient(#D5E4E4 1px, transparent 1px); background-size: 22px 22px; border-bottom: 1px solid #E1EAEA; position: relative">
+<div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px 96px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center; position: relative">
+<div style="flex: 999 1 440px; min-width: 0">
+<span class="rl-up" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #0F5F5F; background: #FFFFFF; border: 1px solid #CFE2E2; border-radius: 999px; padding: 6px 12px; margin-bottom: 22px"><span class="rl-pulse" style="width: 8px; height: 8px; border-radius: 50%; background: #0F6E6E"></span>For anyone who reads chest X-ray reports</span>
+<h1 class="rl-up" style="margin: 0 0 22px; font-size: 60px; line-height: 1.04; font-weight: 700; letter-spacing: -0.03em; animation-delay: .1s">Radiology reports,<br>explained with evidence.</h1>
+<p class="rl-up" style="margin: 0 0 34px; font-size: 20px; line-height: 1.6; color: #3B4954; max-width: 580px; animation-delay: .2s">Upload one report or a whole patient series. RadLabel finds 13 findings, shows the sentence behind each one, checks every label, and answers your questions across all your reports.</p>
+<div class="rl-up" style="display: flex; gap: 12px; flex-wrap: wrap; animation-delay: .3s">
+<a href="Main.dc.html" class="rl-btn" style="display: inline-flex; align-items: center; gap: 10px; min-height: 54px; padding: 0 26px; border-radius: 999px; background: #0F6E6E; color: #FFFFFF; font-weight: 600; font-size: 17px; text-decoration: none">Try a sample patient<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="#how" class="rl-btn" style="display: inline-flex; align-items: center; min-height: 54px; padding: 0 24px; border-radius: 999px; background: #FFFFFF; border: 1px solid #B8D2D2; color: #0F5F5F; font-weight: 600; font-size: 17px; text-decoration: none">See how it works</a>
+</div>
+<p class="rl-up" style="margin: 18px 0 0; font-size: 14px; color: #5A6772; animation-delay: .4s">Free · no sign-up · your reports are never stored</p>
+</div><div aria-hidden="true" style="flex: 1 1 520px; min-width: 0; position: relative; padding: 12px 8px 8px; display: flex; flex-direction: column">
+<div class="rl-float" style="background: #FFFFFF; border: 1px solid #DCE3E8; border-radius: 14px; box-shadow: 0 24px 48px rgba(20,32,43,0.12); padding: 24px 24px 20px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5A6772">Chest X-ray · Report 2 of 5</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8592A0">PA &amp; lateral</span>
+</div>
+<p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8592A0">Findings</p>
+<p style="margin: 0 0 4px; font-size: 15px; line-height: 1.7; color: #2E3B46"><span class="rl-mark" style="animation-delay: 1.0s; border-radius: 3px; padding: 1px 2px">The cardiac silhouette is mildly enlarged.</span> <span class="rl-mark" style="animation-delay: 1.6s; border-radius: 3px; padding: 1px 2px">Moderate left pleural effusion, increased.</span> There is no pneumothorax.</p>
+<p style="margin: 12px 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8592A0">Impression</p>
+<p style="margin: 0; font-size: 15px; line-height: 1.7; color: #2E3B46">Mild cardiomegaly. Increased left pleural effusion.</p>
+</div>
+
+
+
+<div style="position: relative; z-index: 2; margin-top: 16px; padding: 0 4px; display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch">
+<div class="rl-pop" style="flex: 1.15 1 160px; min-width: 0; background: #0F3D3D; color: #FFFFFF; border-radius: 14px; box-shadow: 0 16px 32px rgba(15,61,61,0.28); padding: 14px 16px; animation-delay: 3.0s">
+<p style="margin: 0 0 6px; font-size: 13px; color: #A9CACA">Across 5 reports</p>
+<p style="margin: 0 0 8px; font-size: 15px; font-weight: 600">How did the effusion change?</p>
+<p class="rl-type" style="margin: 0; font-size: 14px; line-height: 1.55; color: #E3F0F0; animation-delay: 3.4s">Small → moderate → stable → smaller → resolved by report 5.</p>
+<p style="margin: 8px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.5; color: #8FC3C3">R1·F2 · R2·F2 · R3·F2 · R4·F2 · R5·F3</p>
+</div>
+<div class="rl-pop" style="flex: 1 1 160px; min-width: 0; background: #FFFFFF; border: 1px solid #CFE2E2; border-radius: 12px; box-shadow: 0 14px 30px rgba(20,32,43,0.12); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; animation-delay: 2.2s; color: #14202B">
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: center"><span style="font-size: 14px; font-weight: 600">Cardiomegaly</span><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #14202B; color: #FFFFFF">Present</span></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: center"><span style="font-size: 14px; font-weight: 600">Pleural Effusion</span><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #14202B; color: #FFFFFF">Present</span></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: center"><span style="font-size: 14px; font-weight: 600">Pneumothorax</span><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #E9EDF1; color: #34424D">Absent</span></div>
+<span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; color: #0B5C55; background: #E1F2EF"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>All verified</span>
+</div>
+</div>
+</div>
+
+
+</div>
+</section>
+
+<section id="how" style="background: #FFFFFF">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; position: relative">
+<p class="rl-reveal" style="margin: 0 0 10px; font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #0F6E6E">How it works</p>
+<h2 class="rl-reveal" style="margin: 0 0 14px; font-size: 42px; letter-spacing: -0.025em; line-height: 1.1">A real example, in four steps</h2>
+<p class="rl-reveal" style="margin: 0 0 48px; font-size: 18px; line-height: 1.6; color: #45535F; max-width: 640px">One patient, five follow-up X-ray reports. Here is what happens when you upload them.</p>
+<ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px">
+
+<li class="rl-card rl-reveal" style="background: #F7F9FA; border: 1px solid #E5EAEE; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #0F6E6E">01 · Upload</span>
+<div aria-hidden="true" style="display: flex; flex-wrap: wrap; gap: 6px; min-height: 76px; align-content: flex-start">
+<span style="font-size: 12px; padding: 5px 9px; border-radius: 8px; background: #FFFFFF; border: 1px solid #DCE3E8">exam_1.txt</span>
+<span style="font-size: 12px; padding: 5px 9px; border-radius: 8px; background: #FFFFFF; border: 1px solid #DCE3E8">exam_2.txt</span>
+<span style="font-size: 12px; padding: 5px 9px; border-radius: 8px; background: #FFFFFF; border: 1px solid #DCE3E8">exam_3.pdf</span>
+<span style="font-size: 12px; padding: 5px 9px; border-radius: 8px; background: #FFFFFF; border: 1px solid #DCE3E8">exam_4.txt</span>
+<span style="font-size: 12px; padding: 5px 9px; border-radius: 8px; background: #FFFFFF; border: 1px solid #DCE3E8">exam_5.txt</span>
+</div>
+<h3 style="margin: 0; font-size: 19px">Drop in your reports</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #45535F">Paste text or upload up to 50 files. Sections and sentences are recognised automatically.</p>
+</li>
+
+<li class="rl-card rl-reveal" style="background: #F7F9FA; border: 1px solid #E5EAEE; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #0F6E6E">02 · Label</span>
+<div aria-hidden="true" style="display: flex; flex-direction: column; gap: 6px; min-height: 76px">
+<div style="display: flex; justify-content: space-between; font-size: 13px; background: #FFFFFF; border: 1px solid #DCE3E8; border-radius: 8px; padding: 6px 10px"><span>Pleural Effusion</span><strong>Present</strong></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; background: #FFFFFF; border: 1px solid #DCE3E8; border-radius: 8px; padding: 6px 10px"><span>Atelectasis</span><strong style="color: #6B4600">Uncertain</strong></div>
+</div>
+<h3 style="margin: 0; font-size: 19px">13 findings per report</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #45535F">A language model reads Findings and Impression and marks each finding present, uncertain, absent or not mentioned.</p>
+</li>
+
+<li class="rl-card rl-reveal" style="background: #F7F9FA; border: 1px solid #E5EAEE; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #0F6E6E">03 · Check</span>
+<div aria-hidden="true" style="display: flex; flex-direction: column; gap: 6px; min-height: 76px">
+<div style="font-size: 13px; background: #FFFFFF; border: 1px solid #DCE3E8; border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap"><span>Atelectasis</span><span style="text-decoration: line-through; color: #8592A0">present</span><span>→ uncertain</span></div>
+<span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; color: #1D4E89; background: #E4ECF7">Corrected: "possibly"</span>
+</div>
+<h3 style="margin: 0; font-size: 19px">Every label double-checked</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #45535F">Rule checks run on everything. Doubtful labels go to a verifier agent that searches the report and decides.</p>
+</li>
+
+<li class="rl-card rl-reveal" style="background: #F7F9FA; border: 1px solid #E5EAEE; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #0F6E6E">04 · Ask</span>
+<div aria-hidden="true" style="display: flex; flex-direction: column; gap: 6px; min-height: 76px">
+<div style="align-self: flex-end; font-size: 13px; background: #E9EEF1; border-radius: 10px 10px 3px 10px; padding: 6px 10px">When was the pacemaker placed?</div>
+<div style="font-size: 13px; background: #FFFFFF; border: 1px solid #CFE2E2; border-radius: 10px 10px 10px 3px; padding: 6px 10px">First seen in report 3 <span style="font-family: 'IBM Plex Mono', monospace; color: #0F5F5F">R3·F1</span></div>
+</div>
+<h3 style="margin: 0; font-size: 19px">Ask across all reports</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #45535F">Your reports are searched for this visit only. Answers cite the exact report and sentence.</p>
+</li>
+</ol>
+</div>
+</section>
+
+<section id="features" style="background: #F6F8F9; border-top: 1px solid #E8ECEF">
+<div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; flex-direction: column; gap: 88px">
+<div>
+<p class="rl-reveal" style="margin: 0 0 10px; font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #0F6E6E">What RadLabel does for you</p>
+<h2 class="rl-reveal" style="margin: 0; font-size: 42px; letter-spacing: -0.025em; line-height: 1.1; max-width: 720px">Structure, proof and answers, from plain report text</h2>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div class="rl-reveal" style="flex: 1 1 380px; min-width: 0">
+<h3 style="margin: 0 0 12px; font-size: 28px; letter-spacing: -0.015em">See the sentence behind every finding</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.65; color: #45535F">Click a finding and the sentences that support it light up in the report. Evidence is matched against the original text in code, so it can't be invented.</p>
+</div>
+<div class="rl-card rl-reveal" aria-hidden="true" style="flex: 1 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #E1E6EA; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; gap: 10px; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: #45535F"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8592A0; padding-top: 2px">F1</span>Heart size is normal.</div>
+<div style="display: flex; gap: 10px; padding: 8px 12px; border-radius: 8px; font-size: 15px; background: #FFEFB8; font-weight: 500"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6A7782; padding-top: 2px">F2</span>Small left pleural effusion.</div>
+<div style="display: flex; gap: 10px; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: #45535F"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #8592A0; padding-top: 2px">F3</span>No pneumothorax.</div>
+<div style="display: flex; gap: 10px; padding: 8px 12px; border-radius: 8px; font-size: 15px; background: #FFEFB8; font-weight: 500"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6A7782; padding-top: 2px">I1</span>Small left pleural effusion.</div>
+<div style="align-self: flex-end; display: flex; align-items: center; gap: 8px; margin-top: 6px; border: 2px solid #0F6E6E; border-radius: 10px; padding: 8px 12px"><span style="font-size: 14px; font-weight: 600">Pleural Effusion</span><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; color: #0B5C55; background: #E1F2EF">Verified · F2, I1</span></div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap-reverse; gap: 48px; align-items: center">
+<div class="rl-card rl-reveal" aria-hidden="true" style="flex: 1 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #E1E6EA; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; color: #0B5C55; background: #E1F2EF">Verified</span>
+<span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; color: #1D4E89; background: #E4ECF7">Corrected</span>
+<span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; color: #4E3590; background: #EEE8F8">Suggested</span>
+<span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; color: #8A4300; background: #FCEBD9">Unverified</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>Verified labels right</span><strong>94%</strong></div>
+<div style="height: 10px; border-radius: 999px; background: #EDF1F3; overflow: hidden"><div class="rl-bar" style="width: 94%; height: 100%; background: #0F6E6E; border-radius: 999px"></div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>Unverified labels right</span><strong>39%</strong></div>
+<div style="height: 10px; border-radius: 999px; background: #EDF1F3; overflow: hidden"><div class="rl-bar" style="width: 39%; height: 100%; background: #C36A10; border-radius: 999px; animation-delay: .2s"></div></div>
+</div>
+</div>
+<div class="rl-reveal" style="flex: 1 1 380px; min-width: 0">
+<h3 style="margin: 0 0 12px; font-size: 28px; letter-spacing: -0.015em">Know which labels to trust</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.65; color: #45535F">Every label carries a badge. In testing, verified labels were right 94% of the time and unverified ones only 39%, so you know exactly where to look twice.</p>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div class="rl-reveal" style="flex: 1 1 380px; min-width: 0">
+<span style="display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #0F3D3D; color: #FFFFFF; margin-bottom: 14px">Retrieval-augmented Q&amp;A</span>
+<h3 style="margin: 0 0 12px; font-size: 28px; letter-spacing: -0.015em">Ask across a whole patient series</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.65; color: #45535F">Upload a patient's follow-up reports and ask how things changed. RadLabel builds a search index for your visit only, retrieves the relevant sentences from every report, and answers with citations. The index is deleted when you leave.</p>
+</div>
+<div class="rl-card rl-reveal" aria-hidden="true" style="flex: 1 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #E1E6EA; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<p style="margin: 0; font-size: 13px; font-weight: 600; color: #5A6772">Pleural effusion over 5 reports</p>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; align-items: end; height: 96px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div class="rl-bar" style="width: 100%; height: 30px; background: #9CCACA; border-radius: 6px"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5A6772">R1</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div class="rl-bar" style="width: 100%; height: 70px; background: #0F6E6E; border-radius: 6px; animation-delay: .1s"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5A6772">R2</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div class="rl-bar" style="width: 100%; height: 70px; background: #0F6E6E; border-radius: 6px; animation-delay: .2s"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5A6772">R3</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div class="rl-bar" style="width: 100%; height: 30px; background: #9CCACA; border-radius: 6px; animation-delay: .3s"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5A6772">R4</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 100%; height: 4px; background: #DCE3E8; border-radius: 6px"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5A6772">R5</span></div>
+</div>
+<div style="background: #F3F8F8; border: 1px solid #D3E6E6; border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.6">Small in report 1, moderate in reports 2 and 3, smaller in report 4, and resolved by report 5.<div style="margin-top: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #0F5F5F">R1·F2 · R2·F2 · R3·F2 · R4·F2 · R5·F3</div></div>
+<p style="margin: 0; font-size: 12px; color: #6A7782">Retrieved 6 sentences from 5 reports</p>
+</div>
+</div>
+
+</div>
+</section>
+
+<section style="background: #FFFFFF">
+<div style="max-width: 960px; margin: 0 auto; padding: 96px 24px">
+<h2 class="rl-reveal" style="margin: 0 0 12px; font-size: 38px; letter-spacing: -0.02em">Why not just paste it into a chatbot?</h2>
+<p class="rl-reveal" style="margin: 0 0 36px; font-size: 17px; line-height: 1.6; color: #45535F">General chatbots are great at conversation. RadLabel is built for one job and measured on it.</p>
+<div class="rl-reveal" style="overflow-x: auto; border: 1px solid #E1E6EA; border-radius: 16px">
+<table style="width: 100%; border-collapse: collapse; font-size: 15px; min-width: 560px">
+<thead>
+<tr style="background: #F6F8F9; text-align: left">
+<th scope="col" style="padding: 14px 18px; font-weight: 600; color: #5A6772"></th>
+<th scope="col" style="padding: 14px 18px; font-weight: 600; color: #5A6772">General chatbot</th>
+<th scope="col" style="padding: 14px 18px; font-weight: 700; color: #0F5F5F">RadLabel</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top: 1px solid #E8ECEF"><th scope="row" style="padding: 14px 18px; text-align: left; font-weight: 500">Points to the exact sentence</th><td style="padding: 14px 18px; color: #5A6772">Sometimes</td><td style="padding: 14px 18px; font-weight: 600">Always, checked in code</td></tr>
+<tr style="border-top: 1px solid #E8ECEF"><th scope="row" style="padding: 14px 18px; text-align: left; font-weight: 500">Second check on every label</th><td style="padding: 14px 18px; color: #5A6772">No</td><td style="padding: 14px 18px; font-weight: 600">Rule checks + verifier agent</td></tr>
+<tr style="border-top: 1px solid #E8ECEF"><th scope="row" style="padding: 14px 18px; text-align: left; font-weight: 500">Accuracy measured against experts</th><td style="padding: 14px 18px; color: #5A6772">Not for this task</td><td style="padding: 14px 18px; font-weight: 600">0.887 macro-F1, 3,086 reports</td></tr>
+<tr style="border-top: 1px solid #E8ECEF"><th scope="row" style="padding: 14px 18px; text-align: left; font-weight: 500">Says when it isn't sure</th><td style="padding: 14px 18px; color: #5A6772">Rarely</td><td style="padding: 14px 18px; font-weight: 600">"Unverified" badge</td></tr>
+<tr style="border-top: 1px solid #E8ECEF"><th scope="row" style="padding: 14px 18px; text-align: left; font-weight: 500">Keeps your reports</th><td style="padding: 14px 18px; color: #5A6772">Depends on the service</td><td style="padding: 14px 18px; font-weight: 600">Never stored</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section style="background: #0F3D3D; color: #FFFFFF">
+<div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-wrap: wrap; gap: 48px">
+<div class="rl-reveal" style="flex: 1 1 340px; min-width: 0">
+<h2 style="margin: 0 0 14px; font-size: 38px; letter-spacing: -0.02em; line-height: 1.15">Safe, private and honest by design</h2>
+<p style="margin: 0 0 20px; font-size: 17px; line-height: 1.6; color: #C7DCDC">What happens to your reports, and what the results do and don't mean.</p>
+<a href="https://github.com/Vibhugupta10616/RadLabel" style="color: #9FE0D8; font-weight: 600">Full evaluation and limitations on GitHub →</a>
+</div>
+<ul style="flex: 2 1 520px; min-width: 0; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px">
+<li class="rl-reveal" style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: #E3F0F0"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#9FE0D8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span><strong style="color: #FFFFFF">Never stored.</strong> Reports are processed in memory and forgotten when you leave.</span></li>
+<li class="rl-reveal" style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: #E3F0F0"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#9FE0D8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span><strong style="color: #FFFFFF">You redact.</strong> Remove names, dates of birth and record numbers before uploading.</span></li>
+<li class="rl-reveal" style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: #E3F0F0"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#9FE0D8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span><strong style="color: #FFFFFF">Not a medical device.</strong> For research and demonstration only.</span></li>
+<li class="rl-reveal" style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: #E3F0F0"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#9FE0D8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span><strong style="color: #FFFFFF">Text, not images.</strong> Labels describe what the report says, not the X-ray itself.</span></li>
+<li class="rl-reveal" style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: #E3F0F0"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#9FE0D8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span><strong style="color: #FFFFFF">"Verified" = faithful to the text,</strong> not clinically confirmed.</span></li>
+<li class="rl-reveal" style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: #E3F0F0"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#9FE0D8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span><strong style="color: #FFFFFF">Tested on one dataset</strong> (Indiana University, ~2013). Other hospitals write differently.</span></li>
+</ul>
+</div>
+</section>
+
+<section style="background: #F3F7F7; border-top: 1px solid #E1EAEA">
+<div style="max-width: 1200px; margin: 0 auto; padding: 80px 24px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+<h2 class="rl-reveal" style="margin: 0; font-size: 40px; letter-spacing: -0.025em">See it on a patient series</h2>
+<p class="rl-reveal" style="margin: 0; font-size: 18px; line-height: 1.6; color: #45535F; max-width: 560px">Start with our sample of five follow-up reports, or paste your own with personal details removed.</p>
+<a href="Main.dc.html" class="rl-btn" style="display: inline-flex; align-items: center; gap: 10px; min-height: 54px; padding: 0 28px; border-radius: 999px; background: #0F6E6E; color: #FFFFFF; font-weight: 600; font-size: 17px; text-decoration: none">Try a sample patient<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</section>
+
+<footer style="background: #FFFFFF; border-top: 1px solid #E8ECEF">
+<div style="max-width: 1200px; margin: 0 auto; padding: 22px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: #5A6772">
+<span>Reference data: Indiana University Chest X-ray Collection (Open-i, NLM), CC BY-NC-ND 4.0 · Not a medical device</span>
+<span>Built by Vibhu Gupta · <a href="https://github.com/Vibhugupta10616/RadLabel">GitHub</a></span>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

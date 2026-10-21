@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --color-ink: #14202B;
+  --color-teal: #0F6E6E;
+  --color-teal-text: #0F5F5F;
+  --color-teal-dark: #0F3D3D;
+  --color-page: #F6F7F9;
+  --color-hl: #FFEFB8;
+  --color-line: #E1E5EA;
+  --color-muted: #5A6772;
+  --color-body: #45535F;
+  --color-copy: #2E3B46;
+}
+
+@layer base {
+  h1, h2, h3 { font-weight: 700; }
+  body { margin: 0; background: #F6F7F9; color: #14202B; font-family: var(--font-sans); }
+  a { color: #0F5F5F; }
+  a:hover { color: #0A4444; }
+  :focus-visible { outline: 2px solid #0F6E6E; outline-offset: 3px; }
+  .on-dark :focus-visible { outline-color: #9FE0D8; }
+}
+
+/* Design keyframes (web/design/Landing.dc.html); Framer Motion handles pop-in, fade-up and reveals. */
+@keyframes rlMark { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }
+@keyframes rlFloat { 0%, 100% { transform: translateY(0) rotate(-1.2deg); } 50% { transform: translateY(-8px) rotate(-1.2deg); } }
+@keyframes rlType { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes rlPulse { 0% { box-shadow: 0 0 0 0 rgba(15, 110, 110, .35); } 100% { box-shadow: 0 0 0 12px rgba(15, 110, 110, 0); } }
+.rl-mark { background-image: linear-gradient(#FFE38A, #FFE38A); background-repeat: no-repeat; background-size: 0% 100%; animation: rlMark .9s ease-out forwards; }
+.rl-float { animation: rlFloat 7s ease-in-out infinite; }
+.rl-type { animation: rlType 1.8s steps(48, end) both; }
+.rl-pulse { animation: rlPulse 2.2s ease-out infinite; }
+.rl-card { transition: transform .25s ease, box-shadow .25s ease; }
+.rl-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(20, 32, 43, .10); }
+.rl-btn { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease; }
+.rl-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(15, 110, 110, .25); }
+.rl-hover { transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease, background-color .3s ease; }
+.rl-hover:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(20, 32, 43, .08); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .rl-mark { background-size: 100% 100%; }
+}

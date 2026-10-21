@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RadLabel results on a phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F5F5F}a:hover{color:#0A4444}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #14202B; background: #F6F7F9; display: flex; flex-direction: column">
+
+<header style="background: #FFFFFF; border-bottom: 1px solid #E1E5EA; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 8px">
+<svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="7" fill="#0F6E6E"></rect><path d="M8 9h7a3.5 3.5 0 0 1 0 7H8zM8 16v4M14 16l4 4" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span style="font-size: 18px; font-weight: 700">RadLabel</span>
+</div>
+<label for="pick" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Report</label>
+<select id="pick" style="min-height: 40px; border: 1px solid #C9D1D9; border-radius: 8px; padding: 0 10px; font-family: inherit; font-size: 14px; background: #FFFFFF">
+<option>Report 1 of 3</option>
+<option>Report 2 of 3</option>
+<option>Report 3 of 3</option>
+</select>
+</header>
+
+<div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow: hidden">
+<h1 style="margin: 0; font-size: 18px">Findings</h1>
+
+<div style="background: #FFFFFF; border: 2px solid #0F6E6E; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 16px; font-weight: 600">Cardiomegaly</span>
+<span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #14202B; color: #FFFFFF">Present</span>
+</div>
+<span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; color: #0B5C55; background: #E1F2EF"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>Verified · both sections</span>
+<div style="background: #FFEFB8; border-radius: 8px; padding: 8px 10px; font-size: 14px; line-height: 1.5"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6A7782">F1</span> The cardiac silhouette is mildly enlarged.</div>
+<div style="background: #FFEFB8; border-radius: 8px; padding: 8px 10px; font-size: 14px; line-height: 1.5"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6A7782">I1</span> Mild cardiomegaly.</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E1E5EA; border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 15px; font-weight: 600">Pleural Effusion</span>
+<span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; color: #0B5C55; background: #E1F2EF">Verified</span>
+</div>
+<span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #14202B; color: #FFFFFF">Present</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E1E5EA; border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 15px; font-weight: 600">Lung Opacity</span>
+<span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; color: #4E3590; background: #EEE8F8">Suggested</span>
+</div>
+<span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #14202B; color: #FFFFFF">Present</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E1E5EA; border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 15px; font-weight: 600">Consolidation</span>
+<span style="align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; color: #8A4300; background: #FCEBD9">Unverified</span>
+</div>
+<span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #FFF1C9; color: #6B4600">Uncertain</span>
+</div>
+
+<span style="font-size: 13px; color: #5A6772; padding: 0 4px">+ 3 more findings · 6 not mentioned</span>
+</div>
+
+<div style="background: #FFFFFF; border-top: 1px solid #E1E5EA; padding: 12px 16px; display: flex; gap: 8px">
+<label for="pq" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Your question</label>
+<input id="pq" type="text" placeholder="Ask about this report" style="flex: 1; min-width: 0; min-height: 48px; border: 1px solid #C9D1D9; border-radius: 10px; padding: 0 12px; font-size: 15px; font-family: inherit">
+<button type="button" style="min-height: 48px; padding: 0 18px; border-radius: 10px; border: none; background: #0F6E6E; color: #FFFFFF; font-weight: 600; font-size: 15px; font-family: inherit">Ask</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
