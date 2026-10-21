@@ -12,7 +12,7 @@ from typing import Any
 
 from test_repair_agent import call, script
 from test_repair_leakage import FORBIDDEN_MODULES, FORBIDDEN_PATHS, FORBIDDEN_TEXT
-from test_verifier_agent import run
+from test_verifier_agent import fake_encoder, run  # noqa: F401  (autouse fixture: no model download)
 
 from radlabel.labelling import verifier_agent as va
 

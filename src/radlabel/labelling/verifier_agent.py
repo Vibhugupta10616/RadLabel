@@ -143,7 +143,10 @@ def tool_impls(sentences: list[Sentence], tagger: dict[str, str]) -> dict[str, A
     def find_by_meaning(label: str) -> Any:
         if not sentences:
             return {"label": label, "sentences": []}
-        v = encode([QUERY_PREFIX + f"{label}: {definitions().get(label, '')}"] + [s.text for s in sentences])
+        try:
+            v = encode([QUERY_PREFIX + f"{label}: {definitions().get(label, '')}"] + [s.text for s in sentences])
+        except ImportError:  # optional extra "embed" not installed: the agent still has its other tools
+            return {"error": "sentence embeddings unavailable; use find_by_alias"}
         sims = v[1:] @ v[0]
         top = np.argsort(-sims, kind="stable")[:MEANING_TOP_K]
         return {"label": label, "sentences": [{"sentence_id": sentences[i].id, "text": sentences[i].text,
