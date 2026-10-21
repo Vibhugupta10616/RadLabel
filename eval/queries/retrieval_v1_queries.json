@@ -1,0 +1,1982 @@
+{
+ "spec": "retrieval_v1",
+ "queries": [
+  {
+   "id": "L:Cardiomegaly",
+   "set": "seen_label",
+   "text": "cardiomegaly",
+   "label": "Cardiomegaly",
+   "target": "Cardiomegaly"
+  },
+  {
+   "id": "L:Lung Opacity",
+   "set": "seen_label",
+   "text": "lung opacity",
+   "label": "Lung Opacity",
+   "target": "Lung Opacity"
+  },
+  {
+   "id": "L:Atelectasis",
+   "set": "seen_label",
+   "text": "atelectasis",
+   "label": "Atelectasis",
+   "target": "Atelectasis"
+  },
+  {
+   "id": "L:Pleural Effusion",
+   "set": "seen_label",
+   "text": "pleural effusion",
+   "label": "Pleural Effusion",
+   "target": "Pleural Effusion"
+  },
+  {
+   "id": "L:Support Devices",
+   "set": "seen_label",
+   "text": "support devices",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "L:Edema",
+   "set": "seen_label",
+   "text": "edema",
+   "label": "Edema",
+   "target": "Edema"
+  },
+  {
+   "id": "L:Consolidation",
+   "set": "seen_label",
+   "text": "consolidation",
+   "label": "Consolidation",
+   "target": "Consolidation"
+  },
+  {
+   "id": "L:Pneumothorax",
+   "set": "seen_label",
+   "text": "pneumothorax",
+   "label": "Pneumothorax",
+   "target": "Pneumothorax"
+  },
+  {
+   "id": "H:Fracture",
+   "set": "heldout_label",
+   "text": "fracture",
+   "label": "Fracture",
+   "target": "Fracture"
+  },
+  {
+   "id": "H:Lung Lesion",
+   "set": "heldout_label",
+   "text": "lung lesion",
+   "label": "Lung Lesion",
+   "target": "Lung Lesion"
+  },
+  {
+   "id": "H:Pleural Other",
+   "set": "heldout_label",
+   "text": "pleural other",
+   "label": "Pleural Other",
+   "target": "Pleural Other"
+  },
+  {
+   "id": "HA:Cardiomegaly:heart is enlarged",
+   "set": "heldout_alias",
+   "text": "heart is enlarged",
+   "label": "Cardiomegaly",
+   "target": "Cardiomegaly"
+  },
+  {
+   "id": "HA:Cardiomegaly:heart size is enlarged",
+   "set": "heldout_alias",
+   "text": "heart size is enlarged",
+   "label": "Cardiomegaly",
+   "target": "Cardiomegaly"
+  },
+  {
+   "id": "HA:Lung Opacity:opacification",
+   "set": "heldout_alias",
+   "text": "opacification",
+   "label": "Lung Opacity",
+   "target": "Lung Opacity"
+  },
+  {
+   "id": "HA:Lung Opacity:airspace opacity",
+   "set": "heldout_alias",
+   "text": "airspace opacity",
+   "label": "Lung Opacity",
+   "target": "Lung Opacity"
+  },
+  {
+   "id": "HA:Lung Opacity:haziness",
+   "set": "heldout_alias",
+   "text": "haziness",
+   "label": "Lung Opacity",
+   "target": "Lung Opacity"
+  },
+  {
+   "id": "HA:Atelectasis:atelectatic",
+   "set": "heldout_alias",
+   "text": "atelectatic",
+   "label": "Atelectasis",
+   "target": "Atelectasis"
+  },
+  {
+   "id": "HA:Atelectasis:plate like atelectasis",
+   "set": "heldout_alias",
+   "text": "plate like atelectasis",
+   "label": "Atelectasis",
+   "target": "Atelectasis"
+  },
+  {
+   "id": "HA:Pleural Effusion:hydrothorax",
+   "set": "heldout_alias",
+   "text": "hydrothorax",
+   "label": "Pleural Effusion",
+   "target": "Pleural Effusion"
+  },
+  {
+   "id": "HA:Support Devices:catheter",
+   "set": "heldout_alias",
+   "text": "catheter",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Support Devices:tube",
+   "set": "heldout_alias",
+   "text": "tube",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Support Devices:endotracheal tube",
+   "set": "heldout_alias",
+   "text": "endotracheal tube",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Support Devices:defibrillator",
+   "set": "heldout_alias",
+   "text": "defibrillator",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Support Devices:icd",
+   "set": "heldout_alias",
+   "text": "icd",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Support Devices:pacer leads",
+   "set": "heldout_alias",
+   "text": "pacer leads",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Support Devices:stent",
+   "set": "heldout_alias",
+   "text": "stent",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Support Devices:prosthesis",
+   "set": "heldout_alias",
+   "text": "prosthesis",
+   "label": "Support Devices",
+   "target": "Support Devices"
+  },
+  {
+   "id": "HA:Edema:fluid overload",
+   "set": "heldout_alias",
+   "text": "fluid overload",
+   "label": "Edema",
+   "target": "Edema"
+  },
+  {
+   "id": "HA:Pneumothorax:ptx",
+   "set": "heldout_alias",
+   "text": "ptx",
+   "label": "Pneumothorax",
+   "target": "Pneumothorax"
+  },
+  {
+   "id": "A01",
+   "set": "attribute",
+   "text": "small pleural effusion",
+   "target": "Pleural Effusion",
+   "code": {
+    "head": "pleural effusion",
+    "subs": [
+     "small"
+    ]
+   }
+  },
+  {
+   "id": "A02",
+   "set": "attribute",
+   "text": "bilateral pleural effusions",
+   "target": "Pleural Effusion",
+   "code": {
+    "head": "pleural effusion",
+    "subs": [
+     "bilateral"
+    ]
+   }
+  },
+  {
+   "id": "A03",
+   "set": "attribute",
+   "text": "right pleural effusion",
+   "target": "Pleural Effusion",
+   "code": {
+    "head": "pleural effusion",
+    "subs": [
+     "right"
+    ]
+   }
+  },
+  {
+   "id": "A04",
+   "set": "attribute",
+   "text": "mild cardiomegaly",
+   "target": "Cardiomegaly",
+   "code": {
+    "head": "cardiomegaly",
+    "subs": [
+     "mild"
+    ]
+   }
+  },
+  {
+   "id": "A05",
+   "set": "attribute",
+   "text": "borderline cardiomegaly",
+   "target": "Cardiomegaly",
+   "code": {
+    "head": "cardiomegaly",
+    "subs": [
+     "borderline"
+    ]
+   }
+  },
+  {
+   "id": "A06",
+   "set": "attribute",
+   "text": "basilar atelectasis",
+   "target": "Atelectasis",
+   "code": {
+    "head": "pulmonary atelectasis",
+    "subs": [
+     "base"
+    ]
+   }
+  },
+  {
+   "id": "A07",
+   "set": "attribute",
+   "text": "left lower lobe atelectasis",
+   "target": "Atelectasis",
+   "code": {
+    "head": "pulmonary atelectasis",
+    "subs": [
+     "left",
+     "lower lobe"
+    ]
+   }
+  },
+  {
+   "id": "A08",
+   "set": "attribute",
+   "text": "right lung nodule",
+   "target": "Lung Lesion",
+   "code": {
+    "head": "nodule",
+    "subs": [
+     "right"
+    ]
+   }
+  },
+  {
+   "id": "A09",
+   "set": "attribute",
+   "text": "calcified granuloma in the right upper lobe",
+   "target": null,
+   "code": {
+    "head": "calcified granuloma",
+    "subs": [
+     "right",
+     "upper lobe"
+    ]
+   }
+  },
+  {
+   "id": "A10",
+   "set": "attribute",
+   "text": "multiple calcified granulomas",
+   "target": null,
+   "code": {
+    "head": "calcified granuloma",
+    "subs": [
+     "multiple"
+    ]
+   }
+  },
+  {
+   "id": "A11",
+   "set": "attribute",
+   "text": "rib fractures",
+   "target": "Fracture",
+   "code": {
+    "head": "fractures, bone",
+    "subs": [
+     "ribs"
+    ]
+   }
+  },
+  {
+   "id": "A12",
+   "set": "attribute",
+   "text": "healed fracture",
+   "target": "Fracture",
+   "code": {
+    "head": "fractures, bone",
+    "subs": [
+     "healed"
+    ]
+   }
+  },
+  {
+   "id": "A13",
+   "set": "attribute",
+   "text": "streaky opacity",
+   "target": "Lung Opacity",
+   "code": {
+    "head": "opacity",
+    "subs": [
+     "streaky"
+    ]
+   }
+  },
+  {
+   "id": "A14",
+   "set": "attribute",
+   "text": "right upper lobe opacity",
+   "target": "Lung Opacity",
+   "code": {
+    "head": "opacity",
+    "subs": [
+     "right",
+     "upper lobe"
+    ]
+   }
+  },
+  {
+   "id": "A15",
+   "set": "attribute",
+   "text": "elevated right hemidiaphragm",
+   "target": null,
+   "code": {
+    "head": "diaphragm",
+    "subs": [
+     "elevated",
+     "right"
+    ]
+   }
+  },
+  {
+   "id": "A16",
+   "set": "attribute",
+   "text": "degenerative changes of the thoracic spine",
+   "target": null,
+   "code": {
+    "head": "thoracic vertebrae",
+    "subs": [
+     "degenerative"
+    ]
+   }
+  },
+  {
+   "id": "A17",
+   "set": "attribute",
+   "text": "tortuous aorta",
+   "target": null,
+   "code": {
+    "head": "aorta",
+    "subs": [
+     "tortuous"
+    ]
+   }
+  },
+  {
+   "id": "A18",
+   "set": "attribute",
+   "text": "interstitial pulmonary edema",
+   "target": "Edema",
+   "code": {
+    "head": "pulmonary edema",
+    "subs": [
+     "interstitial"
+    ]
+   }
+  },
+  {
+   "id": "A19",
+   "set": "attribute",
+   "text": "hyperinflated lungs",
+   "target": null,
+   "code": {
+    "head": "lung",
+    "subs": [
+     "hyperdistention"
+    ]
+   }
+  },
+  {
+   "id": "A20",
+   "set": "attribute",
+   "text": "low lung volumes",
+   "target": null,
+   "code": {
+    "head": "lung",
+    "subs": [
+     "hypoinflation"
+    ]
+   }
+  },
+  {
+   "id": "C01",
+   "set": "compositional",
+   "text": "pleural effusion without cardiomegaly",
+   "target": "Pleural Effusion",
+   "labels": {
+    "all_of": [
+     "Pleural Effusion"
+    ],
+    "none_of": [
+     "Cardiomegaly"
+    ]
+   }
+  },
+  {
+   "id": "C02",
+   "set": "compositional",
+   "text": "cardiomegaly with pleural effusion",
+   "target": "Pleural Effusion",
+   "labels": {
+    "all_of": [
+     "Cardiomegaly",
+     "Pleural Effusion"
+    ]
+   }
+  },
+  {
+   "id": "C03",
+   "set": "compositional",
+   "text": "cardiomegaly without pulmonary edema",
+   "target": "Cardiomegaly",
+   "labels": {
+    "all_of": [
+     "Cardiomegaly"
+    ],
+    "none_of": [
+     "Edema"
+    ]
+   }
+  },
+  {
+   "id": "C04",
+   "set": "compositional",
+   "text": "atelectasis and pleural effusion",
+   "target": "Atelectasis",
+   "labels": {
+    "all_of": [
+     "Atelectasis",
+     "Pleural Effusion"
+    ]
+   }
+  },
+  {
+   "id": "C05",
+   "set": "compositional",
+   "text": "lung opacity without pleural effusion",
+   "target": "Lung Opacity",
+   "labels": {
+    "all_of": [
+     "Lung Opacity"
+    ],
+    "none_of": [
+     "Pleural Effusion"
+    ]
+   }
+  },
+  {
+   "id": "C06",
+   "set": "compositional",
+   "text": "pacemaker or other device with an enlarged heart",
+   "target": "Cardiomegaly",
+   "labels": {
+    "all_of": [
+     "Support Devices",
+     "Cardiomegaly"
+    ]
+   }
+  },
+  {
+   "id": "C07",
+   "set": "compositional",
+   "text": "lung nodule that is not a calcified granuloma",
+   "target": "Lung Lesion",
+   "labels": {
+    "all_of": [
+     "Lung Lesion"
+    ]
+   },
+   "none_codes": [
+    "calcified granuloma"
+   ]
+  },
+  {
+   "id": "C08",
+   "set": "compositional",
+   "text": "consolidation with pleural effusion",
+   "target": "Consolidation",
+   "labels": {
+    "all_of": [
+     "Consolidation",
+     "Pleural Effusion"
+    ]
+   }
+  },
+  {
+   "id": "C09",
+   "set": "compositional",
+   "text": "atelectasis without lung opacity",
+   "target": "Atelectasis",
+   "labels": {
+    "all_of": [
+     "Atelectasis"
+    ],
+    "none_of": [
+     "Lung Opacity"
+    ]
+   }
+  },
+  {
+   "id": "C10",
+   "set": "compositional",
+   "text": "pulmonary edema with cardiomegaly",
+   "target": "Edema",
+   "labels": {
+    "all_of": [
+     "Edema",
+     "Cardiomegaly"
+    ]
+   }
+  },
+  {
+   "id": "R:127",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 127,
+   "target": null
+  },
+  {
+   "id": "R:197",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 197,
+   "target": null
+  },
+  {
+   "id": "R:442",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 442,
+   "target": null
+  },
+  {
+   "id": "R:494",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 494,
+   "target": null
+  },
+  {
+   "id": "R:752",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 752,
+   "target": null
+  },
+  {
+   "id": "R:769",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 769,
+   "target": null
+  },
+  {
+   "id": "R:810",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 810,
+   "target": null
+  },
+  {
+   "id": "R:922",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 922,
+   "target": null
+  },
+  {
+   "id": "R:1101",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1101,
+   "target": null
+  },
+  {
+   "id": "R:1226",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1226,
+   "target": null
+  },
+  {
+   "id": "R:1269",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1269,
+   "target": null
+  },
+  {
+   "id": "R:1279",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1279,
+   "target": null
+  },
+  {
+   "id": "R:1287",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1287,
+   "target": null
+  },
+  {
+   "id": "R:1411",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1411,
+   "target": null
+  },
+  {
+   "id": "R:1419",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1419,
+   "target": null
+  },
+  {
+   "id": "R:1464",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1464,
+   "target": null
+  },
+  {
+   "id": "R:1576",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1576,
+   "target": null
+  },
+  {
+   "id": "R:1641",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1641,
+   "target": null
+  },
+  {
+   "id": "R:1666",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1666,
+   "target": null
+  },
+  {
+   "id": "R:1898",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1898,
+   "target": null
+  },
+  {
+   "id": "R:1921",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 1921,
+   "target": null
+  },
+  {
+   "id": "R:2226",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2226,
+   "target": null
+  },
+  {
+   "id": "R:2267",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2267,
+   "target": null
+  },
+  {
+   "id": "R:2297",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2297,
+   "target": null
+  },
+  {
+   "id": "R:2345",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2345,
+   "target": null
+  },
+  {
+   "id": "R:2532",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2532,
+   "target": null
+  },
+  {
+   "id": "R:2746",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2746,
+   "target": null
+  },
+  {
+   "id": "R:2857",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2857,
+   "target": null
+  },
+  {
+   "id": "R:2945",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 2945,
+   "target": null
+  },
+  {
+   "id": "R:3150",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3150,
+   "target": null
+  },
+  {
+   "id": "R:3246",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3246,
+   "target": null
+  },
+  {
+   "id": "R:3278",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3278,
+   "target": null
+  },
+  {
+   "id": "R:3327",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3327,
+   "target": null
+  },
+  {
+   "id": "R:3424",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3424,
+   "target": null
+  },
+  {
+   "id": "R:3447",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3447,
+   "target": null
+  },
+  {
+   "id": "R:3516",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3516,
+   "target": null
+  },
+  {
+   "id": "R:3733",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3733,
+   "target": null
+  },
+  {
+   "id": "R:3769",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3769,
+   "target": null
+  },
+  {
+   "id": "R:3802",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3802,
+   "target": null
+  },
+  {
+   "id": "R:3996",
+   "set": "report_to_report",
+   "fold": 0,
+   "report_id": 3996,
+   "target": null
+  },
+  {
+   "id": "R:28",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 28,
+   "target": null
+  },
+  {
+   "id": "R:327",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 327,
+   "target": null
+  },
+  {
+   "id": "R:440",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 440,
+   "target": null
+  },
+  {
+   "id": "R:471",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 471,
+   "target": null
+  },
+  {
+   "id": "R:607",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 607,
+   "target": null
+  },
+  {
+   "id": "R:661",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 661,
+   "target": null
+  },
+  {
+   "id": "R:689",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 689,
+   "target": null
+  },
+  {
+   "id": "R:901",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 901,
+   "target": null
+  },
+  {
+   "id": "R:1015",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1015,
+   "target": null
+  },
+  {
+   "id": "R:1032",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1032,
+   "target": null
+  },
+  {
+   "id": "R:1060",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1060,
+   "target": null
+  },
+  {
+   "id": "R:1061",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1061,
+   "target": null
+  },
+  {
+   "id": "R:1075",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1075,
+   "target": null
+  },
+  {
+   "id": "R:1081",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1081,
+   "target": null
+  },
+  {
+   "id": "R:1181",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1181,
+   "target": null
+  },
+  {
+   "id": "R:1248",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1248,
+   "target": null
+  },
+  {
+   "id": "R:1303",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1303,
+   "target": null
+  },
+  {
+   "id": "R:1552",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1552,
+   "target": null
+  },
+  {
+   "id": "R:1553",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1553,
+   "target": null
+  },
+  {
+   "id": "R:1654",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1654,
+   "target": null
+  },
+  {
+   "id": "R:1702",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1702,
+   "target": null
+  },
+  {
+   "id": "R:1934",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 1934,
+   "target": null
+  },
+  {
+   "id": "R:2014",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2014,
+   "target": null
+  },
+  {
+   "id": "R:2285",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2285,
+   "target": null
+  },
+  {
+   "id": "R:2314",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2314,
+   "target": null
+  },
+  {
+   "id": "R:2396",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2396,
+   "target": null
+  },
+  {
+   "id": "R:2736",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2736,
+   "target": null
+  },
+  {
+   "id": "R:2789",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2789,
+   "target": null
+  },
+  {
+   "id": "R:2835",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2835,
+   "target": null
+  },
+  {
+   "id": "R:2908",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2908,
+   "target": null
+  },
+  {
+   "id": "R:2913",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2913,
+   "target": null
+  },
+  {
+   "id": "R:2914",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 2914,
+   "target": null
+  },
+  {
+   "id": "R:3018",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3018,
+   "target": null
+  },
+  {
+   "id": "R:3090",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3090,
+   "target": null
+  },
+  {
+   "id": "R:3319",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3319,
+   "target": null
+  },
+  {
+   "id": "R:3332",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3332,
+   "target": null
+  },
+  {
+   "id": "R:3430",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3430,
+   "target": null
+  },
+  {
+   "id": "R:3570",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3570,
+   "target": null
+  },
+  {
+   "id": "R:3760",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3760,
+   "target": null
+  },
+  {
+   "id": "R:3804",
+   "set": "report_to_report",
+   "fold": 1,
+   "report_id": 3804,
+   "target": null
+  },
+  {
+   "id": "R:35",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 35,
+   "target": null
+  },
+  {
+   "id": "R:45",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 45,
+   "target": null
+  },
+  {
+   "id": "R:134",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 134,
+   "target": null
+  },
+  {
+   "id": "R:273",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 273,
+   "target": null
+  },
+  {
+   "id": "R:464",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 464,
+   "target": null
+  },
+  {
+   "id": "R:686",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 686,
+   "target": null
+  },
+  {
+   "id": "R:835",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 835,
+   "target": null
+  },
+  {
+   "id": "R:884",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 884,
+   "target": null
+  },
+  {
+   "id": "R:1146",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1146,
+   "target": null
+  },
+  {
+   "id": "R:1158",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1158,
+   "target": null
+  },
+  {
+   "id": "R:1213",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1213,
+   "target": null
+  },
+  {
+   "id": "R:1225",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1225,
+   "target": null
+  },
+  {
+   "id": "R:1227",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1227,
+   "target": null
+  },
+  {
+   "id": "R:1242",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1242,
+   "target": null
+  },
+  {
+   "id": "R:1365",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1365,
+   "target": null
+  },
+  {
+   "id": "R:1430",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1430,
+   "target": null
+  },
+  {
+   "id": "R:1585",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1585,
+   "target": null
+  },
+  {
+   "id": "R:1609",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1609,
+   "target": null
+  },
+  {
+   "id": "R:1699",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1699,
+   "target": null
+  },
+  {
+   "id": "R:1718",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1718,
+   "target": null
+  },
+  {
+   "id": "R:1760",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1760,
+   "target": null
+  },
+  {
+   "id": "R:1768",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1768,
+   "target": null
+  },
+  {
+   "id": "R:1836",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1836,
+   "target": null
+  },
+  {
+   "id": "R:1978",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 1978,
+   "target": null
+  },
+  {
+   "id": "R:2140",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2140,
+   "target": null
+  },
+  {
+   "id": "R:2144",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2144,
+   "target": null
+  },
+  {
+   "id": "R:2246",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2246,
+   "target": null
+  },
+  {
+   "id": "R:2264",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2264,
+   "target": null
+  },
+  {
+   "id": "R:2271",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2271,
+   "target": null
+  },
+  {
+   "id": "R:2371",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2371,
+   "target": null
+  },
+  {
+   "id": "R:2465",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2465,
+   "target": null
+  },
+  {
+   "id": "R:2502",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2502,
+   "target": null
+  },
+  {
+   "id": "R:2778",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 2778,
+   "target": null
+  },
+  {
+   "id": "R:3217",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 3217,
+   "target": null
+  },
+  {
+   "id": "R:3297",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 3297,
+   "target": null
+  },
+  {
+   "id": "R:3387",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 3387,
+   "target": null
+  },
+  {
+   "id": "R:3474",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 3474,
+   "target": null
+  },
+  {
+   "id": "R:3493",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 3493,
+   "target": null
+  },
+  {
+   "id": "R:3832",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 3832,
+   "target": null
+  },
+  {
+   "id": "R:3876",
+   "set": "report_to_report",
+   "fold": 2,
+   "report_id": 3876,
+   "target": null
+  },
+  {
+   "id": "R:27",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 27,
+   "target": null
+  },
+  {
+   "id": "R:58",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 58,
+   "target": null
+  },
+  {
+   "id": "R:102",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 102,
+   "target": null
+  },
+  {
+   "id": "R:103",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 103,
+   "target": null
+  },
+  {
+   "id": "R:130",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 130,
+   "target": null
+  },
+  {
+   "id": "R:688",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 688,
+   "target": null
+  },
+  {
+   "id": "R:726",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 726,
+   "target": null
+  },
+  {
+   "id": "R:1079",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1079,
+   "target": null
+  },
+  {
+   "id": "R:1086",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1086,
+   "target": null
+  },
+  {
+   "id": "R:1112",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1112,
+   "target": null
+  },
+  {
+   "id": "R:1154",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1154,
+   "target": null
+  },
+  {
+   "id": "R:1200",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1200,
+   "target": null
+  },
+  {
+   "id": "R:1247",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1247,
+   "target": null
+  },
+  {
+   "id": "R:1360",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1360,
+   "target": null
+  },
+  {
+   "id": "R:1444",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1444,
+   "target": null
+  },
+  {
+   "id": "R:1474",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1474,
+   "target": null
+  },
+  {
+   "id": "R:1500",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1500,
+   "target": null
+  },
+  {
+   "id": "R:1589",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1589,
+   "target": null
+  },
+  {
+   "id": "R:1764",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 1764,
+   "target": null
+  },
+  {
+   "id": "R:2021",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2021,
+   "target": null
+  },
+  {
+   "id": "R:2045",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2045,
+   "target": null
+  },
+  {
+   "id": "R:2186",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2186,
+   "target": null
+  },
+  {
+   "id": "R:2258",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2258,
+   "target": null
+  },
+  {
+   "id": "R:2263",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2263,
+   "target": null
+  },
+  {
+   "id": "R:2315",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2315,
+   "target": null
+  },
+  {
+   "id": "R:2370",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2370,
+   "target": null
+  },
+  {
+   "id": "R:2921",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2921,
+   "target": null
+  },
+  {
+   "id": "R:2931",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2931,
+   "target": null
+  },
+  {
+   "id": "R:2940",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 2940,
+   "target": null
+  },
+  {
+   "id": "R:3076",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3076,
+   "target": null
+  },
+  {
+   "id": "R:3080",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3080,
+   "target": null
+  },
+  {
+   "id": "R:3086",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3086,
+   "target": null
+  },
+  {
+   "id": "R:3245",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3245,
+   "target": null
+  },
+  {
+   "id": "R:3280",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3280,
+   "target": null
+  },
+  {
+   "id": "R:3432",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3432,
+   "target": null
+  },
+  {
+   "id": "R:3469",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3469,
+   "target": null
+  },
+  {
+   "id": "R:3602",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3602,
+   "target": null
+  },
+  {
+   "id": "R:3800",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3800,
+   "target": null
+  },
+  {
+   "id": "R:3910",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3910,
+   "target": null
+  },
+  {
+   "id": "R:3960",
+   "set": "report_to_report",
+   "fold": 3,
+   "report_id": 3960,
+   "target": null
+  },
+  {
+   "id": "R:160",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 160,
+   "target": null
+  },
+  {
+   "id": "R:258",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 258,
+   "target": null
+  },
+  {
+   "id": "R:313",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 313,
+   "target": null
+  },
+  {
+   "id": "R:500",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 500,
+   "target": null
+  },
+  {
+   "id": "R:585",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 585,
+   "target": null
+  },
+  {
+   "id": "R:644",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 644,
+   "target": null
+  },
+  {
+   "id": "R:651",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 651,
+   "target": null
+  },
+  {
+   "id": "R:695",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 695,
+   "target": null
+  },
+  {
+   "id": "R:800",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 800,
+   "target": null
+  },
+  {
+   "id": "R:864",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 864,
+   "target": null
+  },
+  {
+   "id": "R:949",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 949,
+   "target": null
+  },
+  {
+   "id": "R:1244",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1244,
+   "target": null
+  },
+  {
+   "id": "R:1272",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1272,
+   "target": null
+  },
+  {
+   "id": "R:1390",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1390,
+   "target": null
+  },
+  {
+   "id": "R:1501",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1501,
+   "target": null
+  },
+  {
+   "id": "R:1572",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1572,
+   "target": null
+  },
+  {
+   "id": "R:1619",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1619,
+   "target": null
+  },
+  {
+   "id": "R:1665",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1665,
+   "target": null
+  },
+  {
+   "id": "R:1708",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1708,
+   "target": null
+  },
+  {
+   "id": "R:1881",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1881,
+   "target": null
+  },
+  {
+   "id": "R:1970",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 1970,
+   "target": null
+  },
+  {
+   "id": "R:2102",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2102,
+   "target": null
+  },
+  {
+   "id": "R:2181",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2181,
+   "target": null
+  },
+  {
+   "id": "R:2190",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2190,
+   "target": null
+  },
+  {
+   "id": "R:2606",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2606,
+   "target": null
+  },
+  {
+   "id": "R:2755",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2755,
+   "target": null
+  },
+  {
+   "id": "R:2846",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2846,
+   "target": null
+  },
+  {
+   "id": "R:2868",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2868,
+   "target": null
+  },
+  {
+   "id": "R:2986",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 2986,
+   "target": null
+  },
+  {
+   "id": "R:3003",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3003,
+   "target": null
+  },
+  {
+   "id": "R:3380",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3380,
+   "target": null
+  },
+  {
+   "id": "R:3481",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3481,
+   "target": null
+  },
+  {
+   "id": "R:3558",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3558,
+   "target": null
+  },
+  {
+   "id": "R:3571",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3571,
+   "target": null
+  },
+  {
+   "id": "R:3632",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3632,
+   "target": null
+  },
+  {
+   "id": "R:3633",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3633,
+   "target": null
+  },
+  {
+   "id": "R:3670",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3670,
+   "target": null
+  },
+  {
+   "id": "R:3706",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3706,
+   "target": null
+  },
+  {
+   "id": "R:3848",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3848,
+   "target": null
+  },
+  {
+   "id": "R:3907",
+   "set": "report_to_report",
+   "fold": 4,
+   "report_id": 3907,
+   "target": null
+  }
+ ]
+}

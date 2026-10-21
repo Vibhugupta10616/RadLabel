@@ -1,0 +1,83 @@
+# Retrieval evaluation spec (README §8.2, M8). FROZEN: written and committed 2026-10-22 BEFORE any retrieval run.
+# Any change needs owner approval and a new version. Relevance comes from the v1 expert codes, on the eval side only
+# (eval/retrieval.py). The indication is never part of a query.
+version: retrieval_v1
+
+corpus: >-
+  Per fold k: the fold-k exact-text representatives (one report per exact normalised text), indexed alone; every
+  query runs against every fold; pooled numbers average over (query, fold) pairs where the query has >= 1 relevant
+  report in that fold (pairs with none are skipped and counted).
+
+metrics:
+  k: 10
+  recall_at_10: "relevant reports in the top 10 / min(10, number of relevant reports in the fold)"
+  ndcg_at_10: >-
+    DCG over the top 10 (gain / log2(rank + 1)) divided by the ideal DCG of the fold's relevant reports; gains are 1
+    for label, alias, attribute and compositional queries and the Jaccard overlap for report-to-report queries
+  negation_contamination_at_10: >-
+    for queries with a target label among the 11 finding labels: the share of the top 10 whose eval-detector mentions
+    of that label (data/processed/eval_mentions.jsonl, negspacy + eval lexicon) exist and are ALL negated
+  ci: "95% bootstrap, 1,000 resamples over (query, fold) pairs, seed 13"
+
+variants:
+  bm25: "BM25 over report text (Findings + Impression, [REDACTED]), Qdrant sparse vectors with the IDF modifier; k1 1.2, b 0.75"
+  dense_report: "base BAAI/bge-small-en-v1.5, one point per report (Findings + Impression), cosine"
+  dense_sentence_ctx: >-
+    base bge-small, one point per sentence with the contextual prefix "[Findings | report also mentions: a, b] text"
+    built from PREDICTED v2 labels (status present, No Finding excluded); top 200 sentences, max score per report
+  dense_sentence_ctx_filter: >-
+    as dense_sentence_ctx, excluding sentence points whose pipeline negation tag is negation_only (every label
+    mention in the sentence negated); no training
+  rrf: "reciprocal rank fusion (k = 60) of the bm25 and dense_sentence_ctx report rankings (top 100 of each)"
+  query_prefix: "bge retrieval instruction for label, alias, attribute and compositional queries; none for report-to-report"
+
+label_queries:
+  heldout_labels: [Fracture, Lung Lesion, Pleural Other]   # never used in M9 training (README §6.3)
+  seen_label: "the label name, lower-case, for each finding label not held out (8); relevant: label coded (v1)"
+  heldout_label: "the label name, lower-case, for each held-out label (3); relevant: label coded (v1)"
+  heldout_alias: >-
+    every hand-written pipeline alias with heldout = true (src/radlabel/preprocess/aliases.py), excluding anchors and
+    aliases equal to the label name, for the seen finding labels; relevant: the alias's label coded (v1)
+
+report_to_report:
+  per_fold: 40
+  seed: 13
+  query_reports: "abnormal subset (README §4.8) with >= 1 Findings sentence; sampled per fold, sorted ids, random.Random(13 + fold)"
+  query_text: "the first 2 Findings sentences ([REDACTED] applied), joined with a space"
+  relevant: "another fold-k report sharing >= 1 abnormal label (v1 labels minus No Finding); the query report is removed"
+  gain: "Jaccard overlap of the two abnormal label sets"
+
+# 30 hand-written queries. code: a report is relevant if any expert code has this head and ALL listed sub-headings
+# (case-insensitive). labels: all_of / none_of over the v1 labels; none_codes: no code with that head.
+# target: the label used for negation contamination (null when it is not one of the 11 finding labels).
+handwritten:
+  - {id: A01, type: attribute, text: small pleural effusion, code: {head: pleural effusion, subs: [small]}, target: Pleural Effusion}
+  - {id: A02, type: attribute, text: bilateral pleural effusions, code: {head: pleural effusion, subs: [bilateral]}, target: Pleural Effusion}
+  - {id: A03, type: attribute, text: right pleural effusion, code: {head: pleural effusion, subs: [right]}, target: Pleural Effusion}
+  - {id: A04, type: attribute, text: mild cardiomegaly, code: {head: cardiomegaly, subs: [mild]}, target: Cardiomegaly}
+  - {id: A05, type: attribute, text: borderline cardiomegaly, code: {head: cardiomegaly, subs: [borderline]}, target: Cardiomegaly}
+  - {id: A06, type: attribute, text: basilar atelectasis, code: {head: pulmonary atelectasis, subs: [base]}, target: Atelectasis}
+  - {id: A07, type: attribute, text: left lower lobe atelectasis, code: {head: pulmonary atelectasis, subs: [left, lower lobe]}, target: Atelectasis}
+  - {id: A08, type: attribute, text: right lung nodule, code: {head: nodule, subs: [right]}, target: Lung Lesion}
+  - {id: A09, type: attribute, text: calcified granuloma in the right upper lobe, code: {head: calcified granuloma, subs: [right, upper lobe]}, target: null}
+  - {id: A10, type: attribute, text: multiple calcified granulomas, code: {head: calcified granuloma, subs: [multiple]}, target: null}
+  - {id: A11, type: attribute, text: rib fractures, code: {head: "fractures, bone", subs: [ribs]}, target: Fracture}
+  - {id: A12, type: attribute, text: healed fracture, code: {head: "fractures, bone", subs: [healed]}, target: Fracture}
+  - {id: A13, type: attribute, text: streaky opacity, code: {head: opacity, subs: [streaky]}, target: Lung Opacity}
+  - {id: A14, type: attribute, text: right upper lobe opacity, code: {head: opacity, subs: [right, upper lobe]}, target: Lung Opacity}
+  - {id: A15, type: attribute, text: elevated right hemidiaphragm, code: {head: diaphragm, subs: [elevated, right]}, target: null}
+  - {id: A16, type: attribute, text: degenerative changes of the thoracic spine, code: {head: thoracic vertebrae, subs: [degenerative]}, target: null}
+  - {id: A17, type: attribute, text: tortuous aorta, code: {head: aorta, subs: [tortuous]}, target: null}
+  - {id: A18, type: attribute, text: interstitial pulmonary edema, code: {head: pulmonary edema, subs: [interstitial]}, target: Edema}
+  - {id: A19, type: attribute, text: hyperinflated lungs, code: {head: lung, subs: [hyperdistention]}, target: null}
+  - {id: A20, type: attribute, text: low lung volumes, code: {head: lung, subs: [hypoinflation]}, target: null}
+  - {id: C01, type: compositional, text: pleural effusion without cardiomegaly, labels: {all_of: [Pleural Effusion], none_of: [Cardiomegaly]}, target: Pleural Effusion}
+  - {id: C02, type: compositional, text: cardiomegaly with pleural effusion, labels: {all_of: [Cardiomegaly, Pleural Effusion]}, target: Pleural Effusion}
+  - {id: C03, type: compositional, text: cardiomegaly without pulmonary edema, labels: {all_of: [Cardiomegaly], none_of: [Edema]}, target: Cardiomegaly}
+  - {id: C04, type: compositional, text: atelectasis and pleural effusion, labels: {all_of: [Atelectasis, Pleural Effusion]}, target: Atelectasis}
+  - {id: C05, type: compositional, text: lung opacity without pleural effusion, labels: {all_of: [Lung Opacity], none_of: [Pleural Effusion]}, target: Lung Opacity}
+  - {id: C06, type: compositional, text: pacemaker or other device with an enlarged heart, labels: {all_of: [Support Devices, Cardiomegaly]}, target: Cardiomegaly}
+  - {id: C07, type: compositional, text: lung nodule that is not a calcified granuloma, labels: {all_of: [Lung Lesion]}, none_codes: [calcified granuloma], target: Lung Lesion}
+  - {id: C08, type: compositional, text: consolidation with pleural effusion, labels: {all_of: [Consolidation, Pleural Effusion]}, target: Consolidation}
+  - {id: C09, type: compositional, text: atelectasis without lung opacity, labels: {all_of: [Atelectasis], none_of: [Lung Opacity]}, target: Atelectasis}
+  - {id: C10, type: compositional, text: pulmonary edema with cardiomegaly, labels: {all_of: [Edema, Cardiomegaly]}, target: Edema}
