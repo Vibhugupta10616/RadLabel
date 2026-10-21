@@ -270,9 +270,20 @@ def reading(out: dict[str, Any]) -> str:
         f"{seen[1]['contamination']['value']:.3f} → {seen[0]['contamination']['value']:.3f}). Part of its gain comes "
         "from the contextual prefix, which names the PREDICTED v2 labels: once the \"No X\" sentences are filtered "
         "out, sentences whose prefix mentions X come from reports predicted positive for X, so this row partly "
-        "measures the labelling pipeline, not only the embeddings. It is the baseline the fine-tuned model must "
-        "beat (M9, judged two ways, SPEC §8.2). Base models only; no held-out effect is expected before "
-        "fine-tuning.")
+        "measures the labelling pipeline, not only the embeddings. Base models only; no held-out effect is expected "
+        "before fine-tuning." + _best_sentence(out))
+
+
+def _best_sentence(out: dict[str, Any]) -> str:
+    bb = out.get("best_base")
+    if bb is None:
+        return ""
+    a, b = (out["variants"][v]["all"]["ndcg"] for v in bb["top_two"])
+    how = (f"the top two, {NAMES[bb['top_two'][0]]} ({a['value']:.3f}) and {NAMES[bb['top_two'][1]]} "
+           f"({b['value']:.3f}), are within each other's 95% CI, so the simpler one is chosen" if bb["tied"]
+           else f"highest pooled nDCG@10 ({a['value']:.3f}), outside the runner-up's CI")
+    return (f" **Best base combination** (owner rule, SPEC §8.2): **{NAMES[bb['variant']]}**: {how}. It is the "
+            "reference for the M9 full-system comparison.")
 
 
 def render(out: dict[str, Any], sets: tuple[str, ...] = (*SETS, "all")) -> str:

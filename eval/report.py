@@ -38,6 +38,11 @@ PAIRED_NAMES = {
 }
 
 
+# README summary wording for the best base search setup (SPEC §8.2)
+SHORT_NAMES = {"dense_sentence": "base embeddings", "dense_sentence_filter": "base embeddings + negation filter",
+               "rrf_plain": "base embeddings + BM25", "bm25": "BM25"}
+
+
 def _pct(x: float) -> str:
     return f"{100 * x:.1f}%"
 
@@ -201,7 +206,8 @@ def summary() -> str:
         f"- Verified labels are right far more often than unverified ones: precision "
         f"**{g['verified_or_verified_rules']['precision']:.3f} vs {g['unverified']['precision']:.3f}**.",
         f"- Only **{_pct(r['unverified_report_rate'])}** of reports end with any unverified label.",
-        f"- Search baseline ({retrieval.NAMES[best]}, nDCG@10 over {b['n_pairs']} query–fold pairs): "
+        f"- Search baseline ({SHORT_NAMES.get(best, retrieval.NAMES[best])}, nDCG@10 over {b['n_pairs']} query–fold "
+        f"pairs): "
         f"**{b['ndcg']['value']:.3f}**. Negation-aware fine-tuning is in progress."]) + "\n"
 
 
