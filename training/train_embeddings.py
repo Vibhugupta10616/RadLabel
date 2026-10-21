@@ -98,7 +98,8 @@ def train(triplets: list[tuple[str, str, str]], out_dir: Path, dev: str, seed: i
     bf16 = cuda and torch.cuda.is_bf16_supported()
     args = SentenceTransformerTrainingArguments(
         output_dir=str(out_dir / "checkpoints"), num_train_epochs=epochs, per_device_train_batch_size=BATCH,
-        learning_rate=LR, warmup_ratio=0.1, seed=seed, data_seed=seed, bf16=bf16, fp16=cuda and not bf16,
+        learning_rate=LR, warmup_steps=0.1, seed=seed,  # a float warmup_steps = warmup ratio (Transformers v5)
+        data_seed=seed, bf16=bf16, fp16=cuda and not bf16,
         batch_sampler=BatchSamplers.NO_DUPLICATES, logging_steps=50, report_to="none",
         eval_strategy="epoch" if ev else "no", save_strategy="epoch" if ev else "no", save_total_limit=epochs,
         load_best_model_at_end=bool(ev), metric_for_best_model="eval_innerval_ndcg@10" if ev else None,
