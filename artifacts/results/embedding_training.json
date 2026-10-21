@@ -1,0 +1,121 @@
+{
+ "provenance": {
+  "git_commit": "fe859bc6c9c8dc630d793ac99c2ecb768e6c210b",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "per fold",
+  "created": "2026-10-21T22:34:49+00:00",
+  "base_model": "BAAI/bge-small-en-v1.5",
+  "loss": "CachedGISTEmbedLoss",
+  "batch": 128,
+  "mini_batch": 32,
+  "lr": 2e-05,
+  "max_epochs": 3
+ },
+ "results": {
+  "compute": {
+   "device": "cuda",
+   "torch": "2.11.0+cu128",
+   "cuda": "12.8",
+   "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+   "bf16": true,
+   "driver": "592.82"
+  },
+  "folds": {
+   "0": {
+    "triplets": 4232,
+    "epochs_trained": 3,
+    "inner_val_ndcg_base": 0.5194782335276097,
+    "inner_val_ndcg_by_epoch": [
+     0.7294922337073046,
+     0.7522847959213051,
+     0.7531573005357599
+    ],
+    "best_epoch": 3,
+    "seconds": 246.74848699569702,
+    "train_reports": 2225,
+    "inner_val_reports": 245,
+    "source_reports": 1018
+   },
+   "1": {
+    "triplets": 4229,
+    "epochs_trained": 3,
+    "inner_val_ndcg_base": 0.5070892214578473,
+    "inner_val_ndcg_by_epoch": [
+     0.6915529837286054,
+     0.7301144794547754,
+     0.7402194644313921
+    ],
+    "best_epoch": 3,
+    "seconds": 244.66071319580078,
+    "train_reports": 2215,
+    "inner_val_reports": 251,
+    "source_reports": 1041
+   },
+   "2": {
+    "triplets": 4229,
+    "epochs_trained": 3,
+    "inner_val_ndcg_base": 0.540523680375422,
+    "inner_val_ndcg_by_epoch": [
+     0.7159346926854468,
+     0.7435598092569946,
+     0.7404442817908384
+    ],
+    "best_epoch": 2,
+    "seconds": 239.23579359054565,
+    "train_reports": 2218,
+    "inner_val_reports": 251,
+    "source_reports": 1041
+   },
+   "3": {
+    "triplets": 4195,
+    "epochs_trained": 3,
+    "inner_val_ndcg_base": 0.5529137994782218,
+    "inner_val_ndcg_by_epoch": [
+     0.7161960158424195,
+     0.7273850792942851,
+     0.7326945298072939
+    ],
+    "best_epoch": 3,
+    "seconds": 86.91197466850281,
+    "train_reports": 2220,
+    "inner_val_reports": 250,
+    "source_reports": 1033
+   },
+   "4": {
+    "triplets": 4224,
+    "epochs_trained": 3,
+    "inner_val_ndcg_base": 0.4822097348549823,
+    "inner_val_ndcg_by_epoch": [
+     0.6789840564014242,
+     0.7128806224171056,
+     0.7116010257209859
+    ],
+    "best_epoch": 2,
+    "seconds": 190.12699842453003,
+    "train_reports": 2208,
+    "inner_val_reports": 261,
+    "source_reports": 1033
+   }
+  }
+ }
+}

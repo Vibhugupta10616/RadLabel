@@ -1,0 +1,45 @@
+{
+ "provenance": {
+  "git_commit": "853ffd048037ddd1d086b28eb3bee76f74f901dd",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "all reports",
+  "created": "2026-10-21T22:48:01+00:00",
+  "base_model": "BAAI/bge-small-en-v1.5"
+ },
+ "results": {
+  "triplets": 4398,
+  "epochs_trained": 3,
+  "inner_val_ndcg_base": null,
+  "inner_val_ndcg_by_epoch": [],
+  "best_epoch": 3,
+  "seconds": 233.3907663822174,
+  "compute": {
+   "device": "cuda",
+   "torch": "2.11.0+cu128",
+   "cuda": "12.8",
+   "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+   "bf16": true,
+   "driver": "592.82"
+  }
+ }
+}

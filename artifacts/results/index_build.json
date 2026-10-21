@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "58360070939af7123316057f380f6a9eb94cb7a6",
+  "git_commit": "853ffd048037ddd1d086b28eb3bee76f74f901dd",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": null,
-  "created": "2026-10-21T18:51:07+00:00",
+  "created": "2026-10-21T22:55:55+00:00",
   "llm": "none"
  },
  "results": {
@@ -61,7 +61,7 @@
   "check_indications_tested": 2192,
   "check_indication_found_in_points": 0,
   "indication_phrase_also_in_own_findings_or_impression": 4,
-  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "embedding_model": "./models/serving/model",
   "source": "artifacts/predictions/verifier_agent_full.jsonl (M7 v2)"
  }
 }
