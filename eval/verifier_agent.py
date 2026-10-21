@@ -76,7 +76,7 @@ def run_all(texts: dict[int, str], llm: LLMClient, agent: bool) -> dict[int, Pip
     """Finished reports are cached, so a retry pass only pays for what is still missing."""
     def one(i: int) -> tuple[int, PipelineResult | None]:
         try:
-            return i, run_pipeline(texts[i], llm, str(i), agent=agent, normal_check_escalates=True)  # evaluated v2
+            return i, run_pipeline(texts[i], llm, str(i), agent=agent, normal_check_escalates=True)  # v2 (default)
         except Exception as e:  # network trouble after the client's retries (CacheMiss included in cache-only)
             log.warning("report %s not done yet: %s", i, type(e).__name__)
             return i, None
@@ -450,7 +450,11 @@ def analysis() -> dict[str, Any]:
     }
     d = ablation["paired_ablation_minus_v2"]
     ablation["not_significantly_worse"] = bool(d["hi"] >= 0)
-    ablation["serving_configuration"] = "ablation" if ablation["not_significantly_worse"] else "v2"
+    # owner decision after M8: serving stays v2 although the ablation is not significantly worse, because it would show
+    # ~99%-correct normals as unverified (unverified reports 2.9% -> 8.1%)
+    ablation["serving_configuration"] = "v2"
+    ablation["serving_decision"] = ("v2: the ablation changes no label but would show ~99%-correct normals as "
+                                    "unverified (owner, 2026-10-22)")
 
     files = {"llm_only": "labelling_llm_only", "tier2": "labelling_llm_verifier_tier2", "v2": "labelling_llm_agent_v2"}
     scores = {k: json.loads((TABLES.parent / "results" / f"{f}.json").read_text(encoding="utf-8"))["results"]["v1"]
@@ -527,8 +531,8 @@ def render_analysis(an: dict[str, Any]) -> str:
               f"({ab['agent_llm_calls_saved']} calls, ${ab['agent_cost_saved_usd']:.2f}); reports with an unverified "
               f"label rise to {ab['reports_with_unverified']} ({100 * ab['unverified_report_rate']:.1f}%), because "
               "those normals stay unconfirmed. Not significantly worse: "
-              f"**{'yes' if ab['not_significantly_worse'] else 'no'}** → serving configuration: "
-              f"**{SERVING_NAMES[ab['serving_configuration']]}**."]
+              f"**{'yes' if ab['not_significantly_worse'] else 'no'}**. Serving configuration: "
+              f"**{SERVING_NAMES[ab['serving_configuration']]}** ({ab['serving_decision']})."]
     return "\n".join(lines) + "\n"
 
 

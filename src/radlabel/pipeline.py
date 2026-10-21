@@ -3,8 +3,9 @@
 parse -> sentences ([REDACTED], IDs) -> Tier 1 tagger (Findings + Impression only; the indication is never an input)
 -> deterministic verifier -> free checks (escalation, recall scan, normal check) -> verifier agent on escalated
 reports only. `agent=False` stops before the agent (escalated labels end `unverified`, reason "agent not run").
-Serving configuration (owner, after the M7 ablation): a report escalated ONLY by the normal check skips the agent
-(its No Finding stays `unverified`); `normal_check_escalates=True` restores the evaluated v2 behaviour.
+Serving configuration = the evaluated v2 (owner, after M8): every escalation, the normal check included, goes to
+the agent. `normal_check_escalates=False` is the M7 ablation (reports escalated only by the normal check skip the
+agent; their No Finding stays `unverified`): same labels, but ~99%-correct normals would be shown as unverified.
 Content-filtered or invalid tagger output -> the rule labeller's labels, all `unverified` (owner policy, M4).
 Reads report text only: never codes from the dataset, folds, eval mentions or metrics
 (tests/test_pipeline_leakage.py).
@@ -42,7 +43,7 @@ class PipelineResult(BaseModel):
 
 
 def run_pipeline(raw_text: str, llm: LLMClient | None = None, report_id: str = "upload",
-                 agent: bool = True, normal_check_escalates: bool = False) -> PipelineResult:
+                 agent: bool = True, normal_check_escalates: bool = True) -> PipelineResult:
     llm = llm or LLMClient()
     parsed = parse_report(raw_text)
     sents = report_sentences(parsed.findings, parsed.impression)
@@ -61,7 +62,7 @@ def run_pipeline(raw_text: str, llm: LLMClient | None = None, report_id: str = "
     result: AgentResult | None = None
     reason = "agent not run"
     if esc and not normal_check_escalates and {e.reason for e in esc} == {"normal_check"}:
-        reason = "normal check not passed; agent skipped (serving configuration)"
+        reason = "normal check not passed; agent skipped (normal-check ablation)"
     elif esc and agent:
         try:
             result = run_agent(llm, report_id, sents, labels, esc, parsed.sections_identified)

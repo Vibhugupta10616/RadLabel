@@ -71,16 +71,17 @@ def test_run_pipeline_content_filter_falls_back_to_rules(tmp_path: Path) -> None
     assert r.content_filtered and r.tagger is None and r.labels.status("Pleural Effusion") == "present"
 
 
-def test_serving_skips_the_agent_when_only_the_normal_check_escalates(tmp_path: Path) -> None:
+def test_normal_check_ablation_skips_the_agent_only_when_asked(tmp_path: Path) -> None:
     calls: list[str] = []
 
     def responder(messages: list[dict]) -> str:
         calls.append(messages[0]["content"][:20])
         return answer()  # every label not_mentioned -> No Finding derived present
     r = run_pipeline("IMPRESSION: No acute cardiopulmonary abnormality.", FakeLLM(responder, tmp_path))
-    nf = next(f for f in r.final if f.label == "No Finding")
-    assert {e.reason for e in r.escalations} == {"normal_check"} and not r.agent_used and len(calls) == 1
-    assert nf.status == "present" and nf.verification == "unverified" and "agent skipped" in nf.reason
+    assert {e.reason for e in r.escalations} == {"normal_check"} and r.agent_used  # serving default = v2
+    calls.clear()
     r = run_pipeline("IMPRESSION: No acute cardiopulmonary abnormality.", FakeLLM(responder, tmp_path / "b"),
-                     normal_check_escalates=True)
-    assert r.agent_used  # evaluated v2 behaviour
+                     normal_check_escalates=False)  # the M7 ablation
+    nf = next(f for f in r.final if f.label == "No Finding")
+    assert not r.agent_used and len(calls) == 1
+    assert nf.status == "present" and nf.verification == "unverified" and "agent skipped" in nf.reason

@@ -22,6 +22,10 @@ metrics:
 variants:
   bm25: "BM25 over report text (Findings + Impression, [REDACTED]), Qdrant sparse vectors with the IDF modifier; k1 1.2, b 0.75"
   dense_report: "base BAAI/bge-small-en-v1.5, one point per report (Findings + Impression), cosine"
+  # added 2026-10-22 after M8 (owner-approved; queries and the other variants unchanged): the pure-embedding row
+  dense_sentence: >-
+    base bge-small, one point per sentence WITHOUT the contextual prefix (no predicted labels in the text); top 200
+    sentences, max score per report
   dense_sentence_ctx: >-
     base bge-small, one point per sentence with the contextual prefix "[Findings | report also mentions: a, b] text"
     built from PREDICTED v2 labels (status present, No Finding excluded); top 200 sentences, max score per report

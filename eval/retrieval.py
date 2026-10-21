@@ -34,8 +34,8 @@ from radlabel.results import write_result
 
 SPEC = Path("eval/queries/retrieval_v1.yaml")
 MATERIALIZED = Path("eval/queries/retrieval_v1_queries.json")  # query texts and query report ids only, committed
-TMP = "radlabel_eval_tmp"
-VARIANTS = ("bm25", "dense_report", "dense_sentence_ctx", "dense_sentence_ctx_filter", "rrf")
+TMP, TMP_PLAIN = "radlabel_eval_tmp", "radlabel_eval_tmp_plain"
+VARIANTS = ("bm25", "dense_report", "dense_sentence", "dense_sentence_ctx", "dense_sentence_ctx_filter", "rrf")
 SETS = ("seen_label", "heldout_label", "heldout_alias", "attribute", "compositional", "report_to_report")
 K, DEEP, N_BOOT = 10, 100, 1000
 
@@ -158,6 +158,12 @@ def run() -> dict[str, Any]:
     flat = [p for i in it.ids for p in points[i]]
     check_points(flat)
     vec = dict(zip([p.id for p in flat], encode([p.text for p in flat]), strict=True))
+    # pure-embedding row: the same sentence points without the predicted-label prefix
+    raw = {i: {s.id: s.text for s in res[i].sentences} for i in it.ids}
+    plain = {i: [p.model_copy(update={"text": raw[i][p.payload["sentence_id"]]}) for p in points[i]
+                 if p.kind == "sentence"] for i in it.ids}
+    flat_plain = [p for i in it.ids for p in plain[i]]
+    vec_plain = dict(zip([p.id for p in flat_plain], encode([p.text for p in flat_plain]), strict=True))
     sents = {r["id"]: r["sentences"] for r in map(json.loads, (PROC / "reports.jsonl").open(encoding="utf-8"))}
     qtext = {q["id"]: q["text"] if q["set"] != "report_to_report" else findings_snippet(sents[q["report_id"]])
              for q in queries}
@@ -172,6 +178,9 @@ def run() -> dict[str, Any]:
         fp = [p for i in ids for p in points[i]]
         store.create(client, TMP, len(next(iter(vec.values()))))
         store.upsert(client, TMP, fp, np.array([vec[p.id] for p in fp]))
+        pp = [p for i in ids for p in plain[i]]
+        store.create(client, TMP_PLAIN, len(next(iter(vec.values()))))
+        store.upsert(client, TMP_PLAIN, pp, np.array([vec_plain[p.id] for p in pp]))
         for q in queries:
             if q["set"] == "report_to_report" and q["fold"] != k:
                 continue
@@ -183,7 +192,8 @@ def run() -> dict[str, Any]:
             text, v = qtext[q["id"]], np.asarray(qvec[q["id"]])
             bm = store.search_bm25(client, TMP, text, DEEP + 1)
             dn = store.search_sentences(client, TMP, v, DEEP + 1)
-            ranked = {"bm25": bm, "dense_report": store.search_reports(client, TMP, v, K + 1), "dense_sentence_ctx": dn,
+            ranked = {"bm25": bm, "dense_report": store.search_reports(client, TMP, v, K + 1),
+                      "dense_sentence": store.search_sentences(client, TMP_PLAIN, v, K + 1), "dense_sentence_ctx": dn,
                       "dense_sentence_ctx_filter": store.search_sentences(client, TMP, v, K + 1,
                                                                           exclude_negation_only=True),
                       "rrf": store.rrf([x for x in bm if x[0] != drop], [x for x in dn if x[0] != drop], top=K + 1)}
@@ -191,6 +201,7 @@ def run() -> dict[str, Any]:
                 order = [int(r) for r, _ in rk if r != drop]
                 pairs[name][q["set"]].append({"query": q["id"], "fold": k, **metrics(order, gains, q["target"], rel)})
     client.delete_collection(TMP)
+    client.delete_collection(TMP_PLAIN)
 
     out: dict[str, Any] = {"n_queries": dict(sorted({s: sum(q["set"] == s for q in queries) for s in SETS}.items())),
                            "skipped_pairs_no_relevant": skipped,
@@ -218,6 +229,7 @@ def run() -> dict[str, Any]:
 
 
 NAMES = {"bm25": "BM25", "dense_report": "base bge-small, report-level",
+         "dense_sentence": "base bge-small, sentences without prefix (pure embedding)",
          "dense_sentence_ctx": "base bge-small, contextual sentences",
          "dense_sentence_ctx_filter": "base bge-small + negated-sentence payload filter (no training)",
          "rrf": "base contextual sentences + BM25 (RRF)"}
