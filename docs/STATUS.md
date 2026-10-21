@@ -15,8 +15,8 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M6 | **Done** (code `567b093`; results rerun from cache at that commit, $0) | Through `run_pipeline`: clean join headline macro-F1 (v1) 0.860 (0.845–0.873), identical to LLM + verifier (paired 0.000; 1 report differs: IU text with inner "Impression:" headers); 30% varied joins 0.848, paired varied − clean −0.012 (−0.017 to −0.007). Parser: clean 100.0% of sentences in the right section, 3,083/3,086 fully parsed; alternative headers 100%; no headers 62.6% (308/309 no sections found). Correctly parsed clean joins: 0 new tagger inputs (all from the M4 cache). Hedge fix: conversions 147 → 125, LLM + verifier 0.857 → 0.860, Cardiomegaly F1 0.914 → 0.944. Normal-claim count: 833 of 1,302 (64.0%) "no acute" impressions have non-normal codes; the tagger predicted No Finding for 3 of them. Spend $0.25 (461 new tagger inputs); total $2.63. |
 | M7 | **Done** (owner-accepted 2026-10-22; tag `m7-verifier-agent`) (code `77e8abd`, `6729cb0`, `33e2667`) | Full run (prompt `verifier-v2`, owner-approved): headline macro-F1 (v1) **0.887** (0.874–0.899), strict 0.883; paired v2 − LLM + verifier + Tier 2 +0.022 (0.013–0.031), v2 − LLM only +0.025 (0.016–0.035), v2 − rule baseline +0.050 (0.037–0.063) → agent **kept** (pre-committed rule). Verified + verified_rules labels precision 0.938 vs unverified 0.393. Reports with any unverified label 2.9% (v1 review rate 30.5%). Escalated 1,290 (41.8%). Agent cost $2.07 new ($2.12 incl. the cached dev reports); rerun from cache $0, byte-identical. |
 | M8 | **Done** (owner-accepted 2026-10-22) (spec `8628794`, code `d4c154b`..`0f25dfa`) | Serving index from the M7 v2 outputs: Postgres 3,086 reports / 40,118 labels (Alembic `0001`), Qdrant 3,086 report + 19,006 contextual sentence points; leakage checks on the stored points pass (payload whitelist; indication text 0 of 2,192). Retrieval (spec frozen before the run, 259 queries, per fold + pooled): best pooled nDCG@10 the negated-sentence filter 0.528 ≈ RRF 0.526; seen-label nDCG 0.637 → 0.871 and contamination 0.310 → 0.070 with the filter; report-to-report best BM25 0.463. No LLM calls ($0). |
-| M9 | **next** (waits for the owner's prompt) | Negation-aware embedding fine-tuning on plain sentences; judged two ways (pure embedding vs base without prefix; full system vs the best base combination); pre-committed use rule (SPEC §8.2). |
-| M10a | planned | Website backend: session API (`/api/session`, `/reports`, `/ask` scope report or all, `/timeline`), in memory, nothing stored; session RAG. |
+| M9 | **results in, waiting for owner review** (code `a793a6f`, `fe859bc`, `853ffd0`) | Fine-tuned bge-small (plain sentences, CachedGISTEmbedLoss, GPU): pooled nDCG@10 0.564 → 0.592, paired +0.028 (0.019–0.038), negation contamination 0.140 → 0.097 → **use rule passes**, search default = fine-tuned serving model. Seen labels +0.134, held-out aliases +0.069, compositional +0.045; held-out labels −0.010 (CI includes 0), attribute −0.013 (CI includes 0). With the filter: 0.582 → 0.602. |
+| M10a | **next** | Website backend: session API (`/api/session`, `/reports`, `/ask` scope report or all, `/timeline`), in memory, nothing stored; session RAG. |
 | M10b | planned | Website evaluation: 20 frozen questions (`docs/m9b_handwritten_questions.md`) on the dev slice; session RAG vs all reports in the prompt on batches of 3/10/30/50; latency and cost. |
 | M10c | in progress (branch `m9c-frontend`) | Website frontend (React); runs on a mock API until M10a. |
 | M11 | planned | Deployment: Vercel (frontend) + Hugging Face Docker Space (backend); secrets as Space secrets; no private models in the image. |
@@ -241,6 +241,24 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
   order (`radlabel.index.store._top`, unit tests). Two consecutive runs are now byte-identical (`564588e`).
 - Effect on the accepted M8 numbers (pooled nDCG@10): BM25 0.498 → 0.504, RRF 0.526 → 0.537; dense rows unchanged
   (one ±0.001 from tie-breaking). Per set, BM25 / RRF move by up to 0.018 (RRF report-to-report 0.342 → 0.360).
+
+## M9 notes
+- Compute: local GPU (NVIDIA RTX 5050 Laptop, 8 GB, driver 592.82); PyTorch 2.11.0+cu128 installed in the venv only
+  (no cu128 build of 2.14.1 exists); `pyproject.toml` pins unchanged, CI stays on CPU. bf16; batch 128, CachedGIST
+  mini-batch 32. Timing test estimated 9 minutes for 5 folds; the real run took ~17 minutes (per-epoch evaluation
+  and model loading were not in the estimate). Training still runs on CPU with `--device auto`.
+- Optional extra `train` (`sentence-transformers[train]`: datasets, accelerate), local only.
+- Pairs: ~4,200 triplets per fold from the training folds only (inner validation held out; test on synthetic folds
+  that no fold-k text reaches fold k's pairs). The builder first used alias texts that are held out for another label
+  (e.g. "airspace disease"); fixed before training: any alias text held out for any label is excluded.
+- Best epochs per fold 3, 3, 2, 3, 2 → serving model 3 epochs on all reports (4,398 triplets), private
+  (`models/serving/model`); the evaluation index was rebuilt with it and plain sentences (leakage checks pass).
+- GPU vs CPU embeddings differ in the 4th–5th decimal (max 0.0001 on a pooled value); the fine-tuning run recomputes
+  the base rows on the same device, so the paired comparisons are like for like. The GPU rerun was byte-identical.
+- Held-out labels (never trained) show no gain; the gain is on seen labels, held-out aliases of seen labels and
+  compositional queries. Attribute queries ("small left effusion") do not improve.
+- Pending housekeeping: the owner's attached README.md and m9b_handwritten_questions.md did not arrive with the M9
+  prompt; to be applied when resent.
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.

@@ -2,7 +2,7 @@
 
 **Chest X-ray report intelligence: verified findings with evidence, and questions answered with citations, over the user's own reports. Full specification for development; the short overview is the [README](../README.md).**
 
-**Status:** done: M0–M8 (v1 labelling M3–M5; v2 parser, single `run_pipeline` entry point and ReAct verifier agent M6–M7; evaluation search index and retrieval evaluation M8). Next: M9 negation-aware embedding fine-tuning (planned, not done), M10 website (M10a backend, M10b evaluation, M10c frontend, started on branch `m9c-frontend`), M11 deployment (Vercel + Hugging Face). Results: [RESULTS.md](RESULTS.md); roadmap §12.
+**Status:** done: M0–M9 (v1 labelling M3–M5; v2 parser, single `run_pipeline` entry point and ReAct verifier agent M6–M7; evaluation search index and retrieval evaluation M8; negation-aware embedding fine-tuning M9, used for search). Next: M10 website (M10a backend, M10b evaluation, M10c frontend, started on branch `m9c-frontend`), M11 deployment (Vercel + Hugging Face). Results: [RESULTS.md](RESULTS.md); roadmap §12.
 
 > Engineering and research project. **Not a medical device and not for clinical use.** Labels are derived from report text, not from images.
 
@@ -16,7 +16,7 @@
 |---|---|
 | **Labelling pipeline** | Takes raw report text, splits it into sections, and extracts findings with sentence-level evidence. Free deterministic checks and a rule-based second reader check every label; a **ReAct verifier agent** handles only the reports where they fail or disagree, and marks every label **verified, corrected, suggested or unverified**. |
 | **Questions** | About one report: the LLM answers from that report's sentences. Across all uploads: **session RAG** retrieves the user's own sentences (dense embeddings + BM25) and the LLM answers from them. Every answer cites `report_no:sentence_id`, checked in code, or refuses. |
-| **Negation-aware embeddings** (M9, planned) | bge-small fine-tuned on plain sentences so that "no effusion" is not retrieved for "effusion"; evaluated on the IU test bed (§8.2) and used for search and RAG only if it passes the pre-committed rule. Not done yet. |
+| **Negation-aware embeddings** (M9) | bge-small fine-tuned on plain sentences so that "no effusion" is not retrieved for "effusion"; evaluated on the IU test bed (§8.2). It passed the pre-committed use rule, so search and session RAG use it ([RESULTS.md](RESULTS.md)); the verifier agent keeps the base model. |
 | **Website** | FastAPI session API and a React frontend (§6.5, M10); deployed on Vercel (frontend) and a Hugging Face Docker Space (backend) (M11). |
 
 Every component is evaluated against **expert-coded ground truth** on the IU reports using **stratified 5-fold cross-validation**.
@@ -336,21 +336,22 @@ Evidence is always sentence IDs that exist in the report, and the sentence text 
 
 ### 6.3 Index, embeddings and fine-tuning (`src/radlabel/index/`, `training/`)
 The IU index is the **evaluation test bed** (M8, §8.2) and the source of training pairs; users never search it.
-- **Points:** one per report (Findings + Impression) and one per sentence, each with its section name (`unknown` if the parser found no sections). **Sentences are embedded without the predicted-label prefix**: in M8, plain sentences scored pooled nDCG@10 0.564 vs 0.491 with the prefix ([RESULTS.md](RESULTS.md)). The prefix and filter rows stay in the evaluation as comparisons. (The M8 index builder still writes prefixed sentence points; switching it is part of M9.)
+- **Points:** one per report (Findings + Impression) and one per sentence, each with its section name (`unknown` if the parser found no sections). **Sentences are embedded without the predicted-label prefix**: in M8, plain sentences scored pooled nDCG@10 0.564 vs 0.491 with the prefix ([RESULTS.md](RESULTS.md)). The prefix and filter rows stay in the evaluation as comparisons. The index builder writes plain sentence points by default since M9 (`INDEX_SENTENCE_PREFIX` keeps the M8 option).
 - **Payload:** report_id, sentence_id, section, predicted labels with their `verification` state, pipeline negation tags, and the evidence sentence IDs per label.
 - **Indication:** stored only in Postgres (`reports.indication`); never embedded, never in an index point, never in a retrieval-evaluation query.
 - **Retrieval:** dense (cosine) + BM25 (sparse vectors with IDF computed at index time), fused with RRF (k = 60); deterministic tie-breaking. Optional cross-encoder reranker. No LLM-judge stage.
 - **Aggregation:** sentence hits → reports by **max score per report**.
 
-**Embedding fine-tuning (M9, planned)** (`training/build_pairs.py`, `training/train_embeddings.py`):
+**Embedding fine-tuning (M9, done)** (`training/build_pairs.py`, `training/train_embeddings.py`):
 - Base model `BAAI/bge-small-en-v1.5`; `--device auto` (CPU works; GPU is faster).
 - Pairs are built **from training folds only**, on **plain sentences (no prefix)**, with expert codes for relevance and the pipeline negation tags for hard negatives:
   - query → report: positive = coded finding; hard negative = report mentioning it only negated
   - query → sentence
   - report → report, sampled **from abnormal reports only**: positive = same label set; hard negative = similar wording with a negated key finding
-- Queries come from label names plus **non-held-out** aliases. **Held-out labels** (Fracture, Lung Lesion, Pleural Other) are never used in training.
+- Queries come from label names plus **non-held-out** aliases. **Held-out labels** (Fracture, Lung Lesion, Pleural Other) are never used in training, and neither is any alias text that is held out for **any** label (the same words can serve two labels).
+- Report → report pairs (optional) were not built.
 - **Loss:** `CachedGISTEmbedLoss` with the base model as guide, which filters in-batch false negatives. Fallback: `MultipleNegativesRankingLoss` with a sampler allowing each label once per batch.
-- 1–3 epochs, selected by inner-validation nDCG@10.
+- 1–3 epochs, selected by inner-validation nDCG@10 (report level, training-label queries); fixed seed; `--device auto` (CUDA with bf16 when available). The serving model uses the most frequent best epoch across folds.
 - Output: `models/eval/fold_{k}/` and `models/serving/`, **private, git-ignored**.
 - **Use:** the fine-tuned model is for **search and session RAG only**, and only if it passes the pre-committed rule of §8.2. The verifier agent's `find_by_meaning` stays on the base model.
 
@@ -590,7 +591,7 @@ All results are generated into [RESULTS.md](RESULTS.md) by `python -m eval.repor
 | **M6** | Parser (`parser.py`), `run_pipeline(raw_text)` (parse → tag → current verifier until M7), evaluation through the entry point with clean and varied joins, empty-section counts and subsets, normal-claim count ("no acute" impressions with non-normal codes), hedge-check consistency fix ("borderline"/"mild" not a hedge where the label definition counts it as present) | Parser accuracy and clean vs varied macro-F1 in results; leakage test covers `run_pipeline`; correctly parsed reports hit the Tier 1 cache ($0) | done |
 | **M7** | Free checks with v2 escalation rules + recall scan (rule baseline as second reader) + normal check on every predicted No Finding; ReAct verifier agent (tools, blind first, caps); dev-slice prompt development and freeze; cost estimate before the full run | §8.1 v2 rows: F1 and paired bootstrap vs v1 columns, verified vs unverified accuracy, escalation and unverified rates, change counts; leakage test for the agent | done |
 | **M8** | Postgres `labels` (with verification state and evidence) from out-of-fold v2 outputs; Qdrant indexing (report + contextual sentence points, sections, indication field, BM25); RRF; aggregation; retrieval eval incl. report-to-report queries | BM25 / base / contextual / filter rows of §8.2; test asserting no expert labels or indication in the index points | done |
-| **M9** | Negation-aware embedding fine-tuning on plain sentences: pairs from training folds, `CachedGISTEmbedLoss` per fold, held-out evaluation, serving model on all data (stored privately); switch the evaluation index to plain sentence points | §8.2 fine-tuned rows judged two ways (pure embedding vs base without prefix; full system vs the best base combination), seen vs held-out split; pre-committed use rule applied | planned |
+| **M9** | Negation-aware embedding fine-tuning on plain sentences: pairs from training folds, `CachedGISTEmbedLoss` per fold, held-out evaluation, serving model on all data (stored privately); switch the evaluation index to plain sentence points | §8.2 fine-tuned rows judged two ways (pure embedding vs base without prefix; full system vs the best base combination), seen vs held-out split; pre-committed use rule applied | done |
 | **M10a** | Website backend: session API (`/api/session`, `/reports`, `/ask` with scope report or all, `/timeline`), in memory and nothing stored; single-report answers and session RAG with citations checked in code; cost cap with the rules-only fallback | Endpoints match the frontend contract (`web/README.md`); a test shows nothing is stored; leakage tests cover the API; CI green | planned |
 | **M10b** | Website evaluation (§8.3, §8.4): the 20 frozen questions on the dev slice, session RAG vs all reports in the prompt on batches of 3/10/30/50, latency and cost | Results file and tables; cost estimated before any paid run | planned |
 | **M10c** | Website frontend (React; started on branch `m9c-frontend`) | Runs against the real backend; end-to-end smoke test (upload → findings → question with citations) | in progress |

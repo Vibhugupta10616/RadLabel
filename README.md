@@ -49,7 +49,7 @@ Out-of-fold on 3,086 expert-coded reports (Indiana University chest X-ray collec
 
 - Verified labels are right far more often than unverified ones: precision **0.938 vs 0.393**.
 - Only **2.9%** of reports end with any unverified label.
-- Search baseline (base embeddings, nDCG@10 over 494 query–fold pairs): **0.564**. Negation-aware fine-tuning is in progress.
+- Search with negation-aware fine-tuned embeddings: nDCG@10 **0.592** vs 0.564 for the base model (494 query–fold pairs), negation contamination 0.097 vs 0.140; the fine-tuned model is used for search.
 
 <!-- summary:end -->
 
