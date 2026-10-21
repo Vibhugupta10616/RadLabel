@@ -59,6 +59,11 @@ WORKERS = 6  # REPAIR_TPM 375K / (~8K tokens counted per request); 429s are back
 EMBED_SETUP_REQUIRED = True
 
 
+def _tally(items: Any) -> dict[str, int]:
+    """Counter as a key-sorted dict: set iteration order varies between processes, results files must not."""
+    return dict(sorted(Counter(items).items()))
+
+
 def clean_joins(ids: list[int]) -> dict[int, str]:
     iu = {r["id"]: r for r in map(json.loads, (PROC / "iu.jsonl").open(encoding="utf-8"))}
     return {i: "\n".join(f"{CLEAN_HEADERS[s]}: {iu[i][s]}" for s in SECTIONS if iu[i][s]) for i in ids}
@@ -109,7 +114,7 @@ def escalation() -> dict[str, Any]:
     reasons = Counter(e.reason for es in esc.values() for e in es)
     reports_by_reason = Counter(x for es in esc.values() for x in {e.reason for e in es})
     only = Counter(next(iter({e.reason for e in es})) for es in esc.values() if len({e.reason for e in es}) == 1)
-    labels_by_reason = {r: dict(Counter(e.label for es in esc.values() for e in es if e.reason == r))
+    labels_by_reason = {r: _tally(e.label for es in esc.values() for e in es if e.reason == r)
                         for r in sorted(reasons)}
     pairs = {(i, e.label) for i, es in esc.items() for e in es}
     is_esc = np.array([i in esc for i in it.ids])
@@ -128,8 +133,9 @@ def escalation() -> dict[str, Any]:
         "escalation_rate_hedged": float(is_esc[hedged].mean()), "escalation_rate_clear": float(is_esc[~hedged].mean()),
         "escalated_dev_slice": int((is_esc & pilot).sum()), "dev_slice_reports": int(pilot.sum()),
         "escalated_outside_dev_slice": int((is_esc & ~pilot).sum()),
-        "escalated_labels": len(pairs), "label_escalations_by_reason": dict(reasons),
-        "reports_by_reason": dict(reports_by_reason), "reports_with_a_single_reason": dict(only),
+        "escalated_labels": len(pairs), "label_escalations_by_reason": dict(sorted(reasons.items())),
+        "reports_by_reason": dict(sorted(reports_by_reason.items())),
+        "reports_with_a_single_reason": dict(sorted(only.items())),
         "labels_by_reason": labels_by_reason,
         "escalation_precision_reports": float(disagree[is_esc].mean()),
         "disagreement_base_rate": float(disagree.mean()),
@@ -192,9 +198,9 @@ def dev(cache_only: bool = False) -> dict[str, Any]:
     out = {
         "prompt_version": va.PROMPT_VERSION, "prompt_sha256": prompt_sha(), "dev_reports": len(dev_ids),
         "escalated_dev_reports": len(todo), "agent_runs": len(rr),
-        "stop_reasons": dict(Counter(a.stop for a in rr)),
+        "stop_reasons": _tally(a.stop for a in rr),
         "mean_tool_calls": float(np.mean([a.tool_calls for a in rr])) if rr else None,
-        "tool_usage": dict(Counter(n for a in rr for n in a.tool_names)),
+        "tool_usage": _tally(n for a in rr for n in a.tool_names),
         "verification_counts": dict(ver), "per_label": {k: dict(v) for k, v in per_label.items() if v},
         "present_flips_vs_codes": dict(flips), "suggested_vs_codes": dict(sugg),
         "evidence_agreement_with_tagger": float(np.mean(agree)) if agree else None,
@@ -312,14 +318,14 @@ def full(cache_only: bool = False) -> dict[str, Any]:
     v1_review = dist.get("review", 0) / sum(dist.values())
     rates = {"escalated_reports": int(esc.sum()), "escalation_rate": float(esc.mean()),
              "escalation_rate_hedged": float(esc[hedged].mean()), "escalation_rate_clear": float(esc[~hedged].mean()),
-             "reports_by_reason": dict(Counter(x for r in res.values() for x in {e.reason for e in r.escalations})),
-             "label_escalations_by_reason": dict(Counter(e.reason for r in res.values() for e in r.escalations)),
+             "reports_by_reason": _tally(x for r in res.values() for x in {e.reason for e in r.escalations}),
+             "label_escalations_by_reason": _tally(e.reason for r in res.values() for e in r.escalations),
              "unverified_labels": n_unv_labels, "unverified_label_rate": n_unv_labels / (len(res) * len(LABELS)),
              "reports_with_unverified": int(unv.sum()), "unverified_report_rate": float(unv.mean()),
              "unverified_report_rate_hedged": float(unv[hedged].mean()),
              "unverified_report_rate_clear": float(unv[~hedged].mean()),
-             "unverified_reasons": dict(Counter(reason_category(f.reason) for r in res.values() for f in r.final
-                                                if f.verification == "unverified")),
+             "unverified_reasons": _tally(reason_category(f.reason) for r in res.values() for f in r.final
+                                                if f.verification == "unverified"),
              "v1_review_rate": v1_review, "reduced_vs_v1_review_rate": bool(unv.mean() < v1_review)}
 
     # normal check table: tagger No Finding (after the deterministic verifier) x check x tagger right/wrong
@@ -364,7 +370,7 @@ def full(cache_only: bool = False) -> dict[str, Any]:
 
     rr = [r.agent for r in res.values() if r.agent is not None]
     agent = {"prompt_version": va.PROMPT_VERSION, "prompt_sha256": prompt_sha(), "embedding_setup": setup,
-             "agent_runs": len(rr), "stop_reasons": dict(Counter(a.stop for a in rr)),
+             "agent_runs": len(rr), "stop_reasons": _tally(a.stop for a in rr),
              "caps_hit": sum(a.stop in ("tool_cap", "token_cap") for a in rr),
              "refusals_content_filtered": sum(a.stop == "content_filtered" for a in rr),
              "budget_stops": sum(any(f.reason == "budget" for f in r.final) for r in res.values()),
