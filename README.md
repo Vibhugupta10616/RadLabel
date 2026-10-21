@@ -757,6 +757,84 @@ Escalation precision (tagger labels disagree with the codes): reports 44.3%, lab
 
 Verifier agent on the **dev slice only** (38 escalated of 102 Tier 1 pilot reports; not a headline result), prompt `verifier-v2` (frozen): labels changed vs the codes wrong → right 11, right → wrong 3; suggested correct 3, wrong 3; verified 24, corrected 11, unverified 4; mean tool calls 1.87; $0.0017 per report. Estimated full run: 1,252 reports, $2.10.
 
+### Retrieval (M8, §8.2): base models
+
+Serving index from the M7 v2 outputs (predicted labels only): Postgres 3,086 reports and 40,118 labels; Qdrant 3,086 report and 19,006 contextual sentence points (BAAI/bge-small-en-v1.5). Checks on the stored points: payload keys whitelisted yes; indication text in a point 0 of 2,192 tested (4 reports repeat the indication's words in their own Findings/Impression).
+
+**Reading (M8).** Best variant by nDCG@10: seen label base bge-small + negated-sentence payload filter (no training) (0.871); heldout label base bge-small + negated-sentence payload filter (no training) (0.643); heldout alias base bge-small + negated-sentence payload filter (no training) (0.671); attribute base contextual sentences + BM25 (RRF) (0.803); compositional base bge-small + negated-sentence payload filter (no training) (0.523); report to report BM25 (0.463); all base bge-small + negated-sentence payload filter (no training) (0.528). The negated-sentence filter lowers negation contamination on the label queries (seen labels 0.310 → 0.070). Part of its gain comes from the contextual prefix, which names the PREDICTED v2 labels: once the "No X" sentences are filtered out, sentences whose prefix mentions X come from reports predicted positive for X, so this row partly measures the labelling pipeline, not only the embeddings. It is the baseline the fine-tuned model must beat (M9). Base models only; no held-out effect is expected before fine-tuning.
+
+Per fold, each fold's reports indexed alone; pooled over (query, fold) pairs with 95% bootstrap CIs; spec frozen before the run (`eval/queries/retrieval_v1.yaml`).
+
+**seen label** (40 query–fold pairs)
+
+| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
+|---|---|---|---|
+| BM25 | 0.466 (0.354–0.575) | 0.483 (0.369–0.591) | 0.402 (0.287–0.512) |
+| base bge-small, report-level | 0.643 (0.549–0.741) | 0.672 (0.581–0.764) | 0.310 (0.205–0.415) |
+| base bge-small, contextual sentences | 0.647 (0.562–0.734) | 0.637 (0.549–0.725) | 0.310 (0.205–0.410) |
+| base bge-small + negated-sentence payload filter (no training) | 0.868 (0.831–0.908) | 0.871 (0.830–0.913) | 0.070 (0.032–0.118) |
+| base contextual sentences + BM25 (RRF) | 0.657 (0.555–0.752) | 0.676 (0.572–0.770) | 0.315 (0.207–0.420) |
+
+**heldout label** (15 query–fold pairs)
+
+| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
+|---|---|---|---|
+| BM25 | 0.253 (0.160–0.360) | 0.257 (0.158–0.368) | 0.140 (0.060–0.227) |
+| base bge-small, report-level | 0.260 (0.187–0.327) | 0.265 (0.193–0.340) | 0.120 (0.047–0.220) |
+| base bge-small, contextual sentences | 0.633 (0.540–0.733) | 0.638 (0.527–0.751) | 0.033 (0.013–0.060) |
+| base bge-small + negated-sentence payload filter (no training) | 0.633 (0.533–0.733) | 0.643 (0.532–0.759) | 0.013 (0.000–0.033) |
+| base contextual sentences + BM25 (RRF) | 0.433 (0.333–0.540) | 0.465 (0.350–0.578) | 0.053 (0.007–0.107) |
+
+**heldout alias** (90 query–fold pairs)
+
+| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
+|---|---|---|---|
+| BM25 | 0.437 (0.367–0.502) | 0.489 (0.418–0.554) | 0.141 (0.089–0.196) |
+| base bge-small, report-level | 0.619 (0.552–0.677) | 0.644 (0.581–0.700) | 0.089 (0.049–0.132) |
+| base bge-small, contextual sentences | 0.625 (0.555–0.691) | 0.647 (0.581–0.710) | 0.108 (0.068–0.151) |
+| base bge-small + negated-sentence payload filter (no training) | 0.651 (0.580–0.719) | 0.671 (0.602–0.737) | 0.073 (0.040–0.111) |
+| base contextual sentences + BM25 (RRF) | 0.630 (0.561–0.691) | 0.663 (0.595–0.721) | 0.087 (0.050–0.124) |
+
+**attribute** (100 query–fold pairs)
+
+| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
+|---|---|---|---|
+| BM25 | 0.721 (0.678–0.763) | 0.718 (0.677–0.758) | 0.123 (0.083–0.166) |
+| base bge-small, report-level | 0.599 (0.552–0.648) | 0.613 (0.569–0.662) | 0.131 (0.089–0.177) |
+| base bge-small, contextual sentences | 0.786 (0.746–0.823) | 0.777 (0.739–0.813) | 0.075 (0.051–0.103) |
+| base bge-small + negated-sentence payload filter (no training) | 0.802 (0.763–0.836) | 0.792 (0.754–0.826) | 0.023 (0.011–0.037) |
+| base contextual sentences + BM25 (RRF) | 0.822 (0.787–0.855) | 0.803 (0.769–0.836) | 0.060 (0.034–0.091) |
+
+**compositional** (49 query–fold pairs)
+
+| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
+|---|---|---|---|
+| BM25 | 0.296 (0.227–0.363) | 0.294 (0.223–0.365) | 0.355 (0.245–0.467) |
+| base bge-small, report-level | 0.304 (0.230–0.386) | 0.293 (0.219–0.376) | 0.316 (0.218–0.416) |
+| base bge-small, contextual sentences | 0.377 (0.294–0.465) | 0.394 (0.310–0.484) | 0.308 (0.204–0.414) |
+| base bge-small + negated-sentence payload filter (no training) | 0.534 (0.438–0.625) | 0.523 (0.426–0.616) | 0.163 (0.106–0.222) |
+| base contextual sentences + BM25 (RRF) | 0.343 (0.264–0.426) | 0.355 (0.275–0.442) | 0.341 (0.231–0.449) |
+
+**report to report** (200 query–fold pairs)
+
+| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
+|---|---|---|---|
+| BM25 | 0.700 (0.659–0.738) | 0.463 (0.432–0.493) | – |
+| base bge-small, report-level | 0.590 (0.546–0.632) | 0.392 (0.358–0.427) | – |
+| base bge-small, contextual sentences | 0.442 (0.394–0.494) | 0.262 (0.230–0.297) | – |
+| base bge-small + negated-sentence payload filter (no training) | 0.432 (0.383–0.482) | 0.257 (0.224–0.294) | – |
+| base contextual sentences + BM25 (RRF) | 0.546 (0.499–0.595) | 0.342 (0.309–0.376) | – |
+
+**all** (494 query–fold pairs)
+
+| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |
+|---|---|---|---|
+| BM25 | 0.584 (0.554–0.614) | 0.498 (0.469–0.525) | 0.217 (0.180–0.257) |
+| base bge-small, report-level | 0.563 (0.534–0.593) | 0.492 (0.465–0.518) | 0.178 (0.146–0.213) |
+| base bge-small, contextual sentences | 0.561 (0.531–0.592) | 0.491 (0.462–0.519) | 0.164 (0.134–0.198) |
+| base bge-small + negated-sentence payload filter (no training) | 0.598 (0.567–0.630) | 0.528 (0.497–0.559) | 0.074 (0.056–0.092) |
+| base contextual sentences + BM25 (RRF) | 0.603 (0.575–0.632) | 0.526 (0.498–0.555) | 0.161 (0.129–0.195) |
+
 <!-- results:end -->
 
 ## 11. Limitations
@@ -796,7 +874,7 @@ Verifier agent on the **dev slice only** (38 escalated of 102 Tier 1 pilot repor
 | **M5** | Tier 2 repair agent (LangGraph, tools, limits), review routing, routing metrics (v1) | Repair success rate, escalation precision, hedged vs clear review rates in results | done |
 | **M6** | Parser (`parser.py`), `run_pipeline(raw_text)` (parse → tag → current verifier until M7), evaluation through the entry point with clean and varied joins, empty-section counts and subsets, normal-claim count ("no acute" impressions with non-normal codes), hedge-check consistency fix ("borderline"/"mild" not a hedge where the label definition counts it as present) | Parser accuracy and clean vs varied macro-F1 in results; leakage test covers `run_pipeline`; correctly parsed reports hit the Tier 1 cache ($0) | done |
 | **M7** | Free checks with v2 escalation rules + recall scan (rule baseline as second reader) + normal check on every predicted No Finding; ReAct verifier agent (tools, blind first, caps); dev-slice prompt development and freeze; cost estimate before the full run | §8.1 v2 rows: F1 and paired bootstrap vs v1 columns, verified vs unverified accuracy, escalation and unverified rates, change counts; leakage test for the agent | done |
-| **M8** | Postgres `labels` (with verification state and evidence) from out-of-fold v2 outputs; Qdrant indexing (report + contextual sentence points, sections, indication field, BM25); RRF; aggregation; retrieval eval incl. report-to-report queries | BM25 / base / contextual / filter rows of §8.2; test asserting no expert labels or indication in the index points | planned |
+| **M8** | Postgres `labels` (with verification state and evidence) from out-of-fold v2 outputs; Qdrant indexing (report + contextual sentence points, sections, indication field, BM25); RRF; aggregation; retrieval eval incl. report-to-report queries | BM25 / base / contextual / filter rows of §8.2; test asserting no expert labels or indication in the index points | in progress |
 | **M9** | Negation-aware embedding fine-tuning: pair building, `CachedGISTEmbedLoss` per fold, held-out evaluation, serving model on all data (stored privately); optional reranker row; switch the agent's `find_by_meaning` tool to the fine-tuned model | Fine-tuned rows of §8.2, with seen vs held-out split, compared against the filter baseline | planned |
 | **M10** | Query agent + tools (incl. indication and label evidence) + guardrails, question set (templates, paraphrases, 40 hand-written), agent eval on both label tables | §8.3 table | planned |
 | **M11** | Ingestion worker (queue, retries, cost cap, resume), FastAPI endpoints, Redis cache + rate limit, tracing, Gradio demo with verification badges, attribution, deploy files, model card, CI regression eval on frozen cached outputs | End-to-end: ingest 200 reports, kill and restart the worker, job completes; `/label` and `/ask` work; CI green; demo runs locally | planned |

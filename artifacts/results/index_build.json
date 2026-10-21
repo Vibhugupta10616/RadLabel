@@ -1,0 +1,67 @@
+{
+ "provenance": {
+  "git_commit": "0f25dfa41f348eb0eb82812250d38db65b30af8a",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": null,
+  "created": "2026-10-21T17:35:06+00:00",
+  "llm": "none"
+ },
+ "results": {
+  "reports_written": 3086,
+  "postgres_rows": {
+   "reports": 3086,
+   "labels": 40118
+  },
+  "postgres_columns": {
+   "reports": [
+    "report_id",
+    "findings",
+    "impression",
+    "indication",
+    "comparison",
+    "sections_identified"
+   ],
+   "labels": [
+    "id",
+    "report_id",
+    "label",
+    "status",
+    "verification",
+    "evidence",
+    "corroboration",
+    "reason"
+   ]
+  },
+  "qdrant_collection": "radlabel_reports",
+  "points": 22092,
+  "report_points": 3086,
+  "sentence_points": 19006,
+  "check_payload_keys_whitelisted": true,
+  "check_no_forbidden_words_in_payloads": true,
+  "check_indications_tested": 2192,
+  "check_indication_found_in_points": 0,
+  "indication_phrase_also_in_own_findings_or_impression": 4,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "source": "artifacts/predictions/verifier_agent_full.jsonl (M7 v2)"
+ }
+}

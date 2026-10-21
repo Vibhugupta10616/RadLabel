@@ -223,6 +223,21 @@ NAMES = {"bm25": "BM25", "dense_report": "base bge-small, report-level",
          "rrf": "base contextual sentences + BM25 (RRF)"}
 
 
+def reading(out: dict[str, Any]) -> str:
+    """Plain-language reading for README §10: the best variant per query set by nDCG@10, from the results."""
+    v = out["variants"]
+    best = {s: max(VARIANTS, key=lambda x: v[x][s]["ndcg"]["value"]) for s in (*SETS, "all")}
+    seen = v["dense_sentence_ctx_filter"]["seen_label"], v["dense_sentence_ctx"]["seen_label"]
+    return ("**Reading (M8).** Best variant by nDCG@10: " + "; ".join(
+        f"{s.replace('_', ' ')} {NAMES[b]} ({v[b][s]['ndcg']['value']:.3f})" for s, b in best.items()) + ". "
+        "The negated-sentence filter lowers negation contamination on the label queries (seen labels "
+        f"{seen[1]['contamination']['value']:.3f} → {seen[0]['contamination']['value']:.3f}). Part of its gain comes "
+        "from the contextual prefix, which names the PREDICTED v2 labels: once the \"No X\" sentences are filtered "
+        "out, sentences whose prefix mentions X come from reports predicted positive for X, so this row partly "
+        "measures the labelling pipeline, not only the embeddings. It is the baseline the fine-tuned model must "
+        "beat (M9). Base models only; no held-out effect is expected before fine-tuning.")
+
+
 def render(out: dict[str, Any], sets: tuple[str, ...] = (*SETS, "all")) -> str:
     def f(d: dict[str, float] | None) -> str:
         return "–" if d is None else f"{d['value']:.3f} ({d['lo']:.3f}–{d['hi']:.3f})"

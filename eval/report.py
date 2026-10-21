@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from eval import entry_point, verifier_agent
+from eval import entry_point, retrieval, verifier_agent
 from eval.labelling import _fmt, load_result, render_summary, summary_inputs
 from radlabel.results import RESULTS_DIR
 
@@ -157,6 +157,22 @@ def render() -> str:
     if esc is not None:
         lines += ["", "#### Escalation before any agent call, and the dev slice", "",
                   verifier_agent.render(esc, load_result("verifier_agent_dev")).rstrip()]
+    ret, ib = load_result("retrieval_base"), load_result("index_build")
+    if ret is not None:
+        lines += ["", "### Retrieval (M8, §8.2): base models", ""]
+        if ib is not None:
+            pg, ok = ib["postgres_rows"], "yes" if ib["check_payload_keys_whitelisted"] else "NO"
+            lines += [f"Serving index from the M7 v2 outputs (predicted labels only): Postgres {pg['reports']:,} "
+                      f"reports and {pg['labels']:,} labels; Qdrant {ib['report_points']:,} report and "
+                      f"{ib['sentence_points']:,} contextual sentence points ({ib['embedding_model']}). Checks on "
+                      f"the stored points: payload keys whitelisted {ok}; indication text in a point "
+                      f"{ib['check_indication_found_in_points']} of {ib['check_indications_tested']:,} tested "
+                      f"({ib['indication_phrase_also_in_own_findings_or_impression']} reports repeat the "
+                      "indication's words in their own Findings/Impression).", ""]
+        lines += [retrieval.reading(ret), "",
+                  "Per fold, each fold's reports indexed alone; pooled over (query, fold) pairs with 95% bootstrap "
+                  "CIs; spec frozen before the run (`eval/queries/retrieval_v1.yaml`).", "",
+                  retrieval.render(ret).rstrip()]
     return "\n".join(lines) + "\n"
 
 
