@@ -210,7 +210,7 @@ class AgentResult(BaseModel):
     llm_calls: int
     tokens: int
     cost_usd: float  # cost of the calls as made (cache hits keep it)
-    cached_calls: int  # run-specific
+    cached_calls: int = 0  # run-specific (left out of prediction files)
     models: list[str]
 
 

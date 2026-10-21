@@ -68,14 +68,24 @@ def _reading(paired: dict[str, Any], t2: dict[str, Any] | None) -> list[str]:
             "reports)."]
 
 
+def _v2_claim() -> str:
+    p = load_result("labelling_v2_paired_diffs")
+    if p is None or not (p["v2_minus_tier2"]["lo"] > 0 and p["v2_minus_llm_only"]["lo"] > 0):
+        return ""
+    return ("; the v2 pipeline (LLM + free checks + verifier agent) improves over v1 (LLM + verifier + Tier 2) and "
+            "over LLM only; verified labels are far more accurate than unverified ones")
+
+
 def render() -> str:
     systems, paired = summary_inputs()
     head = systems["LLM + verifier"]
     run = head["run"]  # Tier 1 run stats (incl. Tier 0)
     t2: dict[str, Any] | None = load_result("labelling_llm_verifier_tier2")
     lines = [
-        "**Claim scope.** Supported: the LLM labelling pipeline improves over the implemented rule baseline on this "
-        "dataset under this evaluation protocol. Not supported: clinical reliability.", "",
+        "**Claim scope.** Supported, on this dataset under this evaluation protocol: the LLM labelling pipeline "
+        "improves over the implemented rule baseline" + _v2_claim() + ". Not supported: clinical reliability; "
+        "\"verified\" means checked to faithfully reflect the report text, not that the report or the coding is "
+        "right.", "",
         "Limitations that bound these numbers (details in §11):",
         "- One institution (Indiana University, Open-i); reports from around 2013.",
         "- Expert codes are positive-only.",
@@ -135,8 +145,14 @@ def render() -> str:
     if v2 is not None:
         pf = RESULTS_DIR / "labelling_v2_paired_diffs.json"
         decision = json.loads(pf.read_text(encoding="utf-8"))["provenance"].get("decision") if pf.exists() else None
+        v2p = load_result("labelling_v2_paired_diffs") or {}
+        an = load_result("verifier_agent_analysis")
         lines += ["", "### Verifier agent (M7, v2)", "",
-                  verifier_agent.render_full(v2, load_result("labelling_v2_paired_diffs") or {}, decision).rstrip()]
+                  verifier_agent.render_reading(v2, v2p, an, load_result("verifier_escalation")).rstrip(), "",
+                  verifier_agent.render_full(v2, v2p, decision).rstrip()]
+        if an is not None:
+            lines += ["", "#### Per label, suggested labels and the normal-check ablation (after M7)", "",
+                      verifier_agent.render_analysis(an).rstrip()]
     esc = load_result("verifier_escalation")
     if esc is not None:
         lines += ["", "#### Escalation before any agent call, and the dev slice", "",

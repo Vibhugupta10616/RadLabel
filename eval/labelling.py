@@ -92,11 +92,13 @@ def _macro(gold: dict[str, np.ndarray], pred: dict[str, np.ndarray], elig: dict[
                                        for lab in labels]))
 
 
-def paired_diff(it: Items, a: dict[int, dict[str, str]], b: dict[int, dict[str, str]]) -> dict[str, Any]:
-    """Paired bootstrap of headline macro-F1(a) - macro-F1(b), v1, on the same scored reports and resamples."""
+def paired_diff(it: Items, a: dict[int, dict[str, str]], b: dict[int, dict[str, str]],
+                labels: list[str] = HEADLINE) -> dict[str, Any]:
+    """Paired bootstrap of macro-F1(a) - macro-F1(b) over `labels` (default: the 9 headline labels), v1, on the same
+    scored reports and resamples."""
     keep = ~it.subset["hedged"] & ~it.pilot
-    elig, gold = _elig(it, "v1", keep, HEADLINE), it.gold["v1"]
-    ma, mb = (_macro(gold, _present(it, s), elig, HEADLINE) for s in (a, b))
+    elig, gold = _elig(it, "v1", keep, labels), it.gold["v1"]
+    ma, mb = (_macro(gold, _present(it, s), elig, labels) for s in (a, b))
     d = _ci(lambda i: ma(i) - mb(i), it.cluster)
     return {**d, "a": ma(np.arange(len(it.ids))), "b": mb(np.arange(len(it.ids))),
             "ci_excludes_zero": bool(d["lo"] > 0 or d["hi"] < 0)}

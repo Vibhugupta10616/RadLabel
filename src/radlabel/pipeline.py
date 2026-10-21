@@ -3,6 +3,8 @@
 parse -> sentences ([REDACTED], IDs) -> Tier 1 tagger (Findings + Impression only; the indication is never an input)
 -> deterministic verifier -> free checks (escalation, recall scan, normal check) -> verifier agent on escalated
 reports only. `agent=False` stops before the agent (escalated labels end `unverified`, reason "agent not run").
+Serving configuration (owner, after the M7 ablation): a report escalated ONLY by the normal check skips the agent
+(its No Finding stays `unverified`); `normal_check_escalates=True` restores the evaluated v2 behaviour.
 Content-filtered or invalid tagger output -> the rule labeller's labels, all `unverified` (owner policy, M4).
 Reads report text only: never codes from the dataset, folds, eval mentions or metrics
 (tests/test_pipeline_leakage.py).
@@ -40,7 +42,7 @@ class PipelineResult(BaseModel):
 
 
 def run_pipeline(raw_text: str, llm: LLMClient | None = None, report_id: str = "upload",
-                 agent: bool = True) -> PipelineResult:
+                 agent: bool = True, normal_check_escalates: bool = False) -> PipelineResult:
     llm = llm or LLMClient()
     parsed = parse_report(raw_text)
     sents = report_sentences(parsed.findings, parsed.impression)
@@ -58,7 +60,9 @@ def run_pipeline(raw_text: str, llm: LLMClient | None = None, report_id: str = "
     esc = escalations(labels, sents, rules)
     result: AgentResult | None = None
     reason = "agent not run"
-    if esc and agent:
+    if esc and not normal_check_escalates and {e.reason for e in esc} == {"normal_check"}:
+        reason = "normal check not passed; agent skipped (serving configuration)"
+    elif esc and agent:
         try:
             result = run_agent(llm, report_id, sents, labels, esc, parsed.sections_identified)
         except BudgetExceeded:

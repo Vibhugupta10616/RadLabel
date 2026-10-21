@@ -14,7 +14,9 @@
   label changes, verified vs unverified accuracy, escalation / unverified rates, the normal-check table, section
   corroboration, cost and tool use. Must run with the same embedding setup as the dev runs (EMBED_SETUP_REQUIRED).
 
-Usage: python -m eval.verifier_agent escalation | dev | full  [--cache-only]
+- `analysis`: free analyses of the full run ($0): normal-check ablation, per-label table, suggested labels.
+
+Usage: python -m eval.verifier_agent escalation | dev | full | analysis  [--cache-only]
 """
 
 from __future__ import annotations
@@ -24,6 +26,7 @@ import importlib.metadata
 import importlib.util
 import json
 import logging
+import re
 import sys
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
@@ -73,7 +76,7 @@ def run_all(texts: dict[int, str], llm: LLMClient, agent: bool) -> dict[int, Pip
     """Finished reports are cached, so a retry pass only pays for what is still missing."""
     def one(i: int) -> tuple[int, PipelineResult | None]:
         try:
-            return i, run_pipeline(texts[i], llm, str(i), agent=agent)
+            return i, run_pipeline(texts[i], llm, str(i), agent=agent, normal_check_escalates=True)  # evaluated v2
         except Exception as e:  # network trouble after the client's retries (CacheMiss included in cache-only)
             log.warning("report %s not done yet: %s", i, type(e).__name__)
             return i, None
@@ -142,6 +145,13 @@ def escalation() -> dict[str, Any]:
         "disagreement_rate_not_escalated": float(disagree[~is_esc].mean()),
         "escalation_precision_labels": float(np.mean([wrong(i, lab) for i, lab in pairs])),
         "missed_disagreements_not_escalated": int((disagree & ~is_esc).sum()),
+        # blind first is only partly blind: recall-scan details carry the rule labeller's sentence IDs, and some of
+        # them are sentences the tagger cited for the same label (the agent never gets the tagger's evidence itself)
+        "recall_scan_escalations": sum(e.reason == "recall_scan" for es in esc.values() for e in es),
+        "recall_scan_ids_also_cited_by_tagger": sum(
+            e.reason == "recall_scan" and bool(set(re.findall(r"\b[FI]\d+\b", e.detail)) & set(
+                next(x.evidence for x in res[i].labels.labels if x.label == e.label)))
+            for i, es in esc.items() for e in es),
         "no_finding": {"predicted": len(nf_pred), "normal_check_passed": len(nf_pass),
                        "normal_check_failed": len(nf_fail), "precision_passed": nf_precision(nf_pass),
                        "precision_failed": nf_precision(nf_fail)},
@@ -246,7 +256,7 @@ def reason_category(reason: str) -> str:
     """Fixed categories for unverified reasons: the agent's own free-text reasons quote report wording, and results
     files are committed (licence D1), so they never go into a results file."""
     for prefix in ("agent stopped", "agent evidence failed", "derived after", "tagger output", "budget",
-                   "agent not run"):
+                   "agent not run", "normal check not passed"):
         if reason.startswith(prefix):
             return reason if prefix in ("agent stopped", "tagger output") else prefix
     return "agent: cannot_verify"
@@ -402,6 +412,165 @@ def full(cache_only: bool = False) -> dict[str, Any]:
     return {"agent": agent, "rates": rates, "paired": paired, "decision": decision, "new_spend_usd": new_spend}
 
 
+def analysis() -> dict[str, Any]:
+    """Free analyses of the M7 full run (owner, after M7; $0, from the run's predictions, no LLM call).
+
+    a. Normal-check ablation, CHOSEN AFTER SEEING THE RESULTS (v2 stays the headline): reports escalated only by
+       normal_check skip the agent (tagger labels after the deterministic verifier; No Finding `unverified`, since
+       its check failed). Paired vs v2; agent calls and cost saved.
+    b. Per label: v2 vs LLM only vs LLM + verifier + Tier 2 (F1, precision, recall), changes v2 vs LLM only, and each
+       label's share of the macro-F1 gain; macro-F1 over the 8 headline labels without Other Abnormality, paired.
+    c. Suggested labels per label: count and precision.
+    """
+    it = Items()
+    pos = {i: k for k, i in enumerate(it.ids)}
+    keep = ~it.subset["hedged"] & ~it.pilot
+    res = {int(r.report_id): r for r in (PipelineResult.model_validate_json(x) for x in
+                                        (PRED_DIR / "verifier_agent_full.jsonl").open(encoding="utf-8"))}
+    v2 = {i: {f.label: f.status for f in r.final} for i, r in res.items()}
+    v1 = v1_statuses()
+    only_nc = sorted(i for i, r in res.items() if {e.reason for e in r.escalations} == {"normal_check"})
+    abl = {**v2, **{i: {x.label: x.status for x in res[i].labels.labels} for i in only_nc}}
+    saved = [res[i].agent for i in only_nc if res[i].agent is not None]
+    ablation = {
+        "chosen_after_seeing_results": True,
+        "reports_skipping_agent": len(only_nc),
+        "agent_runs_saved": len(saved), "agent_llm_calls_saved": sum(a.llm_calls for a in saved),
+        "agent_cost_saved_usd": sum(a.cost_usd for a in saved),
+        "agent_runs_remaining": sum(r.agent is not None for r in res.values()) - len(saved),
+        "labels_that_differ_from_v2": sum(abl[i][lab] != v2[i][lab] for i in only_nc for lab in LABELS),
+        # No Finding of these reports becomes `unverified` (its check failed): the unverified-report rate goes up
+        "reports_with_unverified": sum(i in only_nc or any(f.verification == "unverified" for f in r.final)
+                                       for i, r in res.items()),
+        "unverified_report_rate": sum(i in only_nc or any(f.verification == "unverified" for f in r.final)
+                                      for i, r in res.items()) / len(res),
+        "macro_f1_v1": score_block(it, {lab: np.array([abl[i].get(lab) == "present" for i in it.ids])
+                                        for lab in LABELS}, "v1", keep, HEADLINE)["macro_f1_headline"],
+        "paired_ablation_minus_v2": paired_diff(it, abl, v2),
+    }
+    d = ablation["paired_ablation_minus_v2"]
+    ablation["not_significantly_worse"] = bool(d["hi"] >= 0)
+    ablation["serving_configuration"] = "ablation" if ablation["not_significantly_worse"] else "v2"
+
+    files = {"llm_only": "labelling_llm_only", "tier2": "labelling_llm_verifier_tier2", "v2": "labelling_llm_agent_v2"}
+    scores = {k: json.loads((TABLES.parent / "results" / f"{f}.json").read_text(encoding="utf-8"))["results"]["v1"]
+              ["labels"] for k, f in files.items()}
+    ch = _changes(it, v1["llm_only"], v2, it.ids, keep)["by_label"]
+    per_label = {}
+    for lab in LABELS:
+        row = {k: {"f1": s[lab]["f1"]["value"], "precision": s[lab]["precision"], "recall": s[lab]["recall"]}
+               for k, s in scores.items()}
+        row["wrong_to_right_vs_llm_only"] = ch.get(lab, {}).get("wrong_to_right", 0)
+        row["right_to_wrong_vs_llm_only"] = ch.get(lab, {}).get("right_to_wrong", 0)
+        if lab in HEADLINE:  # macro-F1 is the mean over the 9 labels: each label adds (its F1 change) / 9
+            row["share_of_macro_gain_vs_llm_only"] = (row["v2"]["f1"] - row["llm_only"]["f1"]) / len(HEADLINE)
+        per_label[lab] = row
+    eight = [lab for lab in HEADLINE if lab != "Other Abnormality"]
+
+    sugg: dict[str, Counter] = {lab: Counter() for lab in LABELS}
+    for i, r in res.items():
+        if not keep[pos[i]]:
+            continue
+        for f in r.final:
+            if f.verification == "suggested" and not (f.label == NO_FINDING and it.ignored_only[pos[i]]):
+                c = sugg[f.label]
+                c["n"] += 1
+                if f.status == "present":
+                    c["present"] += 1
+                    c["present_correct"] += bool(it.gold["v1"][f.label][pos[i]])
+    suggested = {lab: {**dict(c), "precision": c["present_correct"] / c["present"] if c["present"] else None}
+                 for lab, c in sugg.items() if c}
+    out = {"normal_check_ablation": ablation, "per_label": per_label,
+           "without_other_abnormality": {"labels": eight,
+                                         "paired_v2_minus_llm_only": paired_diff(it, v2, v1["llm_only"], eight)},
+           "suggested_per_label": suggested,
+           "consolidation_known_issue": {  # vs LLM + verifier, as in the M7 label-change counts
+               k: json.loads((TABLES.parent / "results" / "labelling_llm_agent_v2.json").read_text(encoding="utf-8"))
+               ["results"]["label_changes"]["scored_only"]["by_label"].get("Consolidation", {}).get(k, 0)
+               for k in ("wrong_to_right", "right_to_wrong")}}
+    write_result("verifier_agent_analysis", out, fold="oof", mapping_version="v1", eval_version="eval_v1.2",
+                 llm="none (from the M7 run's predictions)", prompt=va.PROMPT_VERSION)
+    return out
+
+
+SERVING_NAMES = {"ablation": "ablation (normal check recorded, not escalating)", "v2": "v2"}
+
+
+def render_analysis(an: dict[str, Any]) -> str:
+    """README §10 block for the post-M7 analyses."""
+    def num(x: float | None) -> str:
+        return "–" if x is None else f"{x:.3f}"
+    ab, wo = an["normal_check_ablation"], an["without_other_abnormality"]["paired_v2_minus_llm_only"]
+    lines = ["| Label | LLM only F1 (P / R) | v1 Tier 2 F1 (P / R) | v2 F1 (P / R) | v2 vs LLM only: wrong → right / "
+             "right → wrong | Share of the macro-F1 gain |", "|---|---|---|---|---|---|"]
+    for lab, r in an["per_label"].items():
+        def c(k: str, r: dict[str, Any] = r) -> str:
+            return f"{num(r[k]['f1'])} ({num(r[k]['precision'])} / {num(r[k]['recall'])})"
+        share = r.get("share_of_macro_gain_vs_llm_only")
+        lines.append(f"| {lab}{' (rare)' if lab not in HEADLINE else ''} | {c('llm_only')} | {c('tier2')} | "
+                     f"{c('v2')} | {r['wrong_to_right_vs_llm_only']} / {r['right_to_wrong_vs_llm_only']} | "
+                     f"{'–' if share is None else f'{share:+.3f}'} |")
+    sg = an["suggested_per_label"]
+    lines += ["", f"Without Other Abnormality (macro-F1 over the other 8 headline labels): v2 − LLM only {_fmt(wo)} "
+              f"(CI {'excludes' if wo['ci_excludes_zero'] else 'includes'} 0).", "",
+              "Suggested labels per label (scored reports): " + "; ".join(
+                  f"{lab} {c['n']} (present {c.get('present', 0)}, precision {num(c['precision'])})"
+                  for lab, c in sg.items()) + ".", "",
+              f"Known issue: Consolidation, v2 vs LLM + verifier wrong → right "
+              f"{an['consolidation_known_issue']['wrong_to_right']}, right → wrong "
+              f"{an['consolidation_known_issue']['right_to_wrong']}; candidate for a future prompt "
+              "version developed on a new dev slice.", "",
+              f"**Normal-check ablation (chosen after seeing the results; v2 stays the headline):** the "
+              f"{ab['reports_skipping_agent']} reports escalated only by the normal check skip the agent (tagger "
+              f"labels, No Finding `unverified`). Macro-F1 (v1) {_fmt(ab['macro_f1_v1'])}; ablation − v2 "
+              f"{_fmt(ab['paired_ablation_minus_v2'])}; saves {ab['agent_runs_saved']} agent runs "
+              f"({ab['agent_llm_calls_saved']} calls, ${ab['agent_cost_saved_usd']:.2f}); reports with an unverified "
+              f"label rise to {ab['reports_with_unverified']} ({100 * ab['unverified_report_rate']:.1f}%), because "
+              "those normals stay unconfirmed. Not significantly worse: "
+              f"**{'yes' if ab['not_significantly_worse'] else 'no'}** → serving configuration: "
+              f"**{SERVING_NAMES[ab['serving_configuration']]}**."]
+    return "\n".join(lines) + "\n"
+
+
+def render_reading(v2: dict[str, Any], paired: dict[str, Any], an: dict[str, Any] | None,
+                   esc: dict[str, Any] | None) -> str:
+    """Plain-language reading of the M7 results (README §10); every number comes from the results files and the
+    wording follows the paired tests."""
+    def sig(d: dict[str, Any]) -> str:
+        return f"{_fmt(d)}, 95% CI {'excludes' if d['ci_excludes_zero'] else 'includes'} 0"
+    g, r, ch = v2["verification_groups"], v2["rates"], v2["label_changes"]["scored_only"]["total"]
+    cells = v2["normal_check"]["cells"]
+
+    def wrong_rate(check: str) -> float:
+        n = sum(c["n"] for k, c in cells.items() if k.startswith(check))
+        return sum(c["n"] for k, c in cells.items() if k.startswith(check) and k.endswith("wrong")) / n
+    out = [f"**Reading (M7).** On this dataset and protocol, v2 improves headline macro-F1 over v1 (LLM + verifier + "
+           f"Tier 2) by {sig(paired['v2_minus_tier2'])}, and over LLM only by {sig(paired['v2_minus_llm_only'])}."]
+    if an is not None:
+        wo = an["without_other_abnormality"]["paired_v2_minus_llm_only"]
+        top = max((x for x in an["per_label"].items() if "share_of_macro_gain_vs_llm_only" in x[1]),
+                  key=lambda x: x[1]["share_of_macro_gain_vs_llm_only"])
+        out.append(f"Most of the gain comes from {top[0]} (+{top[1]['share_of_macro_gain_vs_llm_only']:.3f} of the "
+                   f"macro-F1); it holds without Other Abnormality ({sig(wo)}).")
+    out += [f"Verified labels are far more accurate than unverified ones: precision "
+            f"{g['verified_or_verified_rules']['precision']:.3f} (verified + verified_rules) vs "
+            f"{g['unverified']['precision']:.3f} (unverified).",
+            f"The agent changes many labels in both directions ({ch.get('wrong_to_right', 0)} wrong → right vs "
+            f"{ch.get('right_to_wrong', 0)} right → wrong), and its suggested labels have precision "
+            f"{v2['suggested']['precision_of_present']:.2f}.",
+            f"Reports with any unverified label: {100 * r['unverified_report_rate']:.1f}% vs the v1 review rate of "
+            f"{100 * r['v1_review_rate']:.1f}%. This is not like for like: v1 sent the whole report to human review "
+            "for any remaining failure or escalating flag, while v2 marks only the labels the agent could not settle "
+            "after checking the report itself, so the two rates count different things.",
+            f"The normal check does not separate right from wrong normals (tagger wrong in "
+            f"{100 * wrong_rate('passed'):.1f}% of passed vs {100 * wrong_rate('failed'):.1f}% of failed checks)."]
+    if esc is not None and "recall_scan_ids_also_cited_by_tagger" in esc:
+        out.append(f"\"Blind first\" is only partly blind: recall-scan hints carry the rule labeller's sentence IDs, "
+                   f"and in {esc['recall_scan_ids_also_cited_by_tagger']} of {esc['recall_scan_escalations']} "
+                   "recall-scan escalations such an ID is a sentence the tagger also cited.")
+    return " ".join(out) + "\n"
+
+
 def render_full(v2: dict[str, Any], paired: dict[str, Any], decision: dict[str, Any] | None) -> str:
     """README §10 block for the M7 full run (eval/report.py)."""
 
@@ -508,5 +677,6 @@ def escalation_counts() -> int:
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "escalation"
     co = "--cache-only" in sys.argv
-    r = escalation() if mode == "escalation" else dev(cache_only=co) if mode == "dev" else full(cache_only=co)
+    r = (escalation() if mode == "escalation" else dev(cache_only=co) if mode == "dev" else analysis()
+         if mode == "analysis" else full(cache_only=co))
     print(json.dumps(r, indent=1))

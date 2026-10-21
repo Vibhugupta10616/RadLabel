@@ -29,7 +29,8 @@ def test_pipeline_import_closure_excludes_eval_and_ground_truth_modules() -> Non
 
 
 def test_inputs_are_raw_text_only() -> None:
-    assert list(inspect.signature(run_pipeline).parameters) == ["raw_text", "llm", "report_id", "agent"]
+    assert list(inspect.signature(run_pipeline).parameters) == ["raw_text", "llm", "report_id", "agent",
+                                                                "normal_check_escalates"]
 
 
 def test_run_never_opens_ground_truth_files(tmp_path: Path, monkeypatch: Any) -> None:
