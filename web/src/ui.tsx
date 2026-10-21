@@ -123,7 +123,7 @@ export function StatusGrid({ rows, n, label }: { rows: Pick<TimelineRow, 'label'
       <div className="relative">
         <div ref={ref} tabIndex={label ? 0 : undefined} role={label ? 'region' : undefined} aria-label={label && `${label} (scrolls sideways)`}
           className="relative overflow-x-auto rounded-md">
-          <table aria-label={label} className="w-full border-collapse table-fixed text-[13px]" style={{ minWidth: 120 + n * 68 }}>
+          <table aria-label={label} className="w-full border-collapse table-fixed text-[13px]" style={{ minWidth: 120 + n * 60 }}>
             <thead>
               <tr>
                 <td className="sticky left-0 z-[1] bg-white w-[120px] sm:w-[140px]" />
@@ -137,8 +137,8 @@ export function StatusGrid({ rows, n, label }: { rows: Pick<TimelineRow, 'label'
                   {nos.map((no) => {
                     const s = r.statuses[no] ?? 'not_mentioned'
                     return (
-                      <td key={no} className="p-[3px]">
-                        <span className={`block text-center px-1 py-1.5 rounded-md text-xs font-semibold ${CELL[s]}`}>
+                      <td key={no} className="p-0.5">
+                        <span className={`block text-center px-0.5 py-1 rounded-md text-[11px] font-semibold ${CELL[s]}`}>
                           {s === 'not_mentioned' ? <><span aria-hidden="true">—</span><span className="sr-only">Not mentioned</span></> : STATUS_TEXT[s]}
                         </span>
                       </td>
