@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "77e8abd24cf9fd21d2a07536b6a898eae383caf8",
+  "git_commit": "33e266795e476da3ed6dd325a64b0553af75e53a",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "dev_slice",
-  "created": "2026-10-21T13:00:27+00:00",
+  "created": "2026-10-21T14:19:31+00:00",
   "eval_version": "eval_v1.2",
   "llm": "gpt-5-mini",
   "prompt": "verifier-v2"
@@ -39,11 +39,11 @@
   },
   "mean_tool_calls": 1.868421052631579,
   "tool_usage": {
-   "find_by_alias": 17,
-   "submit": 38,
    "check_negation": 7,
    "check_redaction": 4,
-   "normal_check": 5
+   "find_by_alias": 17,
+   "normal_check": 5,
+   "submit": 38
   },
   "verification_counts": {
    "verified_rules": 449,
@@ -116,8 +116,13 @@
   "cost_dev_usd": 0.06381429999999998,
   "mean_cost_per_escalated_report_usd": 0.001679323684210526,
   "new_spend_this_run_usd": 0.0,
-  "llm_spend_total_usd": 3.369081399999995,
+  "llm_spend_total_usd": 5.429183450000007,
   "full_run_escalated_reports_outside_dev": 1252,
-  "full_run_estimated_cost_usd": 2.1025132526315784
+  "full_run_estimated_cost_usd": 2.1025132526315784,
+  "embedding_setup": {
+   "embed_extra_installed": true,
+   "model": "BAAI/bge-small-en-v1.5",
+   "sentence_transformers": "6.1.0"
+  }
  }
 }

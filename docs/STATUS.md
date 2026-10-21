@@ -13,7 +13,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
 | M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
 | M6 | **Done** (code `567b093`; results rerun from cache at that commit, $0) | Through `run_pipeline`: clean join headline macro-F1 (v1) 0.860 (0.845–0.873), identical to LLM + verifier (paired 0.000; 1 report differs: IU text with inner "Impression:" headers); 30% varied joins 0.848, paired varied − clean −0.012 (−0.017 to −0.007). Parser: clean 100.0% of sentences in the right section, 3,083/3,086 fully parsed; alternative headers 100%; no headers 62.6% (308/309 no sections found). Correctly parsed clean joins: 0 new tagger inputs (all from the M4 cache). Hedge fix: conversions 147 → 125, LLM + verifier 0.857 → 0.860, Cardiomegaly F1 0.914 → 0.944. Normal-claim count: 833 of 1,302 (64.0%) "no acute" impressions have non-normal codes; the tagger predicted No Finding for 3 of them. Spend $0.25 (461 new tagger inputs); total $2.63. |
-| M7 | **in progress: stopped before the full run** (code `77e8abd`) | Free checks on all 3,086 reports ($0): 1,290 escalate (41.8%; hedged 67.0% vs clear 39.3%), 1,252 outside the dev slice. Verifier agent prompt `verifier-v2` frozen on the dev slice (v1–v3 tried; v2 kept by the pre-set rule): 38 escalated dev reports, wrong → right 11 vs right → wrong 3, suggested 3 correct / 3 wrong, 1.87 tool calls, $0.0017 per report. Estimated full run $2.10. **Waiting for owner OK.** |
+| M7 | **in progress: full run done, waiting for owner review** (code `77e8abd`, `6729cb0`, `33e2667`) | Full run (prompt `verifier-v2`, owner-approved): headline macro-F1 (v1) **0.887** (0.874–0.899), strict 0.883; paired v2 − LLM + verifier + Tier 2 +0.022 (0.013–0.031), v2 − LLM only +0.025 (0.016–0.035), v2 − rule baseline +0.050 (0.037–0.063) → agent **kept** (pre-committed rule). Verified + verified_rules labels precision 0.938 vs unverified 0.393. Reports with any unverified label 2.9% (v1 review rate 30.5%). Escalated 1,290 (41.8%). Agent cost $2.07 new ($2.12 incl. the cached dev reports); rerun from cache $0, byte-identical. |
 | M8 | planned | Postgres `labels` (verification state + evidence), Qdrant index (report + contextual sentence points, indication field, BM25), RRF, retrieval eval incl. report-to-report. |
 | M9 | planned | Negation-aware embedding fine-tuning per fold (`CachedGISTEmbedLoss`), held-out eval vs the filter baseline; serving model; agent's `find_by_meaning` switches to it. |
 | M10 | planned | Query agent + tools + guardrails, question set, agent eval on expert and predicted label tables. |
@@ -60,7 +60,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 
 **Budget:** `MAX_LLM_USD=20` (`.env.example`; `.env` uses the same value). Stop rule (`src/radlabel/llm/client.py`, `BUDGET_FRACTION = 0.5`): fresh LLM calls are refused once the ledger total reaches 50% of `MAX_LLM_USD`, i.e. **$10**; cache hits are always free; the owner raises the limit explicitly. Per-run caps sit inside it (M5: $3 of new spend).
 
-`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$3.37** (M6 $0.25; M6 follow-up $0.54; M7 dev slice $0.20) (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
+`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$5.43** (M6 $0.25; M6 follow-up $0.54; M7 dev slice $0.20; M7 full run $2.07) (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
 
 ## M2 notes
 - `iterstrat` (README §4.2 fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
@@ -154,6 +154,23 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - `normal_phrases.yaml` gained a `heart_normal` anchor used only by the normal check ("Heart size normal." has no
   verb the pipeline negation catches); the evidence check is unchanged.
 - Spend: held-out headers $0.54, dev runs v1/v2/v3 $0.20; total **$3.37**.
+
+## M7 full run (owner-approved 2026-10-22)
+- Paused once at $2.06 (I projected an overrun; the run was in fact nearly done), restarted from the beginning on the
+  owner's instruction with no extra cap: cached calls reused, $0.003 more. New spend $2.07 (estimate $2.10).
+- Embedding setup identical to the dev runs (sentence-transformers 6.1.0, BAAI/bge-small-en-v1.5), recorded in the
+  results; find_by_meaning used 79 times in 1,290 runs.
+- Label changes vs LLM + verifier (scored reports): wrong → right 194, right → wrong 121. Worst per label:
+  Consolidation 0 / 18, Lung Opacity 55 / 45, Fracture 0 / 4.
+- Suggested labels: 171 (153 present, precision 0.536); headline macro-F1 with suggested ignored 0.875.
+- Normal check does **not** separate right from wrong normals: failed 266 right / 2 wrong, passed 282 right / 3
+  wrong. The agent kept 264 of the 266 right ones (withheld 2 wrongly) and withheld 1 of the 2 wrong ones. No Finding
+  precision 0.991 → 0.991, recall 0.873 → 0.884.
+- Section corroboration of final present labels: both sections precision 0.943 (1,151 labels), single section 0.903
+  (2,972), unverified 0.393 (61).
+- Agent runs 1,290: submitted 1,285, tool cap 4, content-filter refusal 1; mean tool calls 2.12.
+- Unverified reasons are stored as fixed categories (the agent's free-text reasons quote report wording).
+- Results tallies are key-sorted (set iteration order made reruns differ in key order only; fixed in `33e2667`).
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.
