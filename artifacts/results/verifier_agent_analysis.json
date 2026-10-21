@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "abc918b271d5ec375ae1bbe694eee8c74916f2e6",
+  "git_commit": "8b434e7cefebdb7b46106a3c47da682ee8db6913",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-21T17:10:53+00:00",
+  "created": "2026-10-21T18:40:43+00:00",
   "eval_version": "eval_v1.2",
   "llm": "none (from the M7 run's predictions)",
   "prompt": "verifier-v2"
@@ -53,7 +53,8 @@
     "ci_excludes_zero": false
    },
    "not_significantly_worse": true,
-   "serving_configuration": "ablation"
+   "serving_configuration": "v2",
+   "serving_decision": "v2: the ablation changes no label but would show ~99%-correct normals as unverified (owner, 2026-10-22)"
   },
   "per_label": {
    "No Finding": {

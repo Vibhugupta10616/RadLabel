@@ -14,10 +14,12 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
 | M6 | **Done** (code `567b093`; results rerun from cache at that commit, $0) | Through `run_pipeline`: clean join headline macro-F1 (v1) 0.860 (0.845–0.873), identical to LLM + verifier (paired 0.000; 1 report differs: IU text with inner "Impression:" headers); 30% varied joins 0.848, paired varied − clean −0.012 (−0.017 to −0.007). Parser: clean 100.0% of sentences in the right section, 3,083/3,086 fully parsed; alternative headers 100%; no headers 62.6% (308/309 no sections found). Correctly parsed clean joins: 0 new tagger inputs (all from the M4 cache). Hedge fix: conversions 147 → 125, LLM + verifier 0.857 → 0.860, Cardiomegaly F1 0.914 → 0.944. Normal-claim count: 833 of 1,302 (64.0%) "no acute" impressions have non-normal codes; the tagger predicted No Finding for 3 of them. Spend $0.25 (461 new tagger inputs); total $2.63. |
 | M7 | **Done** (owner-accepted 2026-10-22; tag `m7-verifier-agent`) (code `77e8abd`, `6729cb0`, `33e2667`) | Full run (prompt `verifier-v2`, owner-approved): headline macro-F1 (v1) **0.887** (0.874–0.899), strict 0.883; paired v2 − LLM + verifier + Tier 2 +0.022 (0.013–0.031), v2 − LLM only +0.025 (0.016–0.035), v2 − rule baseline +0.050 (0.037–0.063) → agent **kept** (pre-committed rule). Verified + verified_rules labels precision 0.938 vs unverified 0.393. Reports with any unverified label 2.9% (v1 review rate 30.5%). Escalated 1,290 (41.8%). Agent cost $2.07 new ($2.12 incl. the cached dev reports); rerun from cache $0, byte-identical. |
-| M8 | **results in, waiting for owner review** (spec `8628794`, code `d4c154b`..`0f25dfa`) | Serving index from the M7 v2 outputs: Postgres 3,086 reports / 40,118 labels (Alembic `0001`), Qdrant 3,086 report + 19,006 contextual sentence points; leakage checks on the stored points pass (payload whitelist; indication text 0 of 2,192). Retrieval (spec frozen before the run, 259 queries, per fold + pooled): best pooled nDCG@10 the negated-sentence filter 0.528 ≈ RRF 0.526; seen-label nDCG 0.637 → 0.871 and contamination 0.310 → 0.070 with the filter; report-to-report best BM25 0.463. No LLM calls ($0). |
-| M9 | planned | Negation-aware embedding fine-tuning per fold (`CachedGISTEmbedLoss`), held-out eval vs the filter baseline; serving model; agent's `find_by_meaning` switches to it. |
-| M10 | planned | Query agent + tools + guardrails, question set, agent eval on expert and predicted label tables. |
-| M11 | planned | Ingestion worker, FastAPI, Redis, tracing, Gradio demo with verification badges, deploy files, model card, CI regression eval. |
+| M8 | **Done** (owner-accepted 2026-10-22) (spec `8628794`, code `d4c154b`..`0f25dfa`) | Serving index from the M7 v2 outputs: Postgres 3,086 reports / 40,118 labels (Alembic `0001`), Qdrant 3,086 report + 19,006 contextual sentence points; leakage checks on the stored points pass (payload whitelist; indication text 0 of 2,192). Retrieval (spec frozen before the run, 259 queries, per fold + pooled): best pooled nDCG@10 the negated-sentence filter 0.528 ≈ RRF 0.526; seen-label nDCG 0.637 → 0.871 and contamination 0.310 → 0.070 with the filter; report-to-report best BM25 0.463. No LLM calls ($0). |
+| M9a | **next** | Website backend: FastAPI `/label` (one report or a patient series via `run_pipeline`; uploads never stored), `/ask` (query agent + tools + guardrails), health/ready, Redis, read-only DB role. |
+| M9b | planned | Website evaluation: query-agent eval (§8.3), system metrics (§8.4), upload paths. |
+| M9c | planned | Website frontend: upload, findings with evidence and verification badges, Q&A with citations, attribution. |
+| M10 | planned | Negation-aware embedding fine-tuning, swapped into the same search; cross-report retrieval eval re-run; judged two ways (D16). |
+| M11 | planned | Public deployment on Azure with safeguards. |
 
 ## Decisions (owner)
 - **D1 (2026-10-20): nothing is tuned per label.** Every tuned parameter (Tier 0 patterns, refusal threshold, embedding checkpoint, any rule-baseline setting) is ONE global value, selected on a pooled metric (macro-F1 or nDCG over the 9 headline labels) on inner validation. Rare labels are never used for selection.
@@ -27,6 +29,19 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - **D5 (M3): pipeline/eval vocabulary overlap accepted** (README §11 limitation). The pipeline alias list is **frozen** at the M3 commit (alias-set hash pinned in `tests/test_alias_freeze.py`); any later change needs owner OK and may only be based on training-fold error analysis, never on out-of-fold or test results.
 - D6 (M3): `hedged` is excluded from rare-label scores and from the abnormal / redaction_adjacent subset scores, as for headline scores.
 - D7 (M3): noise-adjusted scores (README §4.6, Stretch) skipped for now.
+
+### After M8 (owner, 2026-10-22)
+- **D15:** serving configuration = the evaluated v2 (`run_pipeline(normal_check_escalates=True)`, the default). The
+  normal-check ablation stays a documented result: no label changes, ~$0.25 per 3,000 reports saved, but unverified
+  reports 2.9% → 8.1%; showing "unverified" on ~99%-correct normals would mislead users.
+- **D16:** embedding fine-tuning (M10) is judged two ways (README §8.2): pure embedding effect = base vs fine-tuned,
+  both WITHOUT the predicted-label prefix; full system = fine-tuned + prefix + negation filter vs the best filter
+  row. The prefix / filter rows partly reflect the labelling pipeline's output. Base no-prefix row added to M8.
+- **D17:** roadmap: M8 search index + retrieval eval (done) · M9 website (M9a backend, M9b evaluation, M9c frontend;
+  the query agent is part of M9a) · M10 fine-tuning, swapped into the same search, retrieval eval re-run · M11 public
+  deployment (Azure + safeguards). Product: upload one report or a patient series, 13 findings with evidence and
+  verification badges, questions about one report or across all, with citations. IU reports are the test bed for
+  search; user uploads are never stored.
 
 ### v2 plan (owner, 2026-10-21; README §5, §6.2, §12)
 - **D8:** the Tier 2 repair agent and the human-review queue (Tier 3) are replaced by one **ReAct verifier agent** that runs only on escalated reports (check FAIL, escalating flag, recall-scan disagreement) and marks each label `verified_rules | verified | verified_impression_only | corrected | suggested | unverified`. No review table, no review endpoints. v1 (M3–M5) results stay in README §10 as comparison columns.
@@ -203,6 +218,18 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - New dependencies (core): qdrant-client ~1.12 (matches the server image), SQLAlchemy 2, Alembic, psycopg 3.
   From the host, run with `DATABASE_URL=postgresql://radlabel:radlabel@localhost:5432/radlabel` and
   `QDRANT_URL=http://localhost:6333` (`.env` keeps the in-network defaults).
+
+## After M8 (owner decisions D15–D17; no LLM calls, $0)
+- Serving default is the evaluated v2 (`normal_check_escalates=True`); the ablation stays documented.
+- Pure-embedding row added (base bge-small, sentences WITHOUT the predicted-label prefix): pooled nDCG@10 **0.564**,
+  the best variant overall (filter row 0.528, prefix row 0.491); seen labels 0.731 (prefix 0.637, filter 0.871).
+- **Reproducibility fix:** re-running M8 changed the BM25 and RRF rows (dense rows stable). Causes: tied BM25 scores
+  returned by Qdrant in no fixed order, and float32 sums in its sparse scoring that differ in the last digits between
+  runs (my first guess, Qdrant's IDF statistics, was wrong; index-time IDF was kept anyway). Fix: deterministic
+  tie-breaking for every search, and BM25 candidates rescored client-side from their stored sparse vectors in a fixed
+  order (`radlabel.index.store._top`, unit tests). Two consecutive runs are now byte-identical (`564588e`).
+- Effect on the accepted M8 numbers (pooled nDCG@10): BM25 0.498 → 0.504, RRF 0.526 → 0.537; dense rows unchanged
+  (one ±0.001 from tie-breaking). Per set, BM25 / RRF move by up to 0.018 (RRF report-to-report 0.342 → 0.360).
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.
