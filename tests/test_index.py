@@ -1,0 +1,72 @@
+"""Index and Postgres rows (README §6.3, M8), including the leakage rules: payloads hold predicted labels only, no
+codes from the dataset, folds, eval mentions or the indication."""
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from test_extractor import answer
+from test_repair_leakage import FORBIDDEN_MODULES, FORBIDDEN_TEXT
+
+from radlabel.db.store import rows
+from radlabel.index import bm25, store
+from radlabel.index.points import REPORT_KEYS, SENTENCE_KEYS, context_prefix, report_points
+from radlabel.llm import FakeLLM
+from radlabel.pipeline import PipelineResult, run_pipeline
+
+ROOT = Path(__file__).resolve().parents[1]
+TEXT = ("INDICATION: persistent cough and fever for two weeks.\nFINDINGS: Mild cardiomegaly. No pleural effusion.\n"
+        "IMPRESSION: Mild cardiomegaly.")
+
+
+def result(tmp_path: Path) -> PipelineResult:
+    return run_pipeline(TEXT, FakeLLM(lambda m: answer(Cardiomegaly=("present", ["F1", "I1"]),
+                                                       Pleural_Effusion=("absent", ["F2"])), tmp_path), "42")
+
+
+def test_points_payloads_whitelisted_and_no_indication(tmp_path: Path) -> None:
+    pts = report_points(result(tmp_path))
+    assert [p.kind for p in pts] == ["report", "sentence", "sentence", "sentence"]
+    for p in pts:
+        assert set(p.payload) <= (REPORT_KEYS if p.kind == "report" else SENTENCE_KEYS)
+        blob = (p.text + json.dumps(p.payload)).lower()
+        assert "cough" not in blob and "fever" not in blob and "fold" not in blob
+    assert set(pts[0].payload["labels"]) == {"Cardiomegaly", "Pleural Effusion"}  # not_mentioned left out
+    assert pts[0].payload["labels"]["Cardiomegaly"]["verification"] == "verified_rules"
+
+
+def test_contextual_prefix_and_negation_tags(tmp_path: Path) -> None:
+    pts = {p.payload.get("sentence_id"): p for p in report_points(result(tmp_path))}
+    assert pts["F2"].text == "[Findings | report also mentions: cardiomegaly] No pleural effusion."
+    assert pts["F2"].payload["negation_only"] and pts["F2"].payload["negated"] == ["Pleural Effusion"]
+    assert pts["F1"].payload["affirmed"] == ["Cardiomegaly"] and not pts["F1"].payload["negation_only"]
+    assert context_prefix("unknown", []) == "[Unknown] "
+
+
+def test_postgres_rows_hold_predicted_labels_and_the_indication_separately(tmp_path: Path) -> None:
+    rep, labs = rows(result(tmp_path))
+    assert rep.indication == "persistent cough and fever for two weeks." and "cough" not in rep.findings
+    assert {x.label for x in labs} == {f.label for f in result(tmp_path / "b").final}
+    cardio = next(x for x in labs if x.label == "Cardiomegaly")
+    assert (cardio.status, cardio.verification, cardio.evidence) == ("present", "verified_rules", ["F1", "I1"])
+
+
+def test_bm25_weights_and_rrf() -> None:
+    idx, val = bm25.doc_vector("effusion effusion small", avgdl=3.0)
+    w = dict(zip(idx, val, strict=True))
+    assert w[bm25.term_id("effusion")] > w[bm25.term_id("small")] > 0
+    assert bm25.query_vector("Small small effusion")[1] == [1.0, 1.0]
+    fused = store.rrf([("a", 9.0), ("b", 8.0)], [("b", 0.9), ("c", 0.8)], top=3)
+    assert [r for r, _ in fused] == ["b", "a", "c"]
+
+
+def test_index_and_db_import_closure_excludes_eval_and_ground_truth() -> None:
+    code = ("import sys, json; import radlabel.index.points, radlabel.index.store, radlabel.db.store; "
+            "print(json.dumps(sorted(sys.modules)))")
+    mods = json.loads(subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True,
+                                     cwd=ROOT).stdout)
+    assert not [m for m in mods if any(m == f or m.startswith(f + ".") for f in FORBIDDEN_MODULES)]
+    files = [Path(f) for m in mods if m.startswith("radlabel") and (f := getattr(__import__(m, fromlist=["x"]),
+                                                                                  "__file__", None))]
+    assert not [(f.name, w) for f in files for w in FORBIDDEN_TEXT if w in f.read_text(encoding="utf-8")]

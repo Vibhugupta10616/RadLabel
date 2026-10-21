@@ -40,5 +40,12 @@ folds:
 label-eval:
 	$(PY) -m eval.labelling rule_baseline
 
+# M8: needs the compose services (make up); from the host set DATABASE_URL / QDRANT_URL to localhost
+index:
+	$(PY) -m eval.index_build
+
+retrieval-eval:
+	$(PY) -m eval.retrieval run
+
 report:
 	$(PY) -m eval.report

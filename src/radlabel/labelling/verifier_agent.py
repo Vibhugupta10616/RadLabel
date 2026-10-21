@@ -17,14 +17,13 @@
 from __future__ import annotations
 
 import json
-from functools import lru_cache
 from typing import Any, Literal, TypedDict
 
 import numpy as np
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel
 
-from radlabel.config import get_settings
+from radlabel.embeddings import QUERY_PREFIX, encode
 from radlabel.labelling.extractor import STATUSES
 from radlabel.labelling.free_checks import Escalation, normal_check
 from radlabel.labelling.repair_agent import _ment_json, definitions
@@ -111,22 +110,6 @@ TOOLS = [
                 "properties": {"sentence_id": {"type": "string"}, "quote": {"type": "string"}}}},
             "reason": {"type": "string", "description": "one short sentence"}}}}}),
 ]
-
-
-@lru_cache
-def _encoder() -> Any:
-    from sentence_transformers import SentenceTransformer  # optional extra "embed"
-
-    s = get_settings()
-    return SentenceTransformer(s.embed_base_model, device=None if s.device == "auto" else s.device)
-
-
-def encode(texts: list[str]) -> np.ndarray:
-    """Unit-normalised sentence embeddings (tests replace this function)."""
-    return np.asarray(_encoder().encode(texts, normalize_embeddings=True))
-
-
-QUERY_PREFIX = "Represent this sentence for searching relevant passages: "  # bge retrieval instruction
 
 
 def tool_impls(sentences: list[Sentence], tagger: dict[str, str]) -> dict[str, Any]:
