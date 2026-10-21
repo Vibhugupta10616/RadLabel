@@ -222,12 +222,16 @@ def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any], s
         ("Headline macro-F1, 9 labels (v1)", lambda r: _fmt(r["v1"]["macro_f1_headline"])),
         ("Headline macro-F1, 9 labels (strict)", lambda r: _fmt(r["strict"]["macro_f1_headline"])),
         ("Pooled rare micro-F1 (v1)", lambda r: _fmt(r["v1"]["rare_micro_f1"])),
+        ("Abnormal subset: headline macro-F1 (v1)", lambda r: _fmt(r["subsets"]["abnormal"]["macro_f1_headline"])),
         ("negation_only FP rate (pooled)", lambda r: "{fp} / {n_pairs} ({fp_rate:.4f})".format(
             **r["negation_only_fp"]["all"]["_pooled"])),
         ("*Sensitivity, not headline:* macro-F1 (v1) with `uncertain` = positive for all labels",
          lambda r: _fmt(r["sensitivity_uncertain_as_present_all_labels"]["v1_macro_f1_headline"])),
         ("*Sensitivity, not headline:* macro-F1 (v1), all reports incl. Tier 1 pilot",
          lambda r: _fmt(r["sensitivity_all_reports_incl_pilot"]["v1_macro_f1_headline"])),
+        ("*Sensitivity, not headline:* macro-F1 (v1), `suggested` labels ignored",
+         lambda r: _fmt(r["sensitivity_suggested_ignored"]["v1_macro_f1_headline"])
+         if "sensitivity_suggested_ignored" in r else "–"),
     ]
     names = list(systems)
     lines = ["# Labelling summary (README §8.1)", ""] if standalone else []
@@ -243,8 +247,10 @@ def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any], s
 
 SYSTEM_NAMES = {"rule_baseline": "Rule baseline", "llm_only": "LLM only", "llm_verifier": "LLM + verifier",
                 "llm_verifier_tier2": "LLM + verifier + Tier 2", "pipeline_clean": "run_pipeline, clean join (M6)",
-                "pipeline_varied": "run_pipeline, 30% varied joins (M6)"}
-PAIRED_FILES = ("labelling_paired_diffs", "labelling_tier2_paired_diffs", "labelling_m6_paired_diffs")
+                "pipeline_varied": "run_pipeline, 30% varied joins (M6)",
+                "llm_agent_v2": "LLM + free checks + verifier agent (v2)"}
+PAIRED_FILES = ("labelling_paired_diffs", "labelling_tier2_paired_diffs", "labelling_m6_paired_diffs",
+                "labelling_v2_paired_diffs")
 
 
 def load_result(name: str) -> dict[str, Any] | None:

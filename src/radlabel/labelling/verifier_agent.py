@@ -220,6 +220,8 @@ class FinalLabel(BaseModel):
     evidence: list[str]
     verification: Verification
     reason: str = ""
+    # present or suggested labels: which sections the evidence comes from (code only; routing never uses it)
+    corroboration: Literal["both", "findings", "impression", "none"] | None = None
 
 
 class _State(TypedDict):
@@ -359,4 +361,10 @@ def final_labels(tagger: ReportLabels, sentences: list[Sentence], esc: list[Esca
             label=NO_FINDING, status="present", evidence=sorted({i for v in nc.covered.values() for i in v}),
             verification="verified_rules" if nc.ok else "unverified",
             reason="" if nc.ok else "derived after the agent's changes; normal check not passed")
+    section = {s.id: s.section for s in sentences}
+    for lab, x in out.items():
+        if x.status == "present" or x.verification == "suggested":
+            secs = {section[e] for e in x.evidence if e in section}
+            out[lab] = x.model_copy(update={"corroboration": "both" if len(secs) == 2 else
+                                            (secs.pop() if secs else "none")})
     return [out[lab] for lab in LABELS]

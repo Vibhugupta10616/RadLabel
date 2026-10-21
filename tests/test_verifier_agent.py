@@ -122,3 +122,14 @@ def test_prompt_and_tools_frozen() -> None:
     if FROZEN_SHA256 == "TO-BE-PINNED":
         pytest.skip(f"verifier prompt not frozen yet (sha256 {h})")
     assert h == FROZEN_SHA256, "verifier-agent prompt or tools changed: needs owner OK + new PROMPT_VERSION"
+
+
+def test_section_corroboration_level(tmp_path: Path) -> None:
+    sub = call("submit", labels=[{"label": "Pleural Effusion", "status": "present", "reason": "stated", "evidence": [
+        {"sentence_id": "F1", "quote": "pleural effusion"}, {"sentence_id": "I1", "quote": "Effusion"}]}])
+    _, f = run(script([sub]), tmp_path, "Small left pleural effusion.", "Effusion.")
+    assert by(f)["Pleural Effusion"].corroboration == "both"
+    _, f = run(script([sub]), tmp_path / "b", "Small left pleural effusion. Mild cardiomegaly.", "",
+               Cardiomegaly=("present", ["F2"]))
+    assert by(f)["Cardiomegaly"].corroboration == "findings" and by(f)["Pleural Effusion"].corroboration == "findings"
+    assert by(f)["Atelectasis"].corroboration is None  # only present / suggested labels get a level
