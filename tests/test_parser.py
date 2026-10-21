@@ -54,7 +54,9 @@ def test_run_pipeline_parse_tag_verify(tmp_path: Path) -> None:
                      FakeLLM(responder, tmp_path))
     assert [s.id for s in r.sentences] == ["F1", "I1"]
     assert r.labels.status("Cardiomegaly") == "present"  # M6 hedge fix: "borderline" is not a hedge here
-    assert r.labels.status("No Finding") == "not_mentioned"
+    assert r.labels.status("No Finding") == "not_mentioned" and r.sections_identified
+    r = run_pipeline("Indication dyspnea. Borderline cardiomegaly.", FakeLLM(responder, tmp_path))
+    assert not r.sections_identified  # no headers: visible in the output (the tagger also read the indication)
     assert "dyspnea" not in seen[0]  # the indication is never a tagger input
 
 

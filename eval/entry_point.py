@@ -65,7 +65,13 @@ CLEAN_HEADERS = {"indication": "INDICATION", "comparison": "COMPARISON", "findin
 ALT_HEADERS = {"indication": ["Clinical history", "History", "Reason for exam"],
                "comparison": ["Comparisons", "Prior studies"], "findings": ["Finding", "Findings"],
                "impression": ["Conclusion", "Opinion", "Summary"]}
-FORMATS = ("{h}: {t}", "{H}\n{t}", "{low} - {t}")
+# Held-out header names (owner decision 5, written 2026-10-22 before any run): NOT in the parser's list and never
+# added to it afterwards. Run once on the varied reports; parser accuracy reported separately.
+HELDOUT_HEADERS = {"indication": ["Clinical details", "Hx", "Indications for exam"],
+                   "comparison": ["Prior exam", "Compared with"],
+                   "findings": ["Report", "Observations", "Description"],
+                   "impression": ["Interpretation", "Assessment"]}
+FORMATS = ("{h}: {t}","{H}\n{t}", "{low} - {t}")
 NORMAL_SENTENCE = re.compile(
     r"^(\d+\.\s*)?(?:(?:no|negative for)\s+(?:\S+\s+){0,3}?(?:acute|active)\b"
     r"|(?:normal|negative|unremarkable)\s+(?:chest|exam|examination|study|radiograph)\b|negative\.?$)")
@@ -81,10 +87,11 @@ def join(sec: dict[str, str], variant: str, rng: random.Random) -> tuple[str, di
         del inc[rng.choice(list(inc))]
     if variant == "no_headers":
         return "\n".join(inc.values()), inc
-    if variant == "alt_headers":
+    if variant in ("alt_headers", "heldout_headers"):
+        names = ALT_HEADERS if variant == "alt_headers" else HELDOUT_HEADERS
         lines = []
         for s, t in inc.items():
-            h = rng.choice(ALT_HEADERS[s])
+            h = rng.choice(names[s])
             lines.append(rng.choice(FORMATS).format(h=h, H=h.upper(), low=h.lower(), t=t))
         return "\n".join(lines), inc
     return "\n".join(f"{CLEAN_HEADERS[s]}: {t}" for s, t in inc.items()), inc
@@ -100,7 +107,7 @@ def parse_scores(r: PipelineResult, inc: dict[str, str]) -> tuple[int, int, bool
 def run_jobs(jobs: dict[tuple[int, str], str], llm: LLMClient) -> dict[tuple[int, str], PipelineResult]:
     def one(key: tuple[int, str]) -> PipelineResult | None:
         try:
-            return run_pipeline(jobs[key], llm, str(key[0]))
+            return run_pipeline(jobs[key], llm, str(key[0]), agent=False)  # M6: no agent
         except CacheMiss:
             return None
         except Exception as e:  # network trouble after the client's retries: retried in the next pass
@@ -202,6 +209,11 @@ def main(cache_only: bool = False) -> dict[str, Any]:
         sec = {k: iu[i][k] for k in SECTIONS}
         for v in ["clean"] + ([rng.choice(VARIANTS)] if i in varied_ids else []):
             jobs[(i, v)], included[(i, v)] = join(sec, v, rng)
+    held_rng = random.Random(f"{s.seed}-heldout-headers")  # own stream: the varied joins above stay unchanged
+    for i in ids:
+        if i in varied_ids:
+            k = (i, "heldout_headers")
+            jobs[k], included[k] = join({x: iu[i][x] for x in SECTIONS}, "heldout_headers", held_rng)
 
     llm = LLMClient(cache_only=True)
     spend0 = llm.spent
@@ -228,13 +240,14 @@ def main(cache_only: bool = False) -> dict[str, Any]:
                   "new_tagger_inputs_cost_usd": sum(res[k].tagger_cost_usd for k in new)})
 
     clean = {i: statuses(res[(i, "clean")]) for i in ids}
-    variant = {i: v for i, v in jobs if v != "clean"}
+    variant = {i: v for i, v in jobs if v in VARIANTS}
+    heldout = {i: statuses(res[(i, v)]) for i, v in jobs if v == "heldout_headers"}
     varied = {**clean, **{i: statuses(res[(i, v)]) for i, v in variant.items()}}
 
     # parser accuracy per join type, and the cache check: correctly parsed clean joins must have been cache hits
     parser: dict[str, Any] = {}
     full_clean: set[int] = set()
-    for j in ("clean", *VARIANTS):
+    for j in ("clean", *VARIANTS, "heldout_headers"):
         keys = [k for k in jobs if k[1] == j]
         sc = [parse_scores(res[k], included[k]) for k in keys]
         parser[j] = {"n": len(keys), "sentence_accuracy": sum(a for a, _, _ in sc) / max(1, sum(b for _, b, _ in sc)),
@@ -270,6 +283,12 @@ def main(cache_only: bool = False) -> dict[str, Any]:
                          ["macro_f1_headline"],
                          "macro_f1_varied": score_block(it, _present(it, varied), "v1", m & keep, HEADLINE)
                          ["macro_f1_headline"]}
+    m = np.isin(np.array(it.ids), list(heldout))
+    by_variant["heldout_headers"] = {
+        "n": int(m.sum()), "n_scored": int((m & keep).sum()),
+        "macro_f1_clean": score_block(it, _present(it, clean), "v1", m & keep, HEADLINE)["macro_f1_headline"],
+        "macro_f1_varied": score_block(it, _present(it, {**clean, **heldout}), "v1", m & keep, HEADLINE)
+        ["macro_f1_headline"]}
     subsets: dict[str, Any] = {}
     for run, st in (("clean", clean), ("varied", varied)):
         subsets[run] = {}
@@ -319,7 +338,7 @@ def render(m6: dict[str, Any], paired: dict[str, Any], standalone: bool = True) 
               "|---|---|---|---|---|"]
     lines += [f"| {j.replace('_', ' ')} | {p[j]['n']} | {_pct(p[j]['sentence_accuracy'])} | "
               f"{p[j]['fully_parsed']} ({_pct(p[j]['fully_parsed_rate'])}) | {p[j]['sections_not_identified']} |"
-              for j in ("clean", *VARIANTS)]
+              for j in ("clean", *VARIANTS, "heldout_headers") if j in p]
     lines += ["", "Dropped sections: " + ", ".join(f"{k} {n}" for k, n in p["drop_section_dropped"].items()) + ".", "",
               "Headline macro-F1 (v1) on the varied reports: the same reports with the clean vs the varied join:",
               "",

@@ -22,6 +22,11 @@ eval = [
     "iterative-stratification==0.1.9",
     "scikit-learn>=1.5",
 ]
+# sentence embeddings: the verifier agent's find_by_meaning tool (M7), index + fine-tuning (M8, M9).
+# Optional: tests use a fake encoder, so CI doesn't need it.
+embed = [
+    "sentence-transformers>=5.0",
+]
 dev = [
     "ruff>=0.6",
     "mypy>=1.11",

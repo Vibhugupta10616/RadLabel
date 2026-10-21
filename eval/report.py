@@ -10,7 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from eval import entry_point
+from eval import entry_point, verifier_agent
 from eval.labelling import _fmt, load_result, render_summary, summary_inputs
 
 README = Path("README.md")
@@ -126,6 +126,10 @@ def render() -> str:
                   "Without headers the parser can't separate sections, so the whole text, including the indication, "
                   "is read as Findings.", "",
                   entry_point.render(m6, load_result("labelling_m6_paired_diffs") or {}, standalone=False).rstrip()]
+    esc = load_result("verifier_escalation")
+    if esc is not None:
+        lines += ["", "### Verifier agent: escalation and dev slice (M7, before the full run)", "",
+                  verifier_agent.render(esc, load_result("verifier_agent_dev")).rstrip()]
     return "\n".join(lines) + "\n"
 
 

@@ -8,6 +8,10 @@ no_acute_cp: &no_acute_cp [no acute cardiopulmonary, no active cardiopulmonary, 
                            no acute abnormality]
 pleura_clear: &pleura_clear [pleural spaces are clear, no pleural abnormality, costophrenic angles are sharp,
                              costophrenic angles are clear]
+# Heart region for the normal check (free_checks.py, M7); not used by the evidence check (no label references it)
+heart_normal: [heart size normal, heart size is normal, normal heart size, heart is normal in size, normal size heart,
+               heart size within normal limits, heart size is within normal limits, heart is not enlarged,
+               cardiac silhouette is normal, normal cardiac silhouette, cardiac size is normal, normal cardiac size]
 labels:
   Lung Opacity: [*lungs_clear, *no_acute_cp]
   Consolidation: [*lungs_clear, *no_acute_cp]
