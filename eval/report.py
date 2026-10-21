@@ -116,9 +116,7 @@ def render() -> str:
             f"Escalation precision (Tier 1 labels disagree with the expert codes): Tier 2 "
             f"{_pct(rt['escalation_precision_tier2'])}, review {_pct(rt['escalation_precision_review'])}, base rate "
             f"{_pct(rt['tier1_disagreement_base_rate'])}.",
-            f"- LLM spend: Tier 2 calls ${st['tier2_cost_usd']:.2f}; all LLM calls up to M5 (pilots, mapping "
-            f"cross-checks, Tier 1, Tier 2; from the cost ledger) ${st['llm_spend_total_usd']:.2f}. Reruns are "
-            "served from the cache at $0."]
+            f"- LLM spend: Tier 2 calls ${st['tier2_cost_usd']:.2f}. Reruns are served from the cache at $0."]
     else:
         lines.append(f"- LLM spend, all calls so far (from the cost ledger): ${run['llm_spend_total_usd']:.2f}.")
     m6 = load_result("pipeline_m6")

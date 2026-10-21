@@ -2,7 +2,7 @@
 
 Out-of-fold, one report per exact text (n = 3086; 279 hedged and 96 Tier 1 pilot reports excluded); 95% bootstrap CIs over clusters.
 
-Sensitivity, all reports incl. pilot: v1 headline macro-F1 0.862 (0.848–0.875)  
+Sensitivity, all reports incl. pilot: v1 headline macro-F1 0.866 (0.852–0.878)  
 Sensitivity analysis (not the headline metric), `uncertain` counts as positive for all labels: v1 headline macro-F1 0.861 (0.848–0.874)
 
 ## Mapping v1
@@ -10,7 +10,7 @@ Sensitivity analysis (not the headline metric), `uncertain` counts as positive f
 | Label | F1 (95% CI) | Precision | Recall | n |
 |---|---|---|---|---|
 | No Finding | 0.926 (0.910–0.941) | 0.987 | 0.873 | 628 |
-| Cardiomegaly | 0.914 (0.890–0.937) | 0.996 | 0.844 | 320 |
+| Cardiomegaly | 0.944 (0.924–0.961) | 0.993 | 0.900 | 320 |
 | Lung Opacity | 0.836 (0.805–0.866) | 0.949 | 0.748 | 400 |
 | Lung Lesion | 0.614 (0.533–0.689) | 0.675 | 0.562 | 96 |
 | Atelectasis | 0.855 (0.820–0.888) | 0.980 | 0.759 | 257 |
@@ -23,7 +23,7 @@ Sensitivity analysis (not the headline metric), `uncertain` counts as positive f
 | Consolidation (rare) | 0.923 (0.829–0.984) | 0.857 | 1.000 | 24 |
 | Pneumothorax (rare) | 0.919 (0.800–1.000) | 1.000 | 0.850 | 20 |
 
-**Macro-F1, 9 headline labels:** 0.862 (0.848–0.875)  
+**Macro-F1, 9 headline labels:** 0.866 (0.851–0.878)  
 **Pooled rare micro-F1:** 0.829 (0.769–0.882)
 
 ## Mapping strict
@@ -31,7 +31,7 @@ Sensitivity analysis (not the headline metric), `uncertain` counts as positive f
 | Label | F1 (95% CI) | Precision | Recall | n |
 |---|---|---|---|---|
 | No Finding | 0.926 (0.910–0.941) | 0.987 | 0.873 | 628 |
-| Cardiomegaly | 0.918 (0.894–0.940) | 0.996 | 0.851 | 308 |
+| Cardiomegaly | 0.947 (0.928–0.965) | 0.993 | 0.906 | 308 |
 | Lung Opacity | 0.891 (0.858–0.919) | 0.930 | 0.855 | 248 |
 | Lung Lesion | 0.612 (0.529–0.688) | 0.667 | 0.565 | 92 |
 | Atelectasis | 0.855 (0.820–0.888) | 0.980 | 0.759 | 257 |
@@ -44,16 +44,16 @@ Sensitivity analysis (not the headline metric), `uncertain` counts as positive f
 | Consolidation (rare) | 0.923 (0.829–0.984) | 0.857 | 1.000 | 24 |
 | Pneumothorax (rare) | 0.938 (0.824–1.000) | 1.000 | 0.882 | 17 |
 
-**Macro-F1, 9 headline labels:** 0.865 (0.850–0.878)  
+**Macro-F1, 9 headline labels:** 0.868 (0.853–0.881)  
 **Pooled rare micro-F1:** 0.841 (0.783–0.893)
 
 ## Subsets (v1, headline macro-F1)
 
 | Subset | Macro-F1 (95% CI) |
 |---|---|
-| abnormal | 0.768 (0.755–0.779) |
-| redaction_adjacent | 0.851 (0.814–0.880) |
-| hedged, uncertain = absent | 0.652 (0.613–0.766) |
+| abnormal | 0.771 (0.758–0.783) |
+| redaction_adjacent | 0.852 (0.815–0.881) |
+| hedged, uncertain = absent | 0.653 (0.614–0.766) |
 | hedged, uncertain = present | 0.700 (0.671–0.813) |
 
 ## negation_only false-positive rate

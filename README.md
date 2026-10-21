@@ -313,7 +313,7 @@ Evidence is always sentence IDs that exist in the report, and the sentence text 
 | No Finding exclusivity | No Finding `present` ⇒ every other label ≠ `present`. No Finding is **derived in code** (present iff no other label is present/uncertain, else not_mentioned); a model's No Finding value is ignored (M4). | — (by construction) |
 | Section rule | Impression overrides Findings **only on an explicit same-label contradiction**. "No acute cardiopulmonary abnormality" does **not** cancel specific Findings. Unit test: Findings "mild cardiomegaly" + Impression "no acute disease" → Cardiomegaly stays `present`. A disagreement is a **flag**, not a fail: on the M4 pilot the LLM was right in 26 of 39 such disagreements (owner's pre-committed rule; `docs/evaluation_notes.md`). | escalates |
 
-- **Free checks, part 2: recall scan** (v2, M7). The rule baseline (`eval/baselines/rule_baseline.py`: aliases + pipeline negation, no LLM) runs on every report as a cheap second reader. For each label where the rules say `present` and the tagger says `absent` or `not_mentioned`, the report escalates. This targets the tagger's real weakness: its precision is ~0.99 on several labels, but its recall is lower (§10). The rules have their own errors (e.g. "upper limits of normal" read as enlargement), which is why the agent decides, not the rules.
+- **Free checks, part 2: recall scan** (v2, M7). The rule labeller (`src/radlabel/labelling/rules.py`, also the rule baseline: aliases + pipeline negation, no LLM) runs on every report as a cheap second reader. For each label where the rules say `present` and the tagger says `absent` or `not_mentioned`, the report escalates. This targets the tagger's real weakness: its precision is ~0.99 on several labels, but its recall is lower (§10). The rules have their own errors (e.g. "upper limits of normal" read as enlargement), which is why the agent decides, not the rules.
 - **Free checks, part 3: normal check** (v2, M7; code, no LLM). A predicted No Finding is an **unconfirmed claim** and is always checked, because many reports with a "no acute" impression still carry abnormal codes (e.g. borderline cardiomegaly, granulomas). When No Finding comes out `present`:
   - **coverage:** the report has normal statements covering at least the **heart and lungs** (pleura, mediastinum and bones are recorded when stated, but not required, since many normal reports never mention them);
   - **nothing abnormal:** the rule scan finds no `present` or `uncertain` label, including Other Abnormality cues, in any sentence.
@@ -333,7 +333,7 @@ Evidence is always sentence IDs that exist in the report, and the sentence text 
 - **v1, historical (M5):** a Tier 2 repair agent (`repair_agent.py`) fixed FAIL labels only, and anything still failing or flagged went to a `review` table (Tier 3). Its results stay in §10 as the comparison column. v2 replaces both with the verifier agent.
 
 **Baselines** (`eval/baselines/`):
-- `rule_baseline.py`: alias match + pipeline negation, no LLM. Always available.
+- `rule_baseline.py`: alias match + pipeline negation, no LLM. Always available. A thin wrapper around `src/radlabel/labelling/rules.py`, so pipeline code never imports from `eval/`.
 - `chexpert_labeler/`: the CheXpert labeler in its own Docker image. **Stretch:** if its dependencies fail to build, document the attempt and continue.
 - LLM extractor without the verifier and repair (ablation).
 - No QLoRA / local-model tagger (dropped 21 Oct 2026).
@@ -526,14 +526,14 @@ radlabel/
 │   └── mapping/            # mesh_to_labels_v1.yaml, mesh_to_labels_strict.yaml (no report text)
 ├── src/radlabel/
 │   ├── preprocess/         # parser.py (v2), text.py, sentences.py, negation.py, aliases.py, dedup.py
-│   ├── labelling/          # extractor.py, verifier.py, verifier_agent.py (v2), repair_agent.py (v1),
+│   ├── labelling/          # extractor.py, verifier.py, rules.py, verifier_agent.py (v2), repair_agent.py (v1),
 │   │                       # schema.py, tier0.py, normal_phrases.yaml
 │   ├── pipeline.py         # run_pipeline(raw_text), the single entry point (v2)
 │   ├── index/  agent/  ingest/  api/  llm/  db/
 │   └── config.py, labels.py, results.py
 ├── training/               # build_pairs.py, train_embeddings.py
 ├── eval/                   # cv.py, labelling.py, retrieval.py, agent.py, system.py, bootstrap.py,
-│   │                       # subsets.py, report.py, pilot.py, m4_analysis.py, repair.py (v1),
+│   │                       # subsets.py, entry_point.py, report.py, pilot.py, m4_analysis.py, repair.py (v1),
 │   │                       # lexicon.yaml, negex_termset.yaml, baselines/, queries/, agent_questions/
 ├── demo/app.py
 ├── deploy/
@@ -570,20 +570,20 @@ Limitations that bound these numbers (details in §11):
 - 7 reports refused by the Azure content filter are scored with the rule baseline's labels.
 - The ground truth misses some clearly stated findings, so scores are a lower bound.
 - Labels describe the report text, not the images.
-- Review volume is 30.9% of reports (hedged 58.1%, clear 28.2%), too high for production use; reducing it is future work.
+- Review volume is 30.5% of reports (hedged 57.7%, clear 27.8%), too high for production use; reducing it is future work.
 
 ### Labelling (§8.1)
 
 Out-of-fold, one report per exact text; hedged and Tier 1 pilot reports excluded unless stated; 95% bootstrap CIs over clusters. Scoring: `present` = positive, except in the sensitivity row.
 
-| Metric | Rule baseline | LLM only | LLM + verifier | LLM + verifier + Tier 2 |
-|---|---|---|---|---|
-| Headline macro-F1, 9 labels (v1) | 0.838 (0.823–0.850) | 0.862 (0.848–0.875) | 0.857 (0.842–0.870) | 0.862 (0.848–0.875) |
-| Headline macro-F1, 9 labels (strict) | 0.829 (0.814–0.843) | 0.863 (0.848–0.877) | 0.858 (0.843–0.872) | 0.865 (0.850–0.878) |
-| Pooled rare micro-F1 (v1) | 0.742 (0.677–0.805) | 0.831 (0.771–0.882) | 0.838 (0.777–0.889) | 0.829 (0.769–0.882) |
-| negation_only FP rate (pooled) | 41 / 6164 (0.0067) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) |
-| *Sensitivity, not headline:* macro-F1 (v1) with `uncertain` = positive for all labels | 0.839 (0.825–0.852) | 0.853 (0.839–0.866) | 0.853 (0.839–0.866) | 0.861 (0.848–0.874) |
-| *Sensitivity, not headline:* macro-F1 (v1), all reports incl. Tier 1 pilot | 0.837 (0.823–0.850) | 0.862 (0.848–0.876) | 0.857 (0.842–0.870) | 0.862 (0.848–0.875) |
+| Metric | Rule baseline | LLM only | LLM + verifier | LLM + verifier + Tier 2 | run_pipeline, clean join (M6) | run_pipeline, 30% varied joins (M6) |
+|---|---|---|---|---|---|---|
+| Headline macro-F1, 9 labels (v1) | 0.838 (0.823–0.850) | 0.862 (0.848–0.875) | 0.860 (0.845–0.873) | 0.866 (0.851–0.878) | 0.860 (0.845–0.873) | 0.848 (0.833–0.861) |
+| Headline macro-F1, 9 labels (strict) | 0.829 (0.814–0.843) | 0.863 (0.848–0.877) | 0.861 (0.846–0.875) | 0.868 (0.853–0.881) | 0.861 (0.846–0.875) | 0.850 (0.835–0.865) |
+| Pooled rare micro-F1 (v1) | 0.742 (0.677–0.805) | 0.831 (0.771–0.882) | 0.838 (0.777–0.889) | 0.829 (0.769–0.882) | 0.838 (0.777–0.889) | 0.824 (0.764–0.875) |
+| negation_only FP rate (pooled) | 41 / 6164 (0.0067) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) |
+| *Sensitivity, not headline:* macro-F1 (v1) with `uncertain` = positive for all labels | 0.839 (0.825–0.852) | 0.853 (0.839–0.866) | 0.853 (0.839–0.866) | 0.861 (0.848–0.874) | 0.853 (0.839–0.866) | 0.841 (0.828–0.855) |
+| *Sensitivity, not headline:* macro-F1 (v1), all reports incl. Tier 1 pilot | 0.837 (0.823–0.850) | 0.862 (0.848–0.876) | 0.860 (0.846–0.873) | 0.866 (0.852–0.878) | 0.860 (0.846–0.873) | 0.848 (0.834–0.861) |
 
 Per-label tables: `artifacts/tables/labelling_*.md`.
 
@@ -594,12 +594,14 @@ Headline macro-F1 (9 labels, v1), same out-of-fold reports and the same 1,000 cl
 | Comparison | Difference (95% CI) | CI excludes 0 |
 |---|---|---|
 | LLM only − rule baseline | 0.025 (0.010–0.040) | yes |
-| LLM + verifier − LLM only | -0.006 (-0.008–-0.003) | yes |
+| LLM + verifier − LLM only | -0.002 (-0.004–-0.001) | yes |
 | LLM + verifier + Tier 2 − LLM + verifier | 0.006 (0.003–0.009) | yes |
-| LLM + verifier + Tier 2 − rule baseline | 0.025 (0.010–0.040) | yes |
-| LLM + verifier + Tier 2 − LLM only | 0.000 (-0.004–0.004) | no |
+| LLM + verifier + Tier 2 − rule baseline | 0.028 (0.013–0.043) | yes |
+| LLM + verifier + Tier 2 − LLM only | 0.003 (0.000–0.007) | no |
+| run_pipeline, clean join − LLM + verifier | 0.000 (0.000–0.000) | no |
+| run_pipeline, varied joins − clean join | -0.012 (-0.017–-0.007) | yes |
 
-**Reading.** The verifier's hedge downgrade costs 0.006 macro-F1 and Tier 2 recovers 0.006, so the full pipeline **matches** LLM-only macro-F1 (difference 0.000 (-0.004–0.004); the 95% CI includes 0). The guardrails do not improve F1 over LLM only. What the guardrails add is label-level correction (Tier 2: 29 labels wrong → right vs 5 right → wrong) and routing of uncertain cases to human review (30.9% of reports).
+**Reading.** The verifier's hedge downgrade costs 0.002 macro-F1 and Tier 2 recovers 0.006, so the full pipeline **matches** LLM-only macro-F1 (difference 0.003 (0.000–0.007); the 95% CI includes 0). The guardrails do not improve F1 over LLM only. What the guardrails add is label-level correction (Tier 2: 29 labels wrong → right vs 5 right → wrong) and routing of uncertain cases to human review (30.5% of reports).
 
 ### Pipeline
 
@@ -607,9 +609,54 @@ Headline macro-F1 (9 labels, v1), same out-of-fold reports and the same 1,000 cl
 - Tier 0: 0 out-of-fold matches (exact duplicates share a fold).
 - Verifier FAIL → Tier 2: 211 reports (6.8%).
 - Tier 2 repair agent (gpt-5-mini-2025-08-07, prompt `repair-v1`): fix accepted after re-verification for 78 of 211 (37.0%); mean tool calls 1.97; labels changed 75: wrong → right 29, right → wrong 5 (present = positive vs expert codes).
-- Routing: Tier 1 accepted 2,090, Tier 2 repaired 42, review 954 (30.9%).
-- Review rate: hedged 58.1% vs clear 28.2%. Escalation precision (Tier 1 labels disagree with the expert codes): Tier 2 64.9%, review 51.7%, base rate 25.5%.
-- LLM spend: Tier 2 calls $0.26; all LLM calls so far (pilots, mapping cross-checks, Tier 1, Tier 2; from the cost ledger) $2.38. Reruns are served from the cache at $0.
+- Routing: Tier 1 accepted 2,104, Tier 2 repaired 42, review 940 (30.5%).
+- Review rate: hedged 57.7% vs clear 27.8%. Escalation precision (Tier 1 labels disagree with the expert codes): Tier 2 64.9%, review 50.5%, base rate 25.0%.
+- LLM spend: Tier 2 calls $0.26. Reruns are served from the cache at $0.
+
+### Through the entry point (M6)
+
+Labels produced by `run_pipeline(raw_text)` (parse → tag → verifier), as an upload would be. Without headers the parser can't separate sections, so the whole text, including the indication, is read as Findings.
+
+3,086 unique reports joined into text with headers (codes hidden) and run through `run_pipeline`; 926 of them (30.0%, seed 13) also with a varied join. Clean joins whose labels differ from the LLM + verifier column: 1. Tagger inputs that differ from M4's, so not served by the M4 cache: 461 (no headers 309, drop section 151, clean 1; correctly parsed clean joins: 0), whose calls cost $0.27. All LLM calls so far (cost ledger): $2.63.
+
+| Join | Reports | Sentences in the right section | Fully parsed | No sections found |
+|---|---|---|---|---|
+| clean | 3086 | 100.0% | 3083 (99.9%) | 0 |
+| alt headers | 307 | 100.0% | 307 (100.0%) | 0 |
+| no headers | 309 | 62.6% | 0 (0.0%) | 308 |
+| drop section | 310 | 100.0% | 310 (100.0%) | 0 |
+
+Dropped sections: findings 70, impression 81, indication 81, comparison 78.
+
+Headline macro-F1 (v1) on the varied reports: the same reports with the clean vs the varied join:
+
+| Variant | Scored reports | Clean join | Varied join |
+|---|---|---|---|
+| alt headers | 267 | 0.815 (0.751–0.862) | 0.815 (0.751–0.862) |
+| no headers | 263 | 0.858 (0.810–0.899) | 0.864 (0.818–0.904) |
+| drop section | 276 | 0.873 (0.825–0.907) | 0.756 (0.690–0.807) |
+
+Section subsets (as parsed; headline macro-F1, v1, hedged + pilot excluded):
+
+| Subset | Clean: reports (scored) | Clean macro-F1 | Varied: reports (scored) | Varied macro-F1 |
+|---|---|---|---|---|
+| empty findings | 426 (371) | 0.827 (0.769–0.864) | 452 (396) | 0.777 (0.716–0.819) |
+| empty impression | 6 (5) | 0.633 (0.500–1.000) | 396 (337) | 0.820 (0.773–0.861) |
+| sections not identified | 0 (0) | – | 308 (263) | 0.864 (0.818–0.904) |
+
+**Normal-claim count.** 1302 unique reports have an Impression made only of "no acute"-type statements; the expert codes are normal-only for 467, ignored-only for 2, and **not normal for 833 (64.0%)**. Positive labels among those: Cardiomegaly 30, Lung Opacity 48, Lung Lesion 28, Atelectasis 40, Pleural Effusion 1, Fracture 31, Support Devices 111, Other Abnormality 742, Pleural Other 4, Pneumothorax 2. The tagger predicted No Finding for 3 of the 833 (LLM only; after the verifier 3) and for 418 of the 467 normal-only ones.
+
+**Hedge-check fix** ("borderline"/"mild" are not a hedge where the label definition counts them as present), v1 results from cache, before → after:
+
+| Metric | Before | After |
+|---|---|---|
+| Hedge conversions (present → uncertain) | 147 | 125 |
+| LLM + verifier: headline macro-F1 (v1) | 0.857 (0.842–0.870) | 0.860 (0.845–0.873) |
+| LLM + verifier: Cardiomegaly F1 | 0.914 (0.890–0.937) | 0.944 (0.924–0.961) |
+| LLM + verifier − LLM only | -0.006 (-0.008–-0.003) | -0.002 (-0.004–-0.001) |
+| LLM + verifier + Tier 2: headline macro-F1 (v1) | 0.862 (0.848–0.875) | 0.866 (0.851–0.878) |
+| LLM + verifier + Tier 2 − LLM only | 0.000 (-0.004–0.004) | 0.003 (0.000–0.007) |
+| v1 review rate | 30.9% | 30.5% |
 
 <!-- results:end -->
 

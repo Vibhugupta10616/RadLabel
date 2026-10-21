@@ -1,0 +1,410 @@
+{
+ "provenance": {
+  "git_commit": "567b0939bdbdd9612ee05bdffa4202f53f0bceb1",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "oof",
+  "created": "2026-10-21T12:17:07+00:00",
+  "eval_version": "eval_v1.2",
+  "llm": "gpt-4.1-mini",
+  "prompt": "tier1-v1",
+  "entry_point": "radlabel.pipeline.run_pipeline"
+ },
+ "results": {
+  "run": {
+   "seed": 13,
+   "varied_fraction": 0.3,
+   "n_reports": 3086,
+   "n_varied": 926,
+   "variants": {
+    "no_headers": 309,
+    "alt_headers": 307,
+    "drop_section": 310
+   }
+  },
+  "cache": {
+   "jobs": 4012,
+   "cache_misses_this_run": 0,
+   "misses_by_join_this_run": {},
+   "estimated_new_spend_usd": 0.0,
+   "new_spend_cap_usd": 1.0,
+   "new_spend_this_run_usd": 0.0,
+   "llm_spend_total_usd": 2.6294565999999953,
+   "new_tagger_inputs": 461,
+   "new_tagger_inputs_by_join": {
+    "no_headers": 309,
+    "drop_section": 151,
+    "clean": 1
+   },
+   "new_tagger_inputs_cost_usd": 0.2664152000000001,
+   "clean_fully_parsed_new_inputs": 0,
+   "clean_not_fully_parsed": [
+    2415,
+    2800,
+    3334
+   ]
+  },
+  "parser": {
+   "clean": {
+    "n": 3086,
+    "sentence_accuracy": 0.9998947700726086,
+    "fully_parsed": 3083,
+    "fully_parsed_rate": 0.9990278677900194,
+    "sections_not_identified": 0
+   },
+   "alt_headers": {
+    "n": 307,
+    "sentence_accuracy": 1.0,
+    "fully_parsed": 307,
+    "fully_parsed_rate": 1.0,
+    "sections_not_identified": 0
+   },
+   "no_headers": {
+    "n": 309,
+    "sentence_accuracy": 0.6261930010604454,
+    "fully_parsed": 0,
+    "fully_parsed_rate": 0.0,
+    "sections_not_identified": 308
+   },
+   "drop_section": {
+    "n": 310,
+    "sentence_accuracy": 1.0,
+    "fully_parsed": 310,
+    "fully_parsed_rate": 1.0,
+    "sections_not_identified": 0
+   },
+   "drop_section_dropped": {
+    "findings": 70,
+    "impression": 81,
+    "indication": 81,
+    "comparison": 78
+   }
+  },
+  "by_variant": {
+   "alt_headers": {
+    "n": 307,
+    "n_scored": 267,
+    "macro_f1_clean": {
+     "value": 0.8148162302889431,
+     "lo": 0.7505982024579352,
+     "hi": 0.8617757688909934
+    },
+    "macro_f1_varied": {
+     "value": 0.8148162302889431,
+     "lo": 0.7505982024579352,
+     "hi": 0.8617757688909934
+    }
+   },
+   "no_headers": {
+    "n": 309,
+    "n_scored": 263,
+    "macro_f1_clean": {
+     "value": 0.8576535857904417,
+     "lo": 0.8101831143519078,
+     "hi": 0.8985496185570833
+    },
+    "macro_f1_varied": {
+     "value": 0.8638441002935955,
+     "lo": 0.8181480993961111,
+     "hi": 0.9037111038262889
+    }
+   },
+   "drop_section": {
+    "n": 310,
+    "n_scored": 276,
+    "macro_f1_clean": {
+     "value": 0.8727348914483515,
+     "lo": 0.8248621308091131,
+     "hi": 0.9072990109862467
+    },
+    "macro_f1_varied": {
+     "value": 0.7557777554048476,
+     "lo": 0.6902972907086354,
+     "hi": 0.8066224835617901
+    }
+   }
+  },
+  "subsets": {
+   "clean": {
+    "empty_findings": {
+     "n": 426,
+     "n_scored": 371,
+     "macro_f1": {
+      "value": 0.8267111372694654,
+      "lo": 0.7693624455288244,
+      "hi": 0.8636233899994954
+     }
+    },
+    "empty_impression": {
+     "n": 6,
+     "n_scored": 5,
+     "macro_f1": {
+      "value": 0.6333333333333333,
+      "lo": 0.5,
+      "hi": 1.0
+     }
+    },
+    "sections_not_identified": {
+     "n": 0,
+     "n_scored": 0,
+     "macro_f1": null
+    }
+   },
+   "varied": {
+    "empty_findings": {
+     "n": 452,
+     "n_scored": 396,
+     "macro_f1": {
+      "value": 0.7770988635560501,
+      "lo": 0.7163049634605778,
+      "hi": 0.8191927880035582
+     }
+    },
+    "empty_impression": {
+     "n": 396,
+     "n_scored": 337,
+     "macro_f1": {
+      "value": 0.8204838093413984,
+      "lo": 0.7732191845479456,
+      "hi": 0.8607613394265896
+     }
+    },
+    "sections_not_identified": {
+     "n": 308,
+     "n_scored": 263,
+     "macro_f1": {
+      "value": 0.8638441002935955,
+      "lo": 0.8181480993961111,
+      "hi": 0.9037111038262889
+     }
+    }
+   }
+  },
+  "clean_vs_llm_verifier": {
+   "reports_with_different_labels": 1,
+   "ids": [
+    2415
+   ]
+  },
+  "normal_claim": {
+   "definition": "every Impression sentence matches NORMAL_SENTENCE (eval/entry_point.py); all unique texts",
+   "normal_impression_reports": 1302,
+   "codes_normal_only": 467,
+   "codes_ignored_only": 2,
+   "codes_not_normal_only": 833,
+   "rate_not_normal_only": 0.6397849462365591,
+   "per_label_positive_in_not_normal_only": {
+    "Cardiomegaly": 30,
+    "Lung Opacity": 48,
+    "Lung Lesion": 28,
+    "Atelectasis": 40,
+    "Pleural Effusion": 1,
+    "Fracture": 31,
+    "Support Devices": 111,
+    "Other Abnormality": 742,
+    "Edema": 0,
+    "Pleural Other": 4,
+    "Consolidation": 0,
+    "Pneumothorax": 2
+   },
+   "no_finding_predicted": {
+    "llm_only": {
+     "in_not_normal_only": 3,
+     "in_normal_only": 418
+    },
+    "pipeline_clean": {
+     "in_not_normal_only": 3,
+     "in_normal_only": 418
+    }
+   }
+  },
+  "hedge_fix": {
+   "before_ref": "c328247",
+   "llm_verifier": {
+    "before": {
+     "macro_f1_v1": {
+      "value": 0.8565943118390451,
+      "lo": 0.842015432818054,
+      "hi": 0.869518754168004
+     },
+     "macro_f1_strict": {
+      "value": 0.8582002923597216,
+      "lo": 0.8429173446918681,
+      "hi": 0.8719057766194501
+     },
+     "rare_micro_f1_v1": {
+      "value": 0.8376068376068376,
+      "lo": 0.7766908360984802,
+      "hi": 0.8888888888888888
+     },
+     "cardiomegaly_f1": {
+      "value": 0.9137055837563451,
+      "lo": 0.8896022727272728,
+      "hi": 0.9367521367521368
+     },
+     "cardiomegaly_precision": 0.996309963099631,
+     "cardiomegaly_recall": 0.84375,
+     "cardiomegaly_status_counts": {
+      "present": 339,
+      "absent": 2520,
+      "uncertain": 108,
+      "not_mentioned": 119
+     },
+     "hedge_conversions": 147
+    },
+    "after": {
+     "macro_f1_v1": {
+      "value": 0.8599895019863366,
+      "lo": 0.845278648794131,
+      "hi": 0.8727624773043
+     },
+     "macro_f1_strict": {
+      "value": 0.8614980873433863,
+      "lo": 0.8460311521032615,
+      "hi": 0.8751391649061284
+     },
+     "rare_micro_f1_v1": {
+      "value": 0.8376068376068376,
+      "lo": 0.7766908360984802,
+      "hi": 0.8888888888888888
+     },
+     "cardiomegaly_f1": {
+      "value": 0.9442622950819672,
+      "lo": 0.9242641525587935,
+      "hi": 0.9613645820948757
+     },
+     "cardiomegaly_precision": 0.993103448275862,
+     "cardiomegaly_recall": 0.9,
+     "cardiomegaly_status_counts": {
+      "present": 361,
+      "absent": 2520,
+      "uncertain": 86,
+      "not_mentioned": 119
+     },
+     "hedge_conversions": 125
+    }
+   },
+   "llm_verifier_tier2": {
+    "before": {
+     "macro_f1_v1": {
+      "value": 0.8622575243877025,
+      "lo": 0.8480803036096803,
+      "hi": 0.8747913178134592
+     },
+     "macro_f1_strict": {
+      "value": 0.8648814365345007,
+      "lo": 0.8499157033456075,
+      "hi": 0.8782839380293903
+     },
+     "rare_micro_f1_v1": {
+      "value": 0.8290598290598291,
+      "lo": 0.7692307692307693,
+      "hi": 0.881831550802139
+     },
+     "cardiomegaly_f1": {
+      "value": 0.9137055837563451,
+      "lo": 0.8896022727272728,
+      "hi": 0.9367521367521368
+     },
+     "cardiomegaly_precision": 0.996309963099631,
+     "cardiomegaly_recall": 0.84375,
+     "cardiomegaly_status_counts": {
+      "present": 338,
+      "absent": 2520,
+      "uncertain": 107,
+      "not_mentioned": 121
+     },
+     "hedge_conversions": 147,
+     "review_rate": 0.30913804277381723
+    },
+    "after": {
+     "macro_f1_v1": {
+      "value": 0.8656527145349939,
+      "lo": 0.8513470029744273,
+      "hi": 0.8778144830572705
+     },
+     "macro_f1_strict": {
+      "value": 0.8681792315181653,
+      "lo": 0.8534091355317809,
+      "hi": 0.8811786901046935
+     },
+     "rare_micro_f1_v1": {
+      "value": 0.8290598290598291,
+      "lo": 0.7692307692307693,
+      "hi": 0.881831550802139
+     },
+     "cardiomegaly_f1": {
+      "value": 0.9442622950819672,
+      "lo": 0.9242641525587935,
+      "hi": 0.9613645820948757
+     },
+     "cardiomegaly_precision": 0.993103448275862,
+     "cardiomegaly_recall": 0.9,
+     "cardiomegaly_status_counts": {
+      "present": 360,
+      "absent": 2520,
+      "uncertain": 85,
+      "not_mentioned": 121
+     },
+     "hedge_conversions": 125,
+     "review_rate": 0.304601425793908
+    }
+   },
+   "llm_verifier_minus_llm_only": {
+    "before": {
+     "value": -0.00567922904584095,
+     "lo": -0.008263329997948729,
+     "hi": -0.00348880530352117,
+     "a": 0.8565943118390451,
+     "b": 0.8622735408848861,
+     "ci_excludes_zero": true
+    },
+    "after": {
+     "value": -0.0022840388985494453,
+     "lo": -0.0041611535877492415,
+     "hi": -0.0007010015064987608,
+     "a": 0.8599895019863366,
+     "b": 0.8622735408848861,
+     "ci_excludes_zero": true
+    }
+   },
+   "tier2_minus_llm_only": {
+    "before": {
+     "value": -1.601649718352416e-05,
+     "lo": -0.00396075126210535,
+     "hi": 0.003629718806805335,
+     "a": 0.8622575243877025,
+     "b": 0.8622735408848861,
+     "ci_excludes_zero": false
+    },
+    "after": {
+     "value": 0.0033791736501078695,
+     "lo": -3.446950996770781e-05,
+     "hi": 0.006649321415785608,
+     "a": 0.8656527145349939,
+     "b": 0.8622735408848861,
+     "ci_excludes_zero": false
+    }
+   }
+  }
+ }
+}

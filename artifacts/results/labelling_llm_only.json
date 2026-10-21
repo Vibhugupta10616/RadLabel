@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "b2d20452d243a11743c45634d83f7398ec243be6",
+  "git_commit": "567b0939bdbdd9612ee05bdffa4202f53f0bceb1",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1+strict",
   "fold": "oof",
-  "created": "2026-10-20T20:57:02+00:00",
+  "created": "2026-10-21T12:03:36+00:00",
   "system": "llm_only",
   "eval_version": "eval_v1.2",
   "llm": "gpt-4.1-mini",
@@ -1208,22 +1208,22 @@
    "tier0_skipped": 0,
    "reports_with_fail": 211,
    "report_fail_rate": 0.06837329876863253,
-   "reports_with_flag": 2534,
-   "report_flag_rate": 0.8211276733635774,
+   "reports_with_flag": 2531,
+   "report_flag_rate": 0.8201555411535969,
    "tier2_reports": 211,
-   "review_escalations": 785,
+   "review_escalations": 771,
    "fails_by_check": {
     "evidence_mentions_label": 226
    },
    "flags_by_check": {
     "evidence_exists": 709,
     "evidence_mentions_label": 5186,
-    "hedge_consistency": 147,
+    "hedge_consistency": 125,
     "negation_consistency": 16,
     "section_rule": 911
    },
    "spend_this_run_usd": 0.0,
-   "llm_spend_total_usd": 2.1206203499999976,
+   "llm_spend_total_usd": 2.6294565999999953,
    "cached_responses": 3086,
    "tier0": {
     "min_count": 3,

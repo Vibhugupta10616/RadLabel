@@ -40,6 +40,6 @@ Decision rule: keep iff Tier 2 − LLM + verifier is not significantly negative 
 
 ## Routing
 
-- tier distribution: {'tier1_accepted': 2090, 'review': 954, 'tier2_repaired': 42}
-- review rate: hedged 58.1% (n = 279), clear 28.2% (n = 2807)
-- escalation precision: Tier 2 64.9%, review 51.7% (base rate 25.5%)
+- tier distribution: {'tier1_accepted': 2104, 'review': 940, 'tier2_repaired': 42}
+- review rate: hedged 57.7% (n = 279), clear 27.8% (n = 2807)
+- escalation precision: Tier 2 64.9%, review 50.5% (base rate 25.0%)

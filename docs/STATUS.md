@@ -12,8 +12,8 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M3 | **Done** (tag `m3-rule-baseline`, owner-approved 2026-10-20) | Rule baseline §8.1 table: `artifacts/tables/labelling_rule_baseline.md`; numbers at M3 (pre-splitter): macro-F1 (9 headline) v1 0.833 (0.818–0.846), strict 0.824; pooled rare micro-F1 v1 0.746. Current, after the M4 splitter fix: v1 0.838, strict 0.829, rare 0.742 (README §10). |
 | M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
 | M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
-| M6 | **next** | Parser (`parser.py`), `run_pipeline(raw_text)` (parse → tag → current verifier until M7), evaluation through the entry point (clean + ~30% varied joins), empty-section counts and subsets, normal-claim count, hedge-check consistency fix. |
-| M7 | planned | Free checks with v2 escalation + recall scan (rule labeller as second reader) + normal check; ReAct verifier agent (blind first, caps); dev-slice prompt development and freeze; cost estimate before the full run. |
+| M6 | **Done** (code `567b093`; results rerun from cache at that commit, $0) | Through `run_pipeline`: clean join headline macro-F1 (v1) 0.860 (0.845–0.873), identical to LLM + verifier (paired 0.000; 1 report differs: IU text with inner "Impression:" headers); 30% varied joins 0.848, paired varied − clean −0.012 (−0.017 to −0.007). Parser: clean 100.0% of sentences in the right section, 3,083/3,086 fully parsed; alternative headers 100%; no headers 62.6% (308/309 no sections found). Correctly parsed clean joins: 0 new tagger inputs (all from the M4 cache). Hedge fix: conversions 147 → 125, LLM + verifier 0.857 → 0.860, Cardiomegaly F1 0.914 → 0.944. Normal-claim count: 833 of 1,302 (64.0%) "no acute" impressions have non-normal codes; the tagger predicted No Finding for 3 of them. Spend $0.25 (461 new tagger inputs); total $2.63. |
+| M7 | **next** (waits for owner OK) | Free checks with v2 escalation + recall scan (rule labeller as second reader) + normal check; ReAct verifier agent (blind first, caps); dev-slice prompt development and freeze; cost estimate before the full run. |
 | M8 | planned | Postgres `labels` (verification state + evidence), Qdrant index (report + contextual sentence points, indication field, BM25), RRF, retrieval eval incl. report-to-report. |
 | M9 | planned | Negation-aware embedding fine-tuning per fold (`CachedGISTEmbedLoss`), held-out eval vs the filter baseline; serving model; agent's `find_by_meaning` switches to it. |
 | M10 | planned | Query agent + tools + guardrails, question set, agent eval on expert and predicted label tables. |
@@ -60,7 +60,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 
 **Budget:** `MAX_LLM_USD=20` (`.env.example`; `.env` uses the same value). Stop rule (`src/radlabel/llm/client.py`, `BUDGET_FRACTION = 0.5`): fresh LLM calls are refused once the ledger total reaches 50% of `MAX_LLM_USD`, i.e. **$10**; cache hits are always free; the owner raises the limit explicitly. Per-run caps sit inside it (M5: $3 of new spend).
 
-`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$2.38** after M5 (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
+`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$2.63** after M6 (M6: $0.25) (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
 
 ## M2 notes
 - `iterstrat` (README §4.2 fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
@@ -95,6 +95,35 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Smoke test on 3 never-scored FAIL reports (pilot/hedged) before the full run: plumbing/cost only, no prompt change.
 - Review table: rows (report id + reasons) in `artifacts/review/review.jsonl` (git-ignored). Kept as JSONL (owner). The Postgres `review` table and `POST /review/{id}` are dropped in v2 (D8).
 - First cache rerun showed byte differences only in per-report bookkeeping (`cost_usd`, `cached_calls`) and file order; fixed (sorted file, call cost kept on cache hits); labels/routes were identical.
+
+## M6 notes
+- Parser (`src/radlabel/preprocess/parser.py`): header at the start of the text, a line or a sentence, followed by
+  ":" / "-" or alone on its line; variants per README §6.1. No headers → one block read as Findings,
+  `sections_identified = False`. Text before the first header → Findings if there is no Findings header, else
+  `unassigned` (reported, not labelled).
+- `run_pipeline` (`src/radlabel/pipeline.py`): parse → sentences → Tier 1 → deterministic verifier. Content-filtered
+  **or invalid** tagger output → rule labeller labels (M4 eval policy scored invalid outputs as empty; there are 0
+  invalid outputs, so no effect). Tier 0 is not in `run_pipeline` yet (0 out-of-fold hits by construction; serving
+  only) → add with the serving patterns in M11.
+- Rule labelling moved to `src/radlabel/labelling/rules.py`; `eval/baselines/rule_baseline.py` is a thin wrapper.
+  Rule-baseline predictions and table byte-identical, results payload identical.
+- Hedge fix (`verifier.DEFINITION_PRESENT`: Cardiomegaly ← "borderline", "mild"): 22 reports change, all
+  Cardiomegaly uncertain → present; none is a FAIL report, so Tier 2 inputs and predictions are byte-identical (cache
+  only, $0). v1 review 954 → 940 (30.9% → 30.5%); LLM + verifier − LLM only −0.006 → −0.002 (still significant: the
+  remaining hedge conversions); Tier 2 − LLM only 0.000 → 0.003 (−0.000 to 0.007, CI includes 0).
+- Varied joins (seed 13, 926 reports): alternative headers 307, no headers 309, one section dropped 310 (Findings 70,
+  Impression 81, Indication 81, Comparison 78). The drop-section macro-F1 fall (0.873 → 0.756 on the same reports) is
+  lost content, not parsing (sentence accuracy 100%). Without headers the tagger also reads the indication (no way to
+  separate it); macro-F1 0.858 → 0.864 on those reports.
+- Alternative header names come from the parser's own variant list, so that row checks the matching (case,
+  punctuation, line layout), not unknown header names (README §11 already notes the joins only partly measure the
+  parser).
+- Normal-claim definition (pre-registered in `eval/entry_point.py`, `NORMAL_SENTENCE`): every Impression sentence is a
+  general statement ("no acute/active …", "negative for acute …", "normal/negative/unremarkable chest/exam/study").
+  Positives among the 833: Other Abnormality 742, Support Devices 111, Lung Opacity 48, Atelectasis 40, Fracture 31,
+  Cardiomegaly 30, Lung Lesion 28. The tagger predicted No Finding for 3 of the 833 and for 418 of the 467
+  normal-only ones, so it does not confuse "nothing acute" with "fully normal" (README §6.2: no intermediate tag).
+- `results.git_commit()` no longer counts README.md as dirty code (docs + generated §10), like `docs/`.
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.
