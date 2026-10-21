@@ -15,7 +15,7 @@ from radlabel.index.points import IndexPoint
 DENSE, SPARSE = "dense", "bm25"
 RRF_K = 60
 TIE_LIMIT = 20_000  # upper bound when fetching every point tied at the cut-off score
-SCORE_DECIMALS, SCORE_EPS = 6, 1e-5  # float noise in server scores is far below 1e-6
+SCORE_DECIMALS, SCORE_EPS, SCORE_REL_MARGIN = 6, 1e-5, 1e-4  # candidate margin far above float32 sum noise
 
 
 def create(client: QdrantClient, name: str, dim: int) -> None:
@@ -52,19 +52,30 @@ def _kind(kind: str, exclude_negation_only: bool = False) -> models.Filter:
     return models.Filter(must=must, must_not=must_not)
 
 
-def _top(client: QdrantClient, name: str, query: object, using: str, flt: models.Filter,
-         k: int) -> list[tuple[str, str, float]]:
-    """Top k hits as (report_id, point id, score), deterministic under ties: every point scoring at least the k-th
-    score (minus SCORE_EPS) is fetched, scores are rounded to SCORE_DECIMALS, and hits are sorted by (score, report id,
-    point id). Qdrant returns tied points in no fixed order, and its sparse scores can differ in the last float bits
-    between runs; both made BM25 differ between identical runs (found after M8)."""
+def _top(client: QdrantClient, name: str, query: object, using: str, flt: models.Filter, k: int,
+         sparse_query: set[int] | None = None) -> list[tuple[str, str, float]]:
+    """Top k hits as (report_id, point id, score), deterministic across runs (found after M8):
+    - every point within a small relative margin of the k-th score is fetched (Qdrant returns ties in no fixed order);
+    - BM25 (`sparse_query` = the query's term ids): each candidate's score is recomputed here from its stored sparse
+      vector, summed in index order, because the server's float32 sums can differ in the last digits between runs;
+    - scores rounded to SCORE_DECIMALS, sorted by (score, report id, point id)."""
     def q(limit: int, threshold: float | None = None) -> list[models.ScoredPoint]:
-        return client.query_points(name, query=query, using=using, query_filter=flt, limit=limit,
-                                   score_threshold=threshold, with_payload=["report_id"]).points  # type: ignore[arg-type]
+        return client.query_points(  # type: ignore[arg-type]
+            name, query=query, using=using, query_filter=flt, limit=limit, score_threshold=threshold,
+            with_payload=["report_id"], with_vectors=[SPARSE] if sparse_query is not None else False).points
     hits = q(k)
     if len(hits) == k:
-        hits = q(TIE_LIMIT, hits[-1].score - SCORE_EPS)
-    out = sorted(((h.payload["report_id"], str(h.id), round(h.score, SCORE_DECIMALS)) for h in hits if h.payload),
+        s = hits[-1].score
+        hits = q(TIE_LIMIT, s - abs(s) * SCORE_REL_MARGIN - SCORE_EPS)
+
+    def score(h: models.ScoredPoint) -> float:
+        if sparse_query is None:
+            return h.score
+        v = h.vector[SPARSE] if isinstance(h.vector, dict) else None
+        if not isinstance(v, models.SparseVector):
+            return h.score
+        return float(sum(w for i, w in sorted(zip(v.indices, v.values, strict=True)) if i in sparse_query))
+    out = sorted(((h.payload["report_id"], str(h.id), round(score(h), SCORE_DECIMALS)) for h in hits if h.payload),
                  key=lambda x: (-x[2], x[0], x[1]))
     return out[:k]
 
@@ -74,7 +85,7 @@ def search_bm25(client: QdrantClient, name: str, text: str, k: int) -> list[tupl
     if not idx:
         return []
     return [(r, s) for r, _, s in _top(client, name, models.SparseVector(indices=idx, values=val), SPARSE,
-                                       _kind("report"), k)]
+                                       _kind("report"), k, sparse_query=set(idx))]
 
 
 def search_reports(client: QdrantClient, name: str, vec: np.ndarray, k: int) -> list[tuple[str, float]]:

@@ -106,3 +106,28 @@ def test_ties_are_broken_deterministically() -> None:
 
     tops = {tuple(store._top(Fake(), "c", [0.0], "dense", store._kind("report"), 3)) for _ in range(20)}  # type: ignore[arg-type]
     assert tops == {(("0", "p0", 0.9), ("1", "p1", 0.5), ("2", "p2", 0.5))}
+
+
+def test_bm25_scores_are_recomputed_from_stored_vectors() -> None:
+    """The server's float32 sums can differ between runs; the ranking must come from the stored weights."""
+    import random
+    from types import SimpleNamespace
+
+    from qdrant_client import models
+
+    # query terms {1, 2}: true scores a 3, b 3, c 2.5
+    vecs = {"a": ([1, 2], [2.0, 1.0]), "b": ([1, 3], [3.0, 5.0]), "c": ([2], [2.5])}
+
+    class Fake:
+        def query_points(self, name: str, *, limit: int, score_threshold: float | None = None, **kw: object) -> object:
+            pts = [SimpleNamespace(id=f"p{r}", payload={"report_id": r},
+                                   score=sum(w for i, w in zip(*v, strict=True) if i in (1, 2))
+                                   + random.uniform(-1e-6, 1e-6),  # server float noise
+                                   vector={"bm25": models.SparseVector(indices=v[0], values=v[1])})
+                   for r, v in vecs.items()]
+            pts = [p for p in pts if score_threshold is None or p.score >= score_threshold]
+            return SimpleNamespace(points=sorted(pts, key=lambda p: -p.score)[:limit])
+
+    tops = {tuple(store._top(Fake(), "c", None, "bm25", store._kind("report"), 2, sparse_query={1, 2}))  # type: ignore[arg-type]
+            for _ in range(20)}
+    assert tops == {(("a", "pa", 3.0), ("b", "pb", 3.0))}
