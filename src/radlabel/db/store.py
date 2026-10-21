@@ -36,6 +36,7 @@ def store(eng: Engine, results: Iterable[PipelineResult]) -> int:
             s.execute(delete(Report).where(Report.report_id == r.report_id))
             rep, labs = rows(r)
             s.add(rep)
+            s.flush()  # the report row first: labels reference it (no ORM relationship orders the inserts)
             s.add_all(labs)
             n += 1
     return n

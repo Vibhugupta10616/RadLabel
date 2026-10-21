@@ -70,3 +70,20 @@ def test_index_and_db_import_closure_excludes_eval_and_ground_truth() -> None:
     files = [Path(f) for m in mods if m.startswith("radlabel") and (f := getattr(__import__(m, fromlist=["x"]),
                                                                                   "__file__", None))]
     assert not [(f.name, w) for f in files for w in FORBIDDEN_TEXT if w in f.read_text(encoding="utf-8")]
+
+
+def test_store_writes_reports_before_labels_and_is_idempotent(tmp_path: Path) -> None:
+    from sqlalchemy import create_engine, event, select
+
+    from radlabel.db.models import Base, Label, Report
+    from radlabel.db.store import store as store_db
+
+    eng = create_engine(f"sqlite:///{tmp_path / 'db.sqlite'}")
+    event.listen(eng, "connect", lambda c, _: c.execute("pragma foreign_keys=ON"))  # enforce the FK like Postgres
+    Base.metadata.create_all(eng)
+    r = result(tmp_path / "r")
+    assert store_db(eng, [r, r.model_copy(update={"report_id": "43"})]) == 2
+    assert store_db(eng, [r]) == 1  # rerun replaces the report's rows
+    from sqlalchemy.orm import Session
+    with Session(eng) as s:
+        assert len(s.scalars(select(Report)).all()) == 2 and len(s.scalars(select(Label)).all()) == 26
