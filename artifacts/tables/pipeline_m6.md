@@ -1,6 +1,6 @@
 # Through the entry point (M6)
 
-3,086 unique reports joined into text with headers (codes hidden) and run through `run_pipeline`; 926 of them (30.0%, seed 13) also with a varied join. Clean joins whose labels differ from the LLM + verifier column: 1. Tagger inputs that differ from M4's, so not served by the M4 cache: 461 (no headers 309, drop section 151, clean 1; correctly parsed clean joins: 0), whose calls cost $0.27. All LLM calls so far (cost ledger): $2.63.
+3,086 unique reports joined into text with headers (codes hidden) and run through `run_pipeline`; 926 of them (30.0%, seed 13) also with a varied join. Clean joins whose labels differ from the LLM + verifier column: 1. Tagger inputs that differ from M4's, so not served by the M4 cache: 1387 (no headers 309, drop section 151, clean 1, heldout headers 926; correctly parsed clean joins: 0), whose calls cost $0.81. All LLM calls so far (cost ledger): $3.37.
 
 | Join | Reports | Sentences in the right section | Fully parsed | No sections found |
 |---|---|---|---|---|
@@ -8,6 +8,7 @@
 | alt headers | 307 | 100.0% | 307 (100.0%) | 0 |
 | no headers | 309 | 62.6% | 0 (0.0%) | 308 |
 | drop section | 310 | 100.0% | 310 (100.0%) | 0 |
+| heldout headers | 926 | 50.3% | 0 (0.0%) | 926 |
 
 Dropped sections: findings 70, impression 81, indication 81, comparison 78.
 
@@ -18,6 +19,7 @@ Headline macro-F1 (v1) on the varied reports: the same reports with the clean vs
 | alt headers | 267 | 0.815 (0.751–0.862) | 0.815 (0.751–0.862) |
 | no headers | 263 | 0.858 (0.810–0.899) | 0.864 (0.818–0.904) |
 | drop section | 276 | 0.873 (0.825–0.907) | 0.756 (0.690–0.807) |
+| heldout headers | 806 | 0.850 (0.822–0.873) | 0.850 (0.822–0.874) |
 
 Paired: pipeline clean − llm verifier 0.000 (0.000–0.000); pipeline varied − pipeline clean -0.012 (-0.017–-0.007)
 

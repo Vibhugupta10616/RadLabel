@@ -282,3 +282,12 @@ Reading: the verifier's hedge downgrade costs about 0.006 and Tier 2 recovers ab
 (Tier 2: 29 labels wrong → right vs 5 right → wrong on the 211 FAIL reports) and routing of uncertain cases to human
 review (30.9% of reports; hedged 58.1% vs clear 28.2%). That review volume is too high for production use; reducing
 it is future work.
+
+## Normal-claim count (M6; owner decision 2026-10-22)
+Generated in `artifacts/results/pipeline_m6.json` (`normal_claim`, `python -m eval.entry_point`). Definition, fixed in
+`eval/entry_point.py` (`NORMAL_SENTENCE`) before counting: every Impression sentence is a general "no acute"-type
+statement. Over all 3,086 unique texts: **1,302** such reports; expert codes normal-only 467, ignored-only 2, **not
+normal-only 833 (64.0%)** (mostly Other Abnormality 742 and Support Devices 111). The tagger predicted No Finding for
+**3 of the 833** (and for 418 of the 467 normal-only ones). Decision: the tagger does not confuse "nothing acute" with
+"fully normal", so **no intermediate label** is added. The normal check (README §6.2, free checks part 3) still runs on
+every predicted No Finding.

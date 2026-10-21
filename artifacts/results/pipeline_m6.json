@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "567b0939bdbdd9612ee05bdffa4202f53f0bceb1",
+  "git_commit": "77e8abd24cf9fd21d2a07536b6a898eae383caf8",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-21T12:17:07+00:00",
+  "created": "2026-10-21T13:00:11+00:00",
   "eval_version": "eval_v1.2",
   "llm": "gpt-4.1-mini",
   "prompt": "tier1-v1",
@@ -42,20 +42,21 @@
    }
   },
   "cache": {
-   "jobs": 4012,
+   "jobs": 4938,
    "cache_misses_this_run": 0,
    "misses_by_join_this_run": {},
    "estimated_new_spend_usd": 0.0,
    "new_spend_cap_usd": 1.0,
    "new_spend_this_run_usd": 0.0,
-   "llm_spend_total_usd": 2.6294565999999953,
-   "new_tagger_inputs": 461,
+   "llm_spend_total_usd": 3.369081399999995,
+   "new_tagger_inputs": 1387,
    "new_tagger_inputs_by_join": {
     "no_headers": 309,
     "drop_section": 151,
-    "clean": 1
+    "clean": 1,
+    "heldout_headers": 926
    },
-   "new_tagger_inputs_cost_usd": 0.2664152000000001,
+   "new_tagger_inputs_cost_usd": 0.8110287999999992,
    "clean_fully_parsed_new_inputs": 0,
    "clean_not_fully_parsed": [
     2415,
@@ -91,6 +92,13 @@
     "fully_parsed": 310,
     "fully_parsed_rate": 1.0,
     "sections_not_identified": 0
+   },
+   "heldout_headers": {
+    "n": 926,
+    "sentence_accuracy": 0.5029013539651838,
+    "fully_parsed": 0,
+    "fully_parsed_rate": 0.0,
+    "sections_not_identified": 926
    },
    "drop_section_dropped": {
     "findings": 70,
@@ -140,6 +148,20 @@
      "value": 0.7557777554048476,
      "lo": 0.6902972907086354,
      "hi": 0.8066224835617901
+    }
+   },
+   "heldout_headers": {
+    "n": 926,
+    "n_scored": 806,
+    "macro_f1_clean": {
+     "value": 0.8504609812322994,
+     "lo": 0.822273213763953,
+     "hi": 0.8734394176641426
+    },
+    "macro_f1_varied": {
+     "value": 0.8503463158521599,
+     "lo": 0.8224467466901221,
+     "hi": 0.8738492998940005
     }
    }
   },

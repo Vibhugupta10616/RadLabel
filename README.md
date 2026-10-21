@@ -66,9 +66,9 @@ All numbers come from `data_prep/` (`parse_iu.py`, `map_and_stats.py`, `coding_p
 | Unique reports with a hedged finding sentence | 279 (9.0% of unique texts) |
 | Unique reports with `XXXX` in Findings/Impression | 1,579 (51.2% of unique texts) |
 | Reports with `XXXX` within 2 words of a finding term | 415 (10.8% of **all usable** reports; 407 on unique texts) |
+| Usable reports with ≥ 1 code outside the standard labels | 54.5% (with the dropped labels mapped; slightly higher without) |
 
 The three subset counts above are defined **exactly** by `data_prep/subset_stats.py` (fixed regexes, documented counting bases). `eval/subsets.py` must import or copy those definitions unchanged. The broader hedge list in `coding_policy.py` is only for the coding-policy check in §3.4 and gives different counts.
-| Usable reports with ≥ 1 code outside the standard labels | 54.5% (with the dropped labels mapped; slightly higher without) |
 
 ### 3.4 Coding policy (measured with a heuristic sentence-level check)
 | Mention type in text | Coded by the experts |
@@ -90,7 +90,7 @@ So expert codes are reliable for **present** and **negated** findings, but **not
 | D3 | Hedged findings coded inconsistently | Excluded from headline metrics; uncertainty is kept in the output and used to **escalate to the verifier agent**, with verification metrics | §4.3 |
 | D4 | "No Finding" trap: abnormal reports with no standard label | New **Other Abnormality** label; No Finding = expert `normal` code | §4.4 |
 | D5 | Mapping choices can distort scores | Versioned mapping, automatic per-rule audit, **strict-mapping sensitivity analysis** | §4.4, §4.5 |
-| D6 | Experts sometimes missed clearly stated findings | Report **raw** and **noise-adjusted** scores | §4.6 |
+| D6 | Experts sometimes missed clearly stated findings | Report **raw** scores; **noise-adjusted** scores are deferred (stretch, decision D7) | §4.6 |
 | D7 | Over-redaction (`XXXX`) next to findings | `[REDACTED]` token, verifier exemption, separate subset | §4.7 |
 | D8 | Duplicate boilerplate reports | Duplicate clusters stay within one fold; each text counted once | §4.2 |
 | D9 | Uncoded or empty reports | Excluded (§3.3) | — |
@@ -126,7 +126,7 @@ CC BY-NC-ND allows using and adapting the data privately, but not **sharing** ad
 - In the product (v2), uncertainty's job is **escalation to the verifier agent** (§6.2). There is no human-review queue: a label the agent can't confirm stays in the output marked `unverified`. Measured:
   - **escalation rate and unverified rate on hedged vs clear reports** (should be much higher on hedged)
   - **escalation precision**: the share of escalated reports where the Tier 1 answer disagreed with the expert codes
-  - v1 (M5) measured the same with a review queue: 30.9% of reports went to review (§10).
+  - v1 (M5) measured the same with a review queue (the v1 review rate in §10).
 - Future work: RadGraph's radiologist-annotated test set (PhysioNet) for real uncertainty and span accuracy.
 
 ### 4.4 Label set and mapping v1 (D4, D5)
@@ -156,9 +156,8 @@ Rules that matter:
 - **Not mapped to Edema:** Pulmonary Congestion and Heart Failure. Reports say "vascular congestion without edema", and mapping them created positives that contradict the text. They fall into Other Abnormality.
 - **Not mapped to Lung Lesion:** Calcified Granuloma and Granulomatous Disease (benign, chronic). They fall into Other Abnormality.
 - **Lung Opacity and Lung Lesion require a lung site** (mapping cross-check, 2026-10-20): a code counts when its first sub-heading is `lung`, or when it is an allowed lung region or non-anatomical word and **no** sub-heading is a non-lung site (paratracheal, mediastinum, hilum, heart, ribs, thorax, sternum, breast, humerus, clavicle, abdomen, adipose tissue, cardiophrenic angle, supracardiac, mitral valve, thoracic vertebrae → Other Abnormality) or a pleural site (pleura, pleural sinus → Pleural Other). The full lists are in `mesh_to_labels_v1.yaml`.
-- **Lung Lesion requires a lung site.** Nodule, Mass, Cavitation and Cysts count only when the first sub-heading is `lung` or is not an anatomical site (e.g. none, right, left, multiple, scattered, bilateral). Codes with another site (e.g. `Cysts/humerus`, `Mass/breast`, `Nodule/heart`, `Nodule/pleura`, `Mass/mediastinum`, `Nodule/thorax`, `Mass/thorax`) go to **Other Abnormality**. Reason: `Cysts/humerus` is a bone cyst, found in the mapping audit.
+- **Lung Lesion requires a lung site.** Nodule, Mass and Cavitation count only when the first sub-heading is `lung` or is not an anatomical site (e.g. none, right, left, multiple, scattered, bilateral). Codes with another site (e.g. `Cysts/humerus`, `Mass/breast`, `Nodule/heart`, `Nodule/pleura`, `Mass/mediastinum`, `Nodule/thorax`, `Mass/thorax`) go to **Other Abnormality**. Cysts never count (owner decision after the M1 audit): `Cysts/humerus`, a bone cyst found in the mapping audit, showed the problem.
 - **`Pleura/…/blunted` is not Pleural Other.** A blunted pleural angle usually hints at effusion but isn't a confirmed effusion, so it goes to **Other Abnormality**, like `Costophrenic Angle/blunted`. Found in the mapping audit (n = 3).
-- The positive counts marked *(rerun)* are regenerated by M1 after these two fixes and written into this table from `data_card.json`.
 - **Hierarchy:** scoring uses these **leaf** definitions only, with no closure, so Lung Opacity is scored against its own direct codes. The extractor prompt and verifier use the same definitions, so propagated parent labels can't create false positives.
 
 ### 4.5 Mapping audit and sensitivity (D5)
@@ -170,7 +169,7 @@ Rules that matter:
 
 ### 4.6 Label noise (D6)
 - **Raw score:** against the expert codes. This is the official number.
-- **Noise-adjusted score:** a case is set aside when the model says `present`, the code is absent, and an **independent** evaluation-only detector (negspacy + the eval lexicon, not the pipeline's negation module) finds a clear, non-negated, non-hedged mention in the text. Reported as an estimate, with the number of cases set aside.
+- **Noise-adjusted score** (deferred, stretch; owner decision D7): a case is set aside when the model says `present`, the code is absent, and an **independent** evaluation-only detector (negspacy + the eval lexicon, not the pipeline's negation module) finds a clear, non-negated, non-hedged mention in the text. Reported as an estimate, with the number of cases set aside.
 - The true performance lies between the two.
 
 ### 4.7 Redactions (D7)
@@ -320,7 +319,7 @@ Evidence is always sentence IDs that exist in the report, and the sentence text 
   - Both hold → No Finding is `verified_rules`, with the normal statements as its evidence.
   - Either fails → the report escalates. The agent then either confirms No Finding (`verified`), or **withholds it** (`corrected` to not_mentioned) and adds the abnormal findings it found as `suggested` labels, with evidence.
   - Reported (secondary): No Finding precision before and after the checks and the agent, and how many predicted normals were withheld.
-  - **The "intermediate" state:** between the tagger and the normal check, No Finding is only a *proposed* label, not a final one. It is an internal state, not a new label: there is **no** extra training column (e.g. a derived `no_acute_findings` tag), because the dataset has no ground truth for it and the tagger already reads Findings. The M6 normal-claim count decides whether that is enough; a derived intermediate tag would only be added if the count shows the tagger confusing "nothing acute" with "fully normal", and only with the owner's OK.
+  - **The "intermediate" state:** between the tagger and the normal check, No Finding is only a *proposed* label, not a final one. It is an internal state, not a new label: there is **no** extra training column (e.g. a derived `no_acute_findings` tag), because the dataset has no ground truth for it and the tagger already reads Findings. The M6 normal-claim count settled this (owner, 22 Oct 2026): 1,302 unique reports have an Impression made only of "no acute"-type statements, 833 of them (64.0%) have expert codes that are not normal-only, and the tagger predicted No Finding for only 3 of those 833. The tagger does not confuse "nothing acute" with "fully normal", so **no intermediate label** is added; the normal check still runs on every predicted No Finding.
 - **Verifier agent** (v2, M7; `verifier_agent.py`, LangGraph ReAct): runs **only on escalated reports**. Everything else ends as `verified_rules`.
   - **Model:** the agent deployment (gpt-5-mini), with its own prompt, not the tagger's.
   - **Input:** the report's sentences, the tagger's labels **without the tagger's evidence** (blind first: the agent finds evidence itself), and the escalation reasons (check messages, recall-scan disagreements). Never expert codes, folds, eval mentions or metrics (leakage test).
@@ -469,7 +468,7 @@ All metrics use **out-of-fold predictions** from the stratified 5-fold CV (§4.2
   - final-label macro-F1 vs LLM only and vs LLM + verifier + Tier 2 (paired bootstrap). The agent is **kept** only if its F1 vs LLM + verifier + Tier 2 is not significantly lower.
   - labels changed: wrong → right vs right → wrong, per label; `suggested` labels that are correct vs wrong (the recall effect).
   - **the key result:** precision and F1 of `verified` / `verified_rules` labels vs `unverified` labels. If unverified labels are not clearly less accurate, the verification state carries no information, and that is reported.
-  - escalation rate (share of reports sent to the agent), escalation precision, and the share of labels and reports ending `unverified`, on hedged vs clear reports. This replaces v1's review rate (30.9%).
+  - escalation rate (share of reports sent to the agent), escalation precision, and the share of labels and reports ending `unverified`, on hedged vs clear reports. This replaces the v1 review rate in §10.
   - evidence agreement: how often the agent's evidence matches the tagger's (blind-first design).
   - No Finding precision before and after the normal check and the agent, and the number of predicted normals withheld, right vs wrong (secondary).
   - cost per report and in total; tool calls per report; caps hit.
@@ -617,7 +616,7 @@ Headline macro-F1 (9 labels, v1), same out-of-fold reports and the same 1,000 cl
 
 Labels produced by `run_pipeline(raw_text)` (parse → tag → verifier), as an upload would be. Without headers the parser can't separate sections, so the whole text, including the indication, is read as Findings.
 
-3,086 unique reports joined into text with headers (codes hidden) and run through `run_pipeline`; 926 of them (30.0%, seed 13) also with a varied join. Clean joins whose labels differ from the LLM + verifier column: 1. Tagger inputs that differ from M4's, so not served by the M4 cache: 461 (no headers 309, drop section 151, clean 1; correctly parsed clean joins: 0), whose calls cost $0.27. All LLM calls so far (cost ledger): $2.63.
+3,086 unique reports joined into text with headers (codes hidden) and run through `run_pipeline`; 926 of them (30.0%, seed 13) also with a varied join. Clean joins whose labels differ from the LLM + verifier column: 1. Tagger inputs that differ from M4's, so not served by the M4 cache: 1387 (no headers 309, drop section 151, clean 1, heldout headers 926; correctly parsed clean joins: 0), whose calls cost $0.81. All LLM calls so far (cost ledger): $3.37.
 
 | Join | Reports | Sentences in the right section | Fully parsed | No sections found |
 |---|---|---|---|---|
@@ -625,6 +624,7 @@ Labels produced by `run_pipeline(raw_text)` (parse → tag → verifier), as an 
 | alt headers | 307 | 100.0% | 307 (100.0%) | 0 |
 | no headers | 309 | 62.6% | 0 (0.0%) | 308 |
 | drop section | 310 | 100.0% | 310 (100.0%) | 0 |
+| heldout headers | 926 | 50.3% | 0 (0.0%) | 926 |
 
 Dropped sections: findings 70, impression 81, indication 81, comparison 78.
 
@@ -635,6 +635,7 @@ Headline macro-F1 (v1) on the varied reports: the same reports with the clean vs
 | alt headers | 267 | 0.815 (0.751–0.862) | 0.815 (0.751–0.862) |
 | no headers | 263 | 0.858 (0.810–0.899) | 0.864 (0.818–0.904) |
 | drop section | 276 | 0.873 (0.825–0.907) | 0.756 (0.690–0.807) |
+| heldout headers | 806 | 0.850 (0.822–0.873) | 0.850 (0.822–0.874) |
 
 Section subsets (as parsed; headline macro-F1, v1, hedged + pilot excluded):
 
@@ -658,6 +659,23 @@ Section subsets (as parsed; headline macro-F1, v1, hedged + pilot excluded):
 | LLM + verifier + Tier 2 − LLM only | 0.000 (-0.004–0.004) | 0.003 (0.000–0.007) |
 | v1 review rate | 30.9% | 30.5% |
 
+### Verifier agent: escalation and dev slice (M7, before the full run)
+
+Free checks on all 3,086 unique reports (clean join, tagger from cache, no agent call, $0): **1,290 reports escalate (41.8%)**; hedged 67.0% vs clear 39.3%; 1,777 labels. 7 content-filtered reports end `unverified` without an agent call.
+
+| Reason | Reports | Labels | Reports with only this reason |
+|---|---|---|---|
+| section rule | 778 | 911 | 153 |
+| recall scan | 576 | 617 | 0 |
+| evidence mentions label | 424 | 463 | 265 |
+| normal check | 278 | 278 | 160 |
+| hedge consistency | 105 | 125 | 58 |
+| negation consistency | 14 | 16 | 8 |
+
+Escalation precision (tagger labels disagree with the codes): reports 44.3%, labels 32.6%; base rate 25.0%; not escalated 11.2% (201 reports). Predicted No Finding 577: normal check passed 299 (precision 99.0%), failed 278 (precision 99.3%).
+
+Verifier agent on the **dev slice only** (38 escalated of 102 Tier 1 pilot reports; not a headline result), prompt `verifier-v2` (frozen): labels changed vs the codes wrong → right 11, right → wrong 3; suggested correct 3, wrong 3; verified 24, corrected 11, unverified 4; mean tool calls 1.87; $0.0017 per report. Estimated full run: 1,252 reports, $2.10.
+
 <!-- results:end -->
 
 ## 11. Limitations
@@ -669,12 +687,13 @@ Section subsets (as parsed; headline macro-F1, v1, hedged + pilot excluded):
 - Mapping v1 is lossy, and two standard labels are dropped. Results are shown under v1 and strict.
 - Some clearly stated findings were not coded, so the raw scores are a lower bound (§4.6).
 - Reports refused by the Azure content filter get no LLM output; they are scored with the rule baseline's labels (v1: routed to review; v2: their labels are `unverified`).
-- v1 routed 30.9% of reports to human review, too high for production use. v2 replaces the review queue with the verifier agent and an `unverified` mark; whether that mark is informative is measured in M7 (§8.1).
+- v1 routed too many reports to human review for production use (the v1 review rate in §10). v2 replaces the review queue with the verifier agent and an `unverified` mark; whether that mark is informative is measured in M7 (§8.1).
 - The verifier agent reads the same report text as the tagger, so `verified` is a consistency check by a second model with different tools, not independent proof. Verbatim evidence shows the sentence exists, not that it caused the label.
-- The evaluation joins IU's pre-split sections into one text; real uploads are messier, so the varied-join test only partly measures the parser.
+- The evaluation joins IU's pre-split sections into one text; real uploads are messier, so the varied-join test only partly measures the parser (a held-out set of header names the parser doesn't know is reported separately, §10).
+- When the parser finds no sections, the whole text is read as Findings, so the tagger **also reads the indication** (it can't be separated). Such outputs carry `sections_identified: false`, visible to the verifier agent and in the UI.
 - About 11% of reports have redactions next to finding terms.
 - Subsets and noise adjustment depend on a rule-based eval detector, deliberately separate from the pipeline's own.
-- Rare labels have 27–49 positives in total, hence wide CIs.
+- Rare labels have 27–53 positives in total, hence wide CIs.
 - Labels describe the report text, not the image.
 - The CC BY-NC-ND licence keeps models and processed data private.
 - Pipeline aliases and the eval lexicon share standard vocabulary (same author); independence comes from expert-code ground truth and separate negation detectors.

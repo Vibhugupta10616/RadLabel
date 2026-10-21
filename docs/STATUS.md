@@ -13,7 +13,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M4 | **Done** (acceptance: rerun from cache $0, 3,086/3,086 cached, outputs byte-identical) | gpt-4.1-mini over 3,086 texts, after the splitter fix: invalid 0, content-filtered 7 (policy: scored with rule-baseline labels), Tier 2: 211 (6.8%), review escalations 785. Macro-F1 (9 headline, v1, pilot excluded): rule 0.838, LLM 0.862, LLM+verifier 0.857; paired LLM − rule +0.025 (0.010–0.040). Tier 0: 0 OOF hits by construction. Total LLM spend $2.12. Pre-splitter results: tag `m4-pre-splitter`. |
 | M5 | **Done** (rerun from cache $0, outputs byte-identical) | Tier 2 repair agent (gpt-5-mini-2025-08-07, `repair-v1`, LangGraph, 6 tool calls / 60K tokens per report) on the 211 FAIL reports: repair success 78/211 (37.0%), 0 refusals, 0 errors. Macro-F1 v1: LLM+verifier 0.857 → +Tier 2 0.862; paired +0.006 (0.003–0.009) → **kept** (pre-committed rule); vs rule +0.025 (0.010–0.040). Labels changed 75: wrong→right 29, right→wrong 5. Review 954 (hedged 58.1% vs clear 28.2%); escalation precision Tier 2 64.9% (base 25.5%). Spend $0.26; total $2.38. |
 | M6 | **Done** (code `567b093`; results rerun from cache at that commit, $0) | Through `run_pipeline`: clean join headline macro-F1 (v1) 0.860 (0.845–0.873), identical to LLM + verifier (paired 0.000; 1 report differs: IU text with inner "Impression:" headers); 30% varied joins 0.848, paired varied − clean −0.012 (−0.017 to −0.007). Parser: clean 100.0% of sentences in the right section, 3,083/3,086 fully parsed; alternative headers 100%; no headers 62.6% (308/309 no sections found). Correctly parsed clean joins: 0 new tagger inputs (all from the M4 cache). Hedge fix: conversions 147 → 125, LLM + verifier 0.857 → 0.860, Cardiomegaly F1 0.914 → 0.944. Normal-claim count: 833 of 1,302 (64.0%) "no acute" impressions have non-normal codes; the tagger predicted No Finding for 3 of them. Spend $0.25 (461 new tagger inputs); total $2.63. |
-| M7 | **next** (waits for owner OK) | Free checks with v2 escalation + recall scan (rule labeller as second reader) + normal check; ReAct verifier agent (blind first, caps); dev-slice prompt development and freeze; cost estimate before the full run. |
+| M7 | **in progress: stopped before the full run** (code `77e8abd`) | Free checks on all 3,086 reports ($0): 1,290 escalate (41.8%; hedged 67.0% vs clear 39.3%), 1,252 outside the dev slice. Verifier agent prompt `verifier-v2` frozen on the dev slice (v1–v3 tried; v2 kept by the pre-set rule): 38 escalated dev reports, wrong → right 11 vs right → wrong 3, suggested 3 correct / 3 wrong, 1.87 tool calls, $0.0017 per report. Estimated full run $2.10. **Waiting for owner OK.** |
 | M8 | planned | Postgres `labels` (verification state + evidence), Qdrant index (report + contextual sentence points, indication field, BM25), RRF, retrieval eval incl. report-to-report. |
 | M9 | planned | Negation-aware embedding fine-tuning per fold (`CachedGISTEmbedLoss`), held-out eval vs the filter baseline; serving model; agent's `find_by_meaning` switches to it. |
 | M10 | planned | Query agent + tools + guardrails, question set, agent eval on expert and predicted label tables. |
@@ -60,7 +60,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 
 **Budget:** `MAX_LLM_USD=20` (`.env.example`; `.env` uses the same value). Stop rule (`src/radlabel/llm/client.py`, `BUDGET_FRACTION = 0.5`): fresh LLM calls are refused once the ledger total reaches 50% of `MAX_LLM_USD`, i.e. **$10**; cache hits are always free; the owner raises the limit explicitly. Per-run caps sit inside it (M5: $3 of new spend).
 
-`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$2.63** after M6 (M6: $0.25) (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
+`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$3.37** (M6 $0.25; M6 follow-up $0.54; M7 dev slice $0.20) (ledger `artifacts/llm_cache/ledger.jsonl`; README §10).
 
 ## M2 notes
 - `iterstrat` (README §4.2 fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
@@ -124,6 +124,36 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
   Cardiomegaly 30, Lung Lesion 28. The tagger predicted No Finding for 3 of the 833 and for 418 of the 467
   normal-only ones, so it does not confuse "nothing acute" with "fully normal" (README §6.2: no intermediate tag).
 - `results.git_commit()` no longer counts README.md as dirty code (docs + generated §10), like `docs/`.
+
+## M6 follow-ups (owner, 2026-10-22)
+- README: six fixes (Cysts, stale "(rerun)" note, rare positives 27–53, table row, noise-adjusted deferred per D7,
+  v1 review rate referred to §10); normal-claim finding added (§6.2, `docs/evaluation_notes.md`); no-header
+  limitation (§11); §13 restored (the deletion was unintended).
+- `run_pipeline` output carries `sections_identified` at the top level.
+- Held-out header names (10, written before running, never added to the parser): parser recognises none; 926/926
+  reports end with no sections found, 50.3% of sentences in the right section, 0 fully parsed; macro-F1 on the same
+  reports 0.850 clean vs 0.850 held-out (everything is read as Findings). Cost $0.54.
+
+## M7 notes (before the full run)
+- Escalation (`artifacts/results/verifier_escalation.json`): reports by reason (several per report possible):
+  section_rule 778, recall_scan 576, evidence_mentions_label 424 (FAIL or [REDACTED] on present/uncertain),
+  normal_check 278, hedge_consistency 105, negation_consistency 14. The recall scan is never the only reason: every
+  recall-scan escalation also has a section_rule flag. Escalation precision: reports 44.3% (base rate
+  25.0%; not escalated 11.2%, 201 reports), labels 32.6%.
+- **Normal check:** 577 predicted No Finding; 278 fail the check (mostly no specific heart/lung statement), but the
+  tagger's No Finding precision is 99.3% on those (99.0% on the 299 that pass). So the check escalates ~280 reports
+  with little to catch. Not changed (it's an out-of-fold result): owner decision.
+- Dev-slice development (102 pilot reports, 38 escalate): v1 net −5 (9 wrong → right, 14 right → wrong; the agent
+  read "upper limits of normal" as Cardiomegaly, scarring as Lung Opacity, removed devices as present, congestion as
+  Edema); v2 adds the frozen label definitions to the prompt, "an escalation is not evidence", removed/resolved and
+  size-qualifier rules: net +8; v3 (+ a scarring line) net +4, so v2 is frozen (rule fixed before the v3 run).
+  gpt-5-mini is not deterministic (temperature not settable), so part of the v2/v3 gap may be run-to-run noise.
+- `suggested` labels count as `present` in the final labels (and in scoring); `verified`/`corrected`/`unverified`
+  keep or change the status as the agent decided.
+- `find_by_meaning` uses the base `BAAI/bge-small-en-v1.5` (optional extra `embed`; installed locally, not in CI).
+- `normal_phrases.yaml` gained a `heart_normal` anchor used only by the normal check ("Heart size normal." has no
+  verb the pipeline negation catches); the evidence check is unchanged.
+- Spend: held-out headers $0.54, dev runs v1/v2/v3 $0.20; total **$3.37**.
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.

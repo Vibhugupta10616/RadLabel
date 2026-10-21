@@ -1,0 +1,123 @@
+{
+ "provenance": {
+  "git_commit": "77e8abd24cf9fd21d2a07536b6a898eae383caf8",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "dev_slice",
+  "created": "2026-10-21T13:00:27+00:00",
+  "eval_version": "eval_v1.2",
+  "llm": "gpt-5-mini",
+  "prompt": "verifier-v2"
+ },
+ "results": {
+  "prompt_version": "verifier-v2",
+  "prompt_sha256": "614d6b64037421e18bab602c68ea6b02ef8e49f22a9422d7012f0f3e87216fcc",
+  "dev_reports": 102,
+  "escalated_dev_reports": 38,
+  "agent_runs": 38,
+  "stop_reasons": {
+   "submitted": 38
+  },
+  "mean_tool_calls": 1.868421052631579,
+  "tool_usage": {
+   "find_by_alias": 17,
+   "submit": 38,
+   "check_negation": 7,
+   "check_redaction": 4,
+   "normal_check": 5
+  },
+  "verification_counts": {
+   "verified_rules": 449,
+   "corrected": 11,
+   "verified": 21,
+   "suggested": 6,
+   "verified_impression_only": 3,
+   "unverified": 4
+  },
+  "per_label": {
+   "No Finding": {
+    "unverified": 1,
+    "verified": 7,
+    "verified_impression_only": 1
+   },
+   "Cardiomegaly": {
+    "corrected": 3,
+    "verified_impression_only": 1
+   },
+   "Lung Opacity": {
+    "suggested": 4,
+    "corrected": 4,
+    "verified": 3
+   },
+   "Lung Lesion": {
+    "verified": 2,
+    "suggested": 1
+   },
+   "Atelectasis": {
+    "verified": 1,
+    "unverified": 1
+   },
+   "Pleural Effusion": {
+    "verified_impression_only": 1,
+    "corrected": 1
+   },
+   "Support Devices": {
+    "corrected": 1,
+    "verified": 6,
+    "unverified": 2
+   },
+   "Other Abnormality": {
+    "suggested": 1
+   },
+   "Edema": {
+    "corrected": 1
+   },
+   "Pleural Other": {
+    "verified": 1
+   },
+   "Consolidation": {
+    "corrected": 1,
+    "verified": 1
+   }
+  },
+  "present_flips_vs_codes": {
+   "wrong_to_right": 11,
+   "right_to_wrong": 3
+  },
+  "suggested_vs_codes": {
+   "wrong": 3,
+   "correct": 3
+  },
+  "evidence_agreement_with_tagger": 1.0,
+  "unverified_labels": 4,
+  "reports_with_unverified": 4,
+  "models_returned": [
+   "gpt-5-mini-2025-08-07"
+  ],
+  "cost_dev_usd": 0.06381429999999998,
+  "mean_cost_per_escalated_report_usd": 0.001679323684210526,
+  "new_spend_this_run_usd": 0.0,
+  "llm_spend_total_usd": 3.369081399999995,
+  "full_run_escalated_reports_outside_dev": 1252,
+  "full_run_estimated_cost_usd": 2.1025132526315784
+ }
+}

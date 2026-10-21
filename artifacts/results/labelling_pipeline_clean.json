@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "567b0939bdbdd9612ee05bdffa4202f53f0bceb1",
+  "git_commit": "77e8abd24cf9fd21d2a07536b6a898eae383caf8",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1+strict",
   "fold": "oof",
-  "created": "2026-10-21T12:16:59+00:00",
+  "created": "2026-10-21T13:00:09+00:00",
   "system": "pipeline_clean",
   "eval_version": "eval_v1.2",
   "llm": "gpt-4.1-mini",
