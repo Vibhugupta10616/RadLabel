@@ -35,7 +35,11 @@ from radlabel.results import write_result
 SPEC = Path("eval/queries/retrieval_v1.yaml")
 MATERIALIZED = Path("eval/queries/retrieval_v1_queries.json")  # query texts and query report ids only, committed
 TMP, TMP_PLAIN = "radlabel_eval_tmp", "radlabel_eval_tmp_plain"
-VARIANTS = ("bm25", "dense_report", "dense_sentence", "dense_sentence_ctx", "dense_sentence_ctx_filter", "rrf")
+VARIANTS = ("bm25", "dense_report", "dense_sentence", "dense_sentence_filter", "rrf_plain", "dense_sentence_ctx",
+            "dense_sentence_ctx_filter", "rrf")
+# "simpler" first (owner rule, before M9): one retriever before a filter before fusion; no prefix before the prefix
+SIMPLICITY = ("bm25", "dense_report", "dense_sentence", "dense_sentence_filter", "rrf_plain", "dense_sentence_ctx",
+              "dense_sentence_ctx_filter", "rrf")
 SETS = ("seen_label", "heldout_label", "heldout_alias", "attribute", "compositional", "report_to_report")
 K, DEEP, N_BOOT = 10, 100, 1000
 
@@ -192,8 +196,14 @@ def run() -> dict[str, Any]:
             text, v = qtext[q["id"]], np.asarray(qvec[q["id"]])
             bm = store.search_bm25(client, TMP, text, DEEP + 1)
             dn = store.search_sentences(client, TMP, v, DEEP + 1)
+            ds = store.search_sentences(client, TMP_PLAIN, v, DEEP + 1)  # its top K + 1 = the K + 1 search
             ranked = {"bm25": bm, "dense_report": store.search_reports(client, TMP, v, K + 1),
-                      "dense_sentence": store.search_sentences(client, TMP_PLAIN, v, K + 1), "dense_sentence_ctx": dn,
+                      "dense_sentence": ds[:K + 1],
+                      "dense_sentence_filter": store.search_sentences(client, TMP_PLAIN, v, K + 1,
+                                                                      exclude_negation_only=True),
+                      "rrf_plain": store.rrf([x for x in bm if x[0] != drop], [x for x in ds if x[0] != drop],
+                                             top=K + 1),
+                      "dense_sentence_ctx": dn,
                       "dense_sentence_ctx_filter": store.search_sentences(client, TMP, v, K + 1,
                                                                           exclude_negation_only=True),
                       "rrf": store.rrf([x for x in bm if x[0] != drop], [x for x in dn if x[0] != drop], top=K + 1)}
@@ -222,14 +232,28 @@ def run() -> dict[str, Any]:
                         "contamination": _ci([x["contamination"] for x in rows if x["contamination"] is not None]),
                         "per_fold": per_fold}
         out["variants"][name] = block
+    out["best_base"] = best_base(out["variants"])
     write_result("retrieval_base", out, fold="per fold + pooled", mapping_version="v1", eval_version="eval_v1.2",
                  retrieval_spec=sp["version"], llm="none")
     (TABLES / "retrieval_base.md").write_text(render(out), encoding="utf-8")
     return out
 
 
+def best_base(variants: dict[str, Any]) -> dict[str, Any]:
+    """Best base combination by pooled nDCG@10 (owner rule, before M9): if the top two are within each other's 95% CI
+    they are tied and the simpler one (SIMPLICITY) is chosen."""
+    order = sorted(variants, key=lambda v: -variants[v]["all"]["ndcg"]["value"])
+    a, b = (variants[v]["all"]["ndcg"] for v in order[:2])
+    tied = b["value"] >= a["lo"] and a["value"] <= b["hi"]
+    pick = min(order[:2], key=SIMPLICITY.index) if tied else order[0]
+    return {"variant": pick, "top_two": order[:2], "tied": tied,
+            "rule": "highest pooled nDCG@10; if the top two are within each other's 95% CI, the simpler one"}
+
+
 NAMES = {"bm25": "BM25", "dense_report": "base bge-small, report-level",
          "dense_sentence": "base bge-small, sentences without prefix (pure embedding)",
+         "dense_sentence_filter": "base bge-small, no prefix + negated-sentence filter",
+         "rrf_plain": "base no-prefix sentences + BM25 (RRF)",
          "dense_sentence_ctx": "base bge-small, contextual sentences",
          "dense_sentence_ctx_filter": "base bge-small + negated-sentence payload filter (no training)",
          "rrf": "base contextual sentences + BM25 (RRF)"}

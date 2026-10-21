@@ -26,6 +26,12 @@ variants:
   dense_sentence: >-
     base bge-small, one point per sentence WITHOUT the contextual prefix (no predicted labels in the text); top 200
     sentences, max score per report
+  # added 2026-10-22 before M9 (owner-approved; queries unchanged): base combinations without the prefix
+  dense_sentence_filter: "as dense_sentence, excluding negation_only sentence points (pipeline negation tags)"
+  rrf_plain: "reciprocal rank fusion (k = 60) of the bm25 and dense_sentence report rankings (top 100 of each)"
+  # best base combination (owner rule, before M9): highest pooled nDCG@10; if the top two are within each other's 95%
+  # CI they are tied and the simpler one wins (order: bm25, dense_report, dense_sentence, dense_sentence_filter,
+  # rrf_plain, dense_sentence_ctx, dense_sentence_ctx_filter, rrf)
   dense_sentence_ctx: >-
     base bge-small, one point per sentence with the contextual prefix "[Findings | report also mentions: a, b] text"
     built from PREDICTED v2 labels (status present, No Finding excluded); top 200 sentences, max score per report
