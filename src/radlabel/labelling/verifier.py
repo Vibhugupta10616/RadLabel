@@ -1,4 +1,4 @@
-"""Deterministic verifier (README §6.2). Every check has unit tests (tests/test_verifier.py).
+"""Deterministic verifier (SPEC §6.2). Every check has unit tests (tests/test_verifier.py).
 
 | Check                   | Rule                                                                              |
 | evidence_exists         | present/absent/uncertain cite >= 1 valid sentence ID; invalid IDs fail; absent    |
@@ -10,7 +10,7 @@
 |                         | pipeline negation was wrong in 20/23 full-run fails, owner rule)                   |
 | hedge_consistency       | present, but the only cited evidence is hedged -> converted to uncertain + flag;  |
 |                         | wording the label's definition counts as present ("borderline" cardiomegaly) is   |
-|                         | not a hedge for that label (M6 consistency fix, README §6.2)                      |
+|                         | not a hedge for that label (M6 consistency fix, SPEC §6.2)                      |
 | no_finding_exclusivity  | No Finding present => no other label present (No Finding is derived in code, see |
 |                         | schema.derive_no_finding, so its own evidence is not checked)                     |
 | section_rule            | Impression overrides Findings only on an explicit same-label contradiction;       |
@@ -33,7 +33,7 @@ from radlabel.preprocess.text import REDACTED
 
 NORMAL_PHRASES = Path(__file__).with_name("normal_phrases.yaml")
 # Wording that a label's definition counts as present (frozen Tier 1 prompt: Cardiomegaly "including mild or
-# borderline-stated enlargement") is not a hedge for that label in hedge_consistency (M6, README §6.2).
+# borderline-stated enlargement") is not a hedge for that label in hedge_consistency (M6, SPEC §6.2).
 DEFINITION_PRESENT: dict[str, frozenset[str]] = {"Cardiomegaly": frozenset({"borderline", "mild"})}
 
 
@@ -109,7 +109,7 @@ def verify(out: ReportLabels, sentences: list[Sentence]) -> ReportLabels:
 
 
 def section_rule(label: str, status: str, sentences: list[Sentence], ments: dict[str, list[Mention]]) -> str | None:
-    """Impression overrides Findings only on an explicit same-label contradiction (README §6.2)."""
+    """Impression overrides Findings only on an explicit same-label contradiction (SPEC §6.2)."""
     def sec(section: str) -> list[Mention]:
         return [m for s in sentences if s.section == section for m in ments[s.id] if m.label == label]
 

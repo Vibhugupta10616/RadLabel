@@ -1,4 +1,4 @@
-"""Label set (README §4.4). Shared by serving and evaluation; holds no expert data."""
+"""Label set (SPEC §4.4). Shared by serving and evaluation; holds no expert data."""
 
 NO_FINDING = "No Finding"
 OTHER = "Other Abnormality"

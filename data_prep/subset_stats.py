@@ -1,4 +1,4 @@
-"""Reference definitions for the README §3.3 subset counts (hedged, XXXX, redaction-adjacent).
+"""Reference definitions for the SPEC §3.3 subset counts (hedged, XXXX, redaction-adjacent).
 
 Usage: python -I subset_stats.py iu_mapped.jsonl
 Input: the usable-reports JSONL written by map_and_stats.py (3,832 rows).

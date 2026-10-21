@@ -4,9 +4,9 @@
   and CI needs no API calls. Cache files hold report text: `LLM_CACHE_DIR` is git-ignored.
 - Ledger (`<cache>/ledger.jsonl`): one line per fresh call with tokens, cost and the `model` field the
   API returned. A changed `model` for a deployment logs a warning (silent upgrades).
-- Budget: fresh calls stop at 50% of MAX_LLM_USD (README §7.1); the owner raises it explicitly.
+- Budget: fresh calls stop at 50% of MAX_LLM_USD (SPEC §7.1); the owner raises it explicitly.
 - 429: wait (Retry-After if given, else exponential) and retry; never surfaces as a failed label.
-- Deployments without a verified price are refused (README §7.1).
+- Deployments without a verified price are refused (SPEC §7.1).
 """
 
 from __future__ import annotations

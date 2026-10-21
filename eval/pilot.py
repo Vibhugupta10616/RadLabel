@@ -1,4 +1,4 @@
-"""Tier 1 model-selection pilot (README §7.1, M4a): ~100 reports from training folds only.
+"""Tier 1 model-selection pilot (SPEC §7.1, M4a): ~100 reports from training folds only.
 
 Sample: 100 exact-text representatives from the inner-validation clusters of fold 0 (= fold 0's training
 folds), multilabel-stratified (iterstrat, seed SEED). Each candidate runs at temperature 0 (GPT-5.x with

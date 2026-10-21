@@ -1,4 +1,4 @@
-"""Pipeline NegEx-style mention detection (README §6.1). Independent of the eval-only detector
+"""Pipeline NegEx-style mention detection (SPEC §6.1). Independent of the eval-only detector
 (`eval/subsets.py`, negspacy): own cue lists, written from the NegEx literature (Chapman et al. 2001).
 
 Per sentence: tokens -> clauses (boundaries: but, however, although, though, except, whereas, yet, which, ";")
@@ -132,7 +132,7 @@ def _mentions(text: str) -> tuple[Mention, ...]:
 
 
 def redaction_adjacent(text: str, window: int = 2) -> bool:
-    """[REDACTED] within `window` tokens of any alias mention (README §4.7)."""
+    """[REDACTED] within `window` tokens of any alias mention (SPEC §4.7)."""
     tokens = normalise(text).split()
     red = [i for i, t in enumerate(tokens) if t == "[redacted]"]
     return any(m.start - window <= r < m.end + window for m in mentions(text) for r in red)

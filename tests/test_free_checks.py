@@ -1,4 +1,4 @@
-"""Free checks (README §6.2, M7): v2 escalation rules, recall scan, normal check. One test per rule."""
+"""Free checks (SPEC §6.2, M7): v2 escalation rules, recall scan, normal check. One test per rule."""
 
 from test_repair_agent import tier1
 
@@ -44,7 +44,7 @@ def test_escalating_flags_and_recorded_only_flags() -> None:
 
 
 def test_generic_impression_keeps_findings_and_does_not_escalate() -> None:
-    """README §6.2: Findings "mild cardiomegaly" + Impression "no acute disease" -> Cardiomegaly stays present."""
+    """SPEC §6.2: Findings "mild cardiomegaly" + Impression "no acute disease" -> Cardiomegaly stays present."""
     v, s = tagged("Mild cardiomegaly.", "No acute disease.", Cardiomegaly=("present", ["F1"]))
     assert v.status("Cardiomegaly") == "present" and not escalations(v, s)
 

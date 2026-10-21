@@ -12,7 +12,7 @@ def redact(text: str) -> str:
 
 
 def norm_text(text: str) -> str:
-    """Normalisation used for exact-duplicate detection (README §3.3)."""
+    """Normalisation used for exact-duplicate detection (SPEC §3.3)."""
     t = text.lower().replace("xxxx", " ")
     t = re.sub(r"[^a-z ]", " ", t)
     return re.sub(r"\s+", " ", t).strip()

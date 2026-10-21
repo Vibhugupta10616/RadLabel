@@ -1,4 +1,4 @@
-"""Report parser (README §6.1, M6): raw report text -> indication / comparison / findings / impression.
+"""Report parser (SPEC §6.1, M6): raw report text -> indication / comparison / findings / impression.
 
 Header matching, case-insensitive, with common variants ("Clinical history", "Reason for exam", "Conclusion", ...).
 A header counts at the start of the text, of a line or of a sentence, followed by ":" or "-" (or alone on its

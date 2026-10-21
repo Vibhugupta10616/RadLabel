@@ -1,4 +1,4 @@
-"""Parser (README §6.1) and run_pipeline wiring."""
+"""Parser (SPEC §6.1) and run_pipeline wiring."""
 
 import json
 from pathlib import Path

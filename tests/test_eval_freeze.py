@@ -1,4 +1,4 @@
-"""eval_v1.2 is PERMANENTLY frozen at the end of M1 (README §4.8). Changing these files is a hard
+"""eval_v1.2 is PERMANENTLY frozen at the end of M1 (SPEC §4.8). Changing these files is a hard
 stop: it needs owner approval, an entry in docs/eval_changelog.md, and a new hash here."""
 
 import hashlib

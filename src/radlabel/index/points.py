@@ -1,4 +1,4 @@
-"""Index points (README §6.3, M8), built from a PipelineResult only.
+"""Index points (SPEC §6.3, M8), built from a PipelineResult only.
 
 - One report point (Findings + Impression) and one point per sentence, with its section ("unknown" when the parser
   found no sections). Sentence text gets a contextual prefix from the PREDICTED labels:

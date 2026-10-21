@@ -1,4 +1,4 @@
-"""Tier 2 repair agent (README §6.2): a bounded LangGraph tool loop, then re-verification.
+"""Tier 2 repair agent (SPEC §6.2): a bounded LangGraph tool loop, then re-verification.
 
 - Inputs are ONLY the report's sentences, its verified Tier 1 labels and the verifier FAIL messages (owner, M5).
   Never expert codes, eval mentions, folds or metrics: tests/test_repair_leakage.py.
@@ -31,7 +31,7 @@ from radlabel.preprocess.negation import Mention, mentions
 from radlabel.preprocess.sentences import Sentence
 
 PROMPT_VERSION = "repair-v1"
-MAX_TOOL_CALLS = 6  # README §6.2
+MAX_TOOL_CALLS = 6  # SPEC §6.2
 MAX_REPORT_TOKENS = 60_000  # input + output over all calls of one report
 MAX_COMPLETION_TOKENS = 4_000  # per call (reasoning included); Azure counts it against REPAIR_TPM
 REASONING_EFFORT = "low"

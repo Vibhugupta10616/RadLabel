@@ -1,4 +1,4 @@
-"""Evaluation subsets, exact definitions (README §4.8). Eval-only: never imported by serving code.
+"""Evaluation subsets, exact definitions (SPEC §4.8). Eval-only: never imported by serving code.
 
 - `hedged`, `redaction_adjacent`: imported unchanged from `data_prep/subset_stats.py`.
 - Mentions for `negation_only` (and the mapping audit / noise adjustment): negspacy over the

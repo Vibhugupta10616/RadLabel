@@ -1,5 +1,6 @@
-"""Sentence embeddings (optional extra "embed"): the base model until M10 (EMBED_BASE_MODEL), then the fine-tuned one.
-Used by the verifier agent's find_by_meaning tool and by the index (README §6.3)."""
+"""Sentence embeddings (optional extra "embed"), the base model EMBED_BASE_MODEL. Used by the verifier agent's
+find_by_meaning tool, which stays on the base model (the agent is frozen), and by the index (SPEC §6.3). The
+fine-tuned model (M9) is for search and RAG only."""
 
 from __future__ import annotations
 

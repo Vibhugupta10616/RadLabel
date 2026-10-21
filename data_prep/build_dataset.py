@@ -4,10 +4,10 @@ Writes (all git-ignored, licence D1):
   data/processed/reports.jsonl        text + sentences + exact group + cluster; NO expert codes (serving may read)
   data/processed/expert_labels.jsonl  expert codes + v1 / strict labels (eval/training only)
   data/processed/eval_mentions.jsonl  eval-only negspacy mentions per label
-  data/splits/subsets/*.txt           subset id lists (README §4.8); negation_only as "id<TAB>label"
+  data/splits/subsets/*.txt           subset id lists (SPEC §4.8); negation_only as "id<TAB>label"
   artifacts/results/data_card.json    counts only (committed)
 
-Counting unit (README §4.2): one report per exact normalised text (lowest id); clusters (exact
+Counting unit (SPEC §4.2): one report per exact normalised text (lowest id); clusters (exact
 pairwise Jaccard >= 0.9) are only for fold assignment.
 """
 
@@ -79,7 +79,7 @@ def main() -> None:
     write_jsonl(PROC / "expert_labels.jsonl", experts)
     write_jsonl(PROC / "eval_mentions.jsonl", [{"id": i, "mentions": m} for i, m in ments.items()])
 
-    # ---- subsets (README §4.8), on all usable reports; metrics later restrict to exact-text reps
+    # ---- subsets (SPEC §4.8), on all usable reports; metrics later restrict to exact-text reps
     by_id = {r["id"]: r for r in usable}
     exp = {e["id"]: e for e in experts}
     unique_ids = sorted(set(group_rep.values()))
@@ -95,7 +95,7 @@ def main() -> None:
     (SUBSETS / "negation_only.tsv").write_text("".join(f"{i}\t{lab}\n" for i, lab in sorted(neg_pairs)),
                                               encoding="utf-8")
 
-    # ---- data card (README §3.3, §4.4, §4.5, §4.8)
+    # ---- data card (SPEC §3.3, §4.4, §4.5, §4.8)
     uniq = set(unique_ids)
     abn = set(sub["abnormal"])
     sizes = sorted((len(v) for v in groups.values()), reverse=True)

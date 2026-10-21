@@ -1,4 +1,4 @@
-"""Rule labeller (README §6.2): alias match + pipeline negation, no LLM, no tuned parameters (decision D1).
+"""Rule labeller (SPEC §6.2): alias match + pipeline negation, no LLM, no tuned parameters (decision D1).
 
 Per label, over all sentences: an affirmed mention (asserted, not negated, not hedged) -> present, unless the
 Impression explicitly contradicts it (section rule); else a hedged non-negated mention -> uncertain; else a

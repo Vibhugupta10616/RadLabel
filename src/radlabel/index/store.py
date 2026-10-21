@@ -1,4 +1,4 @@
-"""Qdrant collection (README §6.3): report points (dense + BM25 sparse) and contextual sentence points (dense).
+"""Qdrant collection (SPEC §6.3): report points (dense + BM25 sparse) and contextual sentence points (dense).
 Dense cosine; BM25 sparse vectors carry the full BM25 weight (IDF computed in bm25.py over the indexed reports).
 Sentence hits aggregate to reports by max score. RRF fuses report rankings (k = 60)."""
 

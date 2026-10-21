@@ -1,4 +1,4 @@
-"""Write pipeline outputs to Postgres (README §6.3). Input: PipelineResult only (report text as parsed + predicted
+"""Write pipeline outputs to Postgres (SPEC §6.3). Input: PipelineResult only (report text as parsed + predicted
 labels); nothing else reaches the tables."""
 
 from __future__ import annotations

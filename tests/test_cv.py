@@ -1,4 +1,4 @@
-"""Invariants (README §4.2): no cluster spans two folds; inner validation never overlaps its test fold."""
+"""Invariants (SPEC §4.2): no cluster spans two folds; inner validation never overlaps its test fold."""
 
 import json
 from pathlib import Path

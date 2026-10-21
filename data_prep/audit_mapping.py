@@ -1,4 +1,4 @@
-"""Per-rule mapping audit (README §4.5) + unmapped-code log (README §4.4).
+"""Per-rule mapping audit (SPEC §4.5) + unmapped-code log (SPEC §4.4).
 
 For every rule of v1 and strict: among exact-text representatives with a code matching the rule,
 the share whose text has a clear (non-negated, non-hedged) mention of the label per the eval-only

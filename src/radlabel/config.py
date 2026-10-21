@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     azure_openai_api_version: str = ""
     openai_api_key: SecretStr = SecretStr("")
 
-    # Deployments per role (README §7.1)
+    # Deployments per role (SPEC §7.1)
     azure_openai_deployment: str = "gpt-4.1-mini"
     azure_openai_fallback_deployment: str = "gpt-5.4-mini"
     azure_openai_repair_deployment: str = "gpt-5-mini"

@@ -13,7 +13,7 @@ V1, STRICT = load_mapping("v1"), load_mapping("strict")
     (["Fractures, Bone/ribs"], {"Fracture"}),
     (["Catheters, Indwelling"], {"Support Devices"}),
     (["Calcified Granuloma/lung/upper lobe/right"], {"Other Abnormality"}),
-    (["Pulmonary Congestion"], {"Other Abnormality"}),       # not Edema (README §4.4)
+    (["Pulmonary Congestion"], {"Other Abnormality"}),       # not Edema (SPEC §4.4)
     (["Pneumonia/lower lobe"], {"Other Abnormality"}),       # dropped label
     (["Mediastinum/prominent"], {"Other Abnormality"}),      # dropped label
     (["Opacity/hilum"], {"Other Abnormality"}),              # non-lung site
@@ -32,7 +32,7 @@ V1, STRICT = load_mapping("v1"), load_mapping("strict")
     (["Nodule/pleura"], {"Pleural Other"}),                   # pleural site -> Pleural Other
     (["Opacity/pleural sinus"], {"Pleural Other"}),
     (["Contrast Media/abdomen/left"], set()),                 # ignored like Technical Quality
-    # Lung Lesion needs a lung site (README §4.4)
+    # Lung Lesion needs a lung site (SPEC §4.4)
     (["Nodule/lung/upper lobe/right"], {"Lung Lesion"}),
     (["Nodule"], {"Lung Lesion"}),
     (["Nodule/scattered"], {"Lung Lesion"}),

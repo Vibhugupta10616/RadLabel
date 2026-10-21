@@ -1,4 +1,4 @@
-"""95% bootstrap CIs resampled over clusters (README §4.2): near-duplicates are resampled together."""
+"""95% bootstrap CIs resampled over clusters (SPEC §4.2): near-duplicates are resampled together."""
 
 from __future__ import annotations
 

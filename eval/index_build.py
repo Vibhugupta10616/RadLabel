@@ -1,4 +1,4 @@
-"""Build the serving index (README §6.3, M8) from the M7 out-of-fold v2 outputs, then check it for leakage.
+"""Build the serving index (SPEC §6.3, M8) from the M7 out-of-fold v2 outputs, then check it for leakage.
 
 - Input: artifacts/predictions/verifier_agent_full.jsonl (one PipelineResult per unique report; v2 is zero-shot, so
   each report's labels come from a run that never saw its codes). Nothing else is read.

@@ -1,4 +1,4 @@
-"""M7: free-check escalation counts ($0) and verifier-agent development on the dev slice (README §6.2, §8.1).
+"""M7: free-check escalation counts ($0) and verifier-agent development on the dev slice (SPEC §6.2, §8.1).
 
 - `escalation`: every exact-text representative's clean join through `run_pipeline(agent=False)` (cache only). Counts
   of escalated reports and labels, by reason, hedged vs clear, dev slice vs the rest; escalation precision (the
@@ -8,7 +8,7 @@
   metrics). Behaviour vs the v1 codes (eval side only), cost per report, and the full-run cost estimate
   (mean cost per escalated dev report x escalated reports outside the dev slice). New spend capped at DEV_SPEND_CAP.
 
-- `full` (M7, owner-approved 2026-10-22, pre-committed in README §8.1): every report through `run_pipeline` with the
+- `full` (M7, owner-approved 2026-10-22, pre-committed in SPEC §8.1): every report through `run_pipeline` with the
   agent (prompt frozen), column "LLM + free checks + verifier agent (v2)", paired bootstrap vs LLM only, vs LLM +
   verifier + Tier 2 and vs the rule baseline (keep the agent iff not significantly worse than LLM + verifier + Tier 2),
   label changes, verified vs unverified accuracy, escalation / unverified rates, the normal-check table, section
@@ -501,7 +501,7 @@ SERVING_NAMES = {"ablation": "ablation (normal check recorded, not escalating)",
 
 
 def render_analysis(an: dict[str, Any]) -> str:
-    """README §10 block for the post-M7 analyses."""
+    """docs/RESULTS.md block for the post-M7 analyses."""
     def num(x: float | None) -> str:
         return "–" if x is None else f"{x:.3f}"
     ab, wo = an["normal_check_ablation"], an["without_other_abnormality"]["paired_v2_minus_llm_only"]
@@ -538,7 +538,7 @@ def render_analysis(an: dict[str, Any]) -> str:
 
 def render_reading(v2: dict[str, Any], paired: dict[str, Any], an: dict[str, Any] | None,
                    esc: dict[str, Any] | None) -> str:
-    """Plain-language reading of the M7 results (README §10); every number comes from the results files and the
+    """Plain-language reading of the M7 results (docs/RESULTS.md); every number comes from the results files and the
     wording follows the paired tests."""
     def sig(d: dict[str, Any]) -> str:
         return f"{_fmt(d)}, 95% CI {'excludes' if d['ci_excludes_zero'] else 'includes'} 0"
@@ -576,7 +576,7 @@ def render_reading(v2: dict[str, Any], paired: dict[str, Any], an: dict[str, Any
 
 
 def render_full(v2: dict[str, Any], paired: dict[str, Any], decision: dict[str, Any] | None) -> str:
-    """README §10 block for the M7 full run (eval/report.py)."""
+    """docs/RESULTS.md block for the M7 full run (eval/report.py)."""
 
     def pct(x: float | None) -> str:
         return "–" if x is None else f"{100 * x:.1f}%"
@@ -638,7 +638,7 @@ def render_full(v2: dict[str, Any], paired: dict[str, Any], decision: dict[str, 
 
 
 def render(esc: dict[str, Any], dev: dict[str, Any] | None) -> str:
-    """README §10 block (eval/report.py): escalation before any agent call, and dev-slice behaviour."""
+    """docs/RESULTS.md block (eval/report.py): escalation before any agent call, and dev-slice behaviour."""
     def pct(x: float | None) -> str:
         return "–" if x is None else f"{100 * x:.1f}%"
     rb, nf = esc["reports_by_reason"], esc["no_finding"]

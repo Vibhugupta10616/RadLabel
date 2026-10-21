@@ -1,6 +1,6 @@
 """Duplicate clusters: exact normalised text + near-duplicates by exact pairwise Jaccard >= 0.9.
 
-Pairwise and deterministic (README §4.2); MinHash LSH missed true merges. O(n^2) over unique texts,
+Pairwise and deterministic (SPEC §4.2); MinHash LSH missed true merges. O(n^2) over unique texts,
 pruned by the size bound |A|/|B| >= threshold; under 3 s for ~3k texts.
 """
 

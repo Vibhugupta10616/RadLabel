@@ -1,4 +1,4 @@
-"""BM25 as Qdrant sparse vectors (README §6.3): document weight
+"""BM25 as Qdrant sparse vectors (SPEC §6.3): document weight
 idf * tf * (k1 + 1) / (tf + k1 * (1 - b + b * dl / avgdl)), query weights 1 per distinct term, so the dot product is
 the BM25 score.
 

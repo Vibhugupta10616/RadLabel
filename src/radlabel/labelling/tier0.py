@@ -1,4 +1,4 @@
-"""Tier 0 (README §6.2): exact normalised texts coded `normal` >= 3 times in the training data -> No Finding,
+"""Tier 0 (SPEC §6.2): exact normalised texts coded `normal` >= 3 times in the training data -> No Finding,
 with no LLM call.
 
 `learn` only sees normalised texts; the caller (eval/ or training/) picks the texts coded normal, so expert codes

@@ -1,4 +1,4 @@
-"""Labelling output schema (README §6.2); also the LLM structured-output schema."""
+"""Labelling output schema (SPEC §6.2); also the LLM structured-output schema."""
 
 from __future__ import annotations
 

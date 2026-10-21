@@ -1,4 +1,4 @@
-"""Index and Postgres rows (README §6.3, M8), including the leakage rules: payloads hold predicted labels only, no
+"""Index and Postgres rows (SPEC §6.3, M8), including the leakage rules: payloads hold predicted labels only, no
 codes from the dataset, folds, eval mentions or the indication."""
 
 import json

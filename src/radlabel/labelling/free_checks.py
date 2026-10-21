@@ -1,4 +1,4 @@
-"""Free checks (README §6.2, M7): code only, no LLM, $0, every report. They decide which labels escalate to the
+"""Free checks (SPEC §6.2, M7): code only, no LLM, $0, every report. They decide which labels escalate to the
 verifier agent, and why. Reads report sentences and pipeline outputs only.
 
 Part 1, deterministic verifier (verifier.py), v2 actions: every FAIL escalates; of the flags, negation_consistency,

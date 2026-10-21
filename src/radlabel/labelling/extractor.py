@@ -1,4 +1,4 @@
-"""Tier 1 LLM extractor (README §6.2): zero-shot, synthetic in-prompt examples (hand-written, never IU text),
+"""Tier 1 LLM extractor (SPEC §6.2): zero-shot, synthetic in-prompt examples (hand-written, never IU text),
 strict structured output with one required key per label. Calls go through `radlabel.llm` (cached, costed).
 """
 

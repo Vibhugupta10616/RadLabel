@@ -1,4 +1,4 @@
-"""One test (at least) per verifier rule, README §6.2."""
+"""One test (at least) per verifier rule, SPEC §6.2."""
 
 from radlabel.labelling.schema import LabelOut, ReportLabels
 from radlabel.labelling.verifier import passed, verify
@@ -50,7 +50,7 @@ def test_no_finding_exclusivity() -> None:
 
 
 def test_section_rule_generic_impression_does_not_cancel_findings() -> None:
-    """README §6.2: Findings "mild cardiomegaly" + Impression "no acute disease" -> Cardiomegaly stays present."""
+    """SPEC §6.2: Findings "mild cardiomegaly" + Impression "no acute disease" -> Cardiomegaly stays present."""
     r = run("Mild cardiomegaly.", "No acute disease.", ("Cardiomegaly", "present", ["F1"]))
     assert r.status("Cardiomegaly") == "present" and passed(r)
     r = run("Mild cardiomegaly.", "No acute disease.", ("Cardiomegaly", "absent", ["I1"]))

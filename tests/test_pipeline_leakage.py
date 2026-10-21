@@ -1,4 +1,4 @@
-"""Leakage (README §5, invariant 1; owner hard stop, extended to M6): run_pipeline sees report text only."""
+"""Leakage (SPEC §5, invariant 1; owner hard stop, extended to M6): run_pipeline sees report text only."""
 
 import builtins
 import inspect

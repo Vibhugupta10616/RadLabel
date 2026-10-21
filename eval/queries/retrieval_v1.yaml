@@ -1,4 +1,4 @@
-# Retrieval evaluation spec (README §8.2, M8). FROZEN: written and committed 2026-10-22 BEFORE any retrieval run.
+# Retrieval evaluation spec (SPEC §8.2, M8). FROZEN: written and committed 2026-10-22 BEFORE any retrieval run.
 # Any change needs owner approval and a new version. Relevance comes from the v1 expert codes, on the eval side only
 # (eval/retrieval.py). The indication is never part of a query.
 version: retrieval_v1
@@ -36,7 +36,7 @@ variants:
   query_prefix: "bge retrieval instruction for label, alias, attribute and compositional queries; none for report-to-report"
 
 label_queries:
-  heldout_labels: [Fracture, Lung Lesion, Pleural Other]   # never used in fine-tuning (M10, README §6.3)
+  heldout_labels: [Fracture, Lung Lesion, Pleural Other]   # never used in fine-tuning (M9, SPEC §6.3)
   seen_label: "the label name, lower-case, for each finding label not held out (8); relevant: label coded (v1)"
   heldout_label: "the label name, lower-case, for each held-out label (3); relevant: label coded (v1)"
   heldout_alias: >-
@@ -46,7 +46,7 @@ label_queries:
 report_to_report:
   per_fold: 40
   seed: 13
-  query_reports: "abnormal subset (README §4.8) with >= 1 Findings sentence; sampled per fold, sorted ids, random.Random(13 + fold)"
+  query_reports: "abnormal subset (SPEC §4.8) with >= 1 Findings sentence; sampled per fold, sorted ids, random.Random(13 + fold)"
   query_text: "the first 2 Findings sentences ([REDACTED] applied), joined with a space"
   relevant: "another fold-k report sharing >= 1 abnormal label (v1 labels minus No Finding); the query report is removed"
   gain: "Jaccard overlap of the two abnormal label sets"

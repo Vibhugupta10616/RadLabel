@@ -1,4 +1,4 @@
-"""M6: evaluation through the single entry point (README §8.1), parser accuracy, section subsets, the normal-claim
+"""M6: evaluation through the single entry point (SPEC §8.1), parser accuracy, section subsets, the normal-claim
 count and the hedge-fix before/after.
 
 Pre-committed here, before the run:
@@ -322,7 +322,7 @@ def _pct(x: float | None) -> str:
 
 
 def render(m6: dict[str, Any], paired: dict[str, Any], standalone: bool = True) -> str:
-    """M6 tables; also used for README §10 (eval/report.py)."""
+    """M6 tables; also used for docs/RESULTS.md (eval/report.py)."""
     p, c, nc, hf = m6["parser"], m6["cache"], m6["normal_claim"], m6["hedge_fix"]
     lines = ["# Through the entry point (M6)", ""] if standalone else []
     lines += [f"{m6['run']['n_reports']:,} unique reports joined into text with headers (codes hidden) and run through "

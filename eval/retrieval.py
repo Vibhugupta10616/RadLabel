@@ -1,4 +1,4 @@
-"""Retrieval evaluation (README §8.2, M8): base models, per fold and pooled. Spec: eval/queries/retrieval_v1.yaml
+"""Retrieval evaluation (SPEC §8.2, M8): base models, per fold and pooled. Spec: eval/queries/retrieval_v1.yaml
 (frozen before any run). Relevance comes from the v1 expert codes, here on the eval side only; the index (built by
 radlabel.index from the M7 predictions) never sees them.
 
@@ -236,7 +236,7 @@ NAMES = {"bm25": "BM25", "dense_report": "base bge-small, report-level",
 
 
 def reading(out: dict[str, Any]) -> str:
-    """Plain-language reading for README §10: the best variant per query set by nDCG@10, from the results."""
+    """Plain-language reading for docs/RESULTS.md: the best variant per query set by nDCG@10, from the results."""
     v = out["variants"]
     best = {s: max(VARIANTS, key=lambda x: v[x][s]["ndcg"]["value"]) for s in (*SETS, "all")}
     seen = v["dense_sentence_ctx_filter"]["seen_label"], v["dense_sentence_ctx"]["seen_label"]
@@ -247,7 +247,7 @@ def reading(out: dict[str, Any]) -> str:
         "from the contextual prefix, which names the PREDICTED v2 labels: once the \"No X\" sentences are filtered "
         "out, sentences whose prefix mentions X come from reports predicted positive for X, so this row partly "
         "measures the labelling pipeline, not only the embeddings. It is the baseline the fine-tuned model must "
-        "beat (M10, judged two ways, README §8.2). Base models only; no held-out effect is expected before "
+        "beat (M9, judged two ways, SPEC §8.2). Base models only; no held-out effect is expected before "
         "fine-tuning.")
 
 

@@ -1,4 +1,4 @@
-"""Verifier agent (README §6.2, M7): every tool, the caps, the evidence string check, the label merge, the freeze."""
+"""Verifier agent (SPEC §6.2, M7): every tool, the caps, the evidence string check, the label merge, the freeze."""
 
 import hashlib
 import json

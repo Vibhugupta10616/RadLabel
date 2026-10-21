@@ -1,4 +1,4 @@
-"""The single entry point (README §5, invariant 2): `run_pipeline(raw_text)` is the only way labels are produced.
+"""The single entry point (SPEC §5, invariant 2): `run_pipeline(raw_text)` is the only way labels are produced.
 
 parse -> sentences ([REDACTED], IDs) -> Tier 1 tagger (Findings + Impression only; the indication is never an input)
 -> deterministic verifier -> free checks (escalation, recall scan, normal check) -> verifier agent on escalated

@@ -1,4 +1,4 @@
-"""Invariant: serving code never reads expert labels (README §5, invariant 1)."""
+"""Invariant: serving code never reads expert labels (SPEC §5, invariant 1)."""
 
 import json
 import re

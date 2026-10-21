@@ -1,10 +1,10 @@
-"""Verifier agent (README §6.2, M7): a bounded ReAct tool loop (LangGraph) that runs only on escalated reports.
+"""Verifier agent (SPEC §6.2, M7): a bounded ReAct tool loop (LangGraph) that runs only on escalated reports.
 
 - Model: the agent deployment (role "repair" = gpt-5-mini) through `radlabel.llm` (cached, cost-logged, capped).
 - Blind first: it gets the report sentences, the tagger's statuses WITHOUT the tagger's evidence, and the escalation
   reasons (free_checks.py). Never codes from the dataset, folds, eval mentions or metrics
   (tests/test_verifier_agent_leakage.py).
-- Tools: find_by_alias, find_by_meaning (sentence embeddings, base model until M10), check_negation,
+- Tools: find_by_alias, find_by_meaning (sentence embeddings, always the base model), check_negation,
   compare_sections, check_redaction, get_label_definition (the frozen Tier 1 definitions), normal_check, submit.
 - Limits: MAX_TOOL_CALLS tool calls (submit included) and MAX_REPORT_TOKENS tokens per report; on a cap, the budget
   or a content-filter refusal, the escalated labels end `unverified` with the reason.
@@ -37,7 +37,7 @@ from radlabel.preprocess.sentences import Sentence
 from radlabel.preprocess.text import REDACTED
 
 PROMPT_VERSION = "verifier-v2"  # FROZEN on the dev slice (v1-v3 tried, v2 kept by the pre-set rule); hash test
-MAX_TOOL_CALLS = 8  # README §6.2
+MAX_TOOL_CALLS = 8  # SPEC §6.2
 MAX_REPORT_TOKENS = 80_000  # input + output over all calls of one report
 MAX_COMPLETION_TOKENS = 4_000  # per call, reasoning included
 REASONING_EFFORT = "low"
@@ -332,7 +332,7 @@ def final_labels(tagger: ReportLabels, sentences: list[Sentence], esc: list[Esca
             v = "corrected"
         out[lab] = FinalLabel(label=lab, status=d.status, evidence=[] if d.status == "not_mentioned" else ev,
                               verification=v, reason=d.reason)
-    # No Finding stays consistent with the other labels (it is derived, README §6.2)
+    # No Finding stays consistent with the other labels (it is derived, SPEC §6.2)
     abnormal = any(x.status in ("present", "uncertain") for x in out.values() if x.label != NO_FINDING)
     nf = out[NO_FINDING]
     if abnormal and nf.status == "present":

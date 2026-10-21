@@ -64,7 +64,7 @@ class Mapping:
 
 
 def expert_labels(codes: list[str], v1: Mapping, strict: Mapping) -> dict[str, list[str]]:
-    """v1 labels; strict labels (README §4.5: No Finding / Other Abnormality identical to v1, only the
+    """v1 labels; strict labels (SPEC §4.5: No Finding / Other Abnormality identical to v1, only the
     pathology labels use the strict rules); strict_excluded = v1-only pathology positives, which are
     left out of that label's strict scoring."""
     lab_v1 = v1.map_codes(codes)

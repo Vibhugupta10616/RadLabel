@@ -63,7 +63,7 @@ REVIEW_DIR = PRED_DIR.parent / "review"  # git-ignored
 
 
 def review_reasons(out: ReportLabels | None, tier2: RepairResult | None, filtered: bool) -> list[str]:
-    """Tier 3 routing (README §6.2): still failing after Tier 2, or escalated by a review flag."""
+    """Tier 3 routing (SPEC §6.2): still failing after Tier 2, or escalated by a review flag."""
     if filtered:
         return ["content_filtered"]
     assert out is not None
@@ -178,7 +178,7 @@ def main(cache_only: bool = False, smoke: int = 0) -> dict[str, Any]:
             tier2[i] = {x.label: x.status for x in r.final.labels}
     res = evaluate(it, tier2)
 
-    # routing (README §4.3, §8.1 pipeline metrics) over all exact-text representatives
+    # routing (SPEC §4.3, §8.1 pipeline metrics) over all exact-text representatives
     review: list[dict[str, Any]] = []
     route: dict[int, str] = {}
     for i in it.ids:

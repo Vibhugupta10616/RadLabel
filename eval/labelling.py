@@ -1,4 +1,4 @@
-"""Labelling evaluation (README §8.1) on out-of-fold predictions.
+"""Labelling evaluation (SPEC §8.1) on out-of-fold predictions.
 
 Unit: one report per exact normalised text (3,086); 95% CIs by bootstrap over duplicate clusters.
 - The 102 Tier 1 pilot reports (data/splits/pilot_ids.txt) are excluded from every score here (owner, M4);
@@ -219,7 +219,7 @@ def render_paired(p: dict[str, Any]) -> str:
 
 
 def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any], standalone: bool = True) -> str:
-    """README §8.1 ablation table (systems built so far). Headline rows first; the sensitivity row is labelled."""
+    """SPEC §8.1 ablation table (systems built so far). Headline rows first; the sensitivity row is labelled."""
     rows: list[tuple[str, Callable[[dict[str, Any]], str]]] = [
         ("Headline macro-F1, 9 labels (v1)", lambda r: _fmt(r["v1"]["macro_f1_headline"])),
         ("Headline macro-F1, 9 labels (strict)", lambda r: _fmt(r["strict"]["macro_f1_headline"])),
@@ -236,7 +236,7 @@ def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any], s
          if "sensitivity_suggested_ignored" in r else "–"),
     ]
     names = list(systems)
-    lines = ["# Labelling summary (README §8.1)", ""] if standalone else []
+    lines = ["# Labelling summary (SPEC §8.1)", ""] if standalone else []
     lines += ["Out-of-fold, one report per exact text; hedged and Tier 1 pilot reports excluded unless stated; "
              "95% bootstrap CIs over clusters. Scoring: `present` = positive, except in the sensitivity row.", "",
              "| Metric | " + " | ".join(names) + " |", "|---|" + "---|" * len(names)]

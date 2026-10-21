@@ -1,4 +1,4 @@
-"""Postgres schema (README §5, §6.3, M8). Created by Alembic (`alembic upgrade head`), never ad hoc.
+"""Postgres schema (SPEC §5, §6.3, M8). Created by Alembic (`alembic upgrade head`), never ad hoc.
 
 - `reports`: unchanged report sections as parsed; the indication is a separate column (Q&A only, never indexed).
 - `labels`: PREDICTED v2 labels only (status, verification state, evidence, corroboration, reason). No codes from
