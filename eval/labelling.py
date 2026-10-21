@@ -242,8 +242,9 @@ def render_summary(systems: dict[str, dict[str, Any]], paired: dict[str, Any], s
 
 
 SYSTEM_NAMES = {"rule_baseline": "Rule baseline", "llm_only": "LLM only", "llm_verifier": "LLM + verifier",
-                "llm_verifier_tier2": "LLM + verifier + Tier 2"}
-PAIRED_FILES = ("labelling_paired_diffs", "labelling_tier2_paired_diffs")
+                "llm_verifier_tier2": "LLM + verifier + Tier 2", "pipeline_clean": "run_pipeline, clean join (M6)",
+                "pipeline_varied": "run_pipeline, 30% varied joins (M6)"}
+PAIRED_FILES = ("labelling_paired_diffs", "labelling_tier2_paired_diffs", "labelling_m6_paired_diffs")
 
 
 def load_result(name: str) -> dict[str, Any] | None:

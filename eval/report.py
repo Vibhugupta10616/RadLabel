@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from eval import entry_point
 from eval.labelling import _fmt, load_result, render_summary, summary_inputs
 
 README = Path("README.md")
@@ -21,6 +22,8 @@ PAIRED_NAMES = {
     "tier2_minus_llm_verifier": "LLM + verifier + Tier 2 − LLM + verifier",
     "tier2_minus_rule_baseline": "LLM + verifier + Tier 2 − rule baseline",
     "tier2_minus_llm_only": "LLM + verifier + Tier 2 − LLM only",
+    "pipeline_clean_minus_llm_verifier": "run_pipeline, clean join − LLM + verifier",
+    "pipeline_varied_minus_pipeline_clean": "run_pipeline, varied joins − clean join",
 }
 
 
@@ -113,11 +116,18 @@ def render() -> str:
             f"Escalation precision (Tier 1 labels disagree with the expert codes): Tier 2 "
             f"{_pct(rt['escalation_precision_tier2'])}, review {_pct(rt['escalation_precision_review'])}, base rate "
             f"{_pct(rt['tier1_disagreement_base_rate'])}.",
-            f"- LLM spend: Tier 2 calls ${st['tier2_cost_usd']:.2f}; all LLM calls so far (pilots, mapping "
+            f"- LLM spend: Tier 2 calls ${st['tier2_cost_usd']:.2f}; all LLM calls up to M5 (pilots, mapping "
             f"cross-checks, Tier 1, Tier 2; from the cost ledger) ${st['llm_spend_total_usd']:.2f}. Reruns are "
             "served from the cache at $0."]
     else:
         lines.append(f"- LLM spend, all calls so far (from the cost ledger): ${run['llm_spend_total_usd']:.2f}.")
+    m6 = load_result("pipeline_m6")
+    if m6 is not None:
+        lines += ["", "### Through the entry point (M6)", "",
+                  "Labels produced by `run_pipeline(raw_text)` (parse → tag → verifier), as an upload would be. "
+                  "Without headers the parser can't separate sections, so the whole text, including the indication, "
+                  "is read as Findings.", "",
+                  entry_point.render(m6, load_result("labelling_m6_paired_diffs") or {}, standalone=False).rstrip()]
     return "\n".join(lines) + "\n"
 
 

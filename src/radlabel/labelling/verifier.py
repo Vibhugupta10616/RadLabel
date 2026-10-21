@@ -8,7 +8,9 @@
 |                         | Other Abnormality (open-ended) -> flag; a cited sentence with [REDACTED] -> flag  |
 | negation_consistency    | present, but every cited mention of the label is negated -> flag (review; M4: the |
 |                         | pipeline negation was wrong in 20/23 full-run fails, owner rule)                   |
-| hedge_consistency       | present, but the only cited evidence is hedged -> converted to uncertain + flag   |
+| hedge_consistency       | present, but the only cited evidence is hedged -> converted to uncertain + flag;  |
+|                         | wording the label's definition counts as present ("borderline" cardiomegaly) is   |
+|                         | not a hedge for that label (M6 consistency fix, README §6.2)                      |
 | no_finding_exclusivity  | No Finding present => no other label present (No Finding is derived in code, see |
 |                         | schema.derive_no_finding, so its own evidence is not checked)                     |
 | section_rule            | Impression overrides Findings only on an explicit same-label contradiction;       |
@@ -30,6 +32,9 @@ from radlabel.preprocess.sentences import Sentence
 from radlabel.preprocess.text import REDACTED
 
 NORMAL_PHRASES = Path(__file__).with_name("normal_phrases.yaml")
+# Wording that a label's definition counts as present (frozen Tier 1 prompt: Cardiomegaly "including mild or
+# borderline-stated enlargement") is not a hedge for that label in hedge_consistency (M6, README §6.2).
+DEFINITION_PRESENT: dict[str, frozenset[str]] = {"Cardiomegaly": frozenset({"borderline", "mild"})}
 
 
 @lru_cache
@@ -80,9 +85,12 @@ def verify(out: ReportLabels, sentences: list[Sentence]) -> ReportLabels:
                 else:
                     msgs.append(_msg("evidence_mentions_label", lab, "fail", "no alias in cited sentences"))
             if lo.status == "present" and cited:
+                exempt = DEFINITION_PRESENT.get(lab, frozenset())
+                hedged = [not set(m.hedge_cues) <= exempt for m in cited]
                 if all(m.negated for m in cited):
                     msgs.append(_msg("negation_consistency", lab, "flag", "only negated mentions cited"))
-                elif not any(m.affirmed for m in cited) and any(m.hedged and not m.negated for m in cited):
+                elif (not any(m.asserted and not m.negated and not h for m, h in zip(cited, hedged, strict=True))
+                      and any(h and not m.negated for m, h in zip(cited, hedged, strict=True))):
                     lo.status = "uncertain"
                     msgs.append(_msg("hedge_consistency", lab, "flag", "only hedged evidence: set to uncertain"))
         if lab != NO_FINDING:

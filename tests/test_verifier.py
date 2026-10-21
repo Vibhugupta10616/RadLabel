@@ -103,3 +103,14 @@ def test_rule_d_redacted_evidence_flags() -> None:
     assert ("evidence_mentions_label", "flag") in checks(r) and passed(r)
     r = run("Midline sternotomy changes.", "", ("Support Devices", "present", ["F1"]))
     assert ("evidence_mentions_label", "fail") in checks(r)
+
+
+def test_hedge_consistency_definition_wording_is_not_a_hedge() -> None:
+    """M6 fix: the Cardiomegaly definition counts mild/borderline enlargement as present, so it is not a hedge."""
+    for f in ("Borderline cardiomegaly.", "Heart size is borderline.", "Borderline enlarged cardiac silhouette."):
+        r = run(f, "", ("Cardiomegaly", "present", ["F1"]))
+        assert r.status("Cardiomegaly") == "present" and ("hedge_consistency", "flag") not in checks(r), f
+    r = run("Possible borderline cardiomegaly.", "", ("Cardiomegaly", "present", ["F1"]))  # a real hedge remains
+    assert r.status("Cardiomegaly") == "uncertain" and ("hedge_consistency", "flag") in checks(r)
+    r = run("Borderline small left effusion.", "", ("Pleural Effusion", "present", ["F1"]))  # label-scoped
+    assert r.status("Pleural Effusion") == "uncertain"

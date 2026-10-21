@@ -46,6 +46,7 @@ class Mention:
     negated: bool
     hedged: bool
     asserted: bool  # False for an anchor without an enlargement word
+    hedge_cues: tuple[str, ...] = ()  # the hedge cues in the mention's clause (hedged iff non-empty)
 
     @property
     def affirmed(self) -> bool:
@@ -105,7 +106,7 @@ def _mentions(text: str) -> tuple[Mention, ...]:
     strong = [(a, b) for a, b in _cue_positions(tokens, STRONG_NEG) if not is_pseudo(a, b)]
     weak = _cue_positions(tokens, WEAK_NEG)
     follow = [(a, b) for a, b in _cue_positions(tokens, FOLLOW_NEG) if not is_pseudo(a, b)]
-    hedge = _cue_positions(tokens, HEDGE)
+    hedge = [(c, i, i + len(c.split())) for c in HEDGE for i in _find(tokens, c.split())]
     enlarge = _cue_positions(tokens, ENLARGE)
 
     raw: list[tuple[Alias, int, int]] = [
@@ -124,9 +125,9 @@ def _mentions(text: str) -> tuple[Mention, ...]:
             neg = (any(c0 <= cs and ce <= s for cs, ce in strong)
                    or any(s - WEAK_SCOPE <= cs and ce <= s for cs, ce in weak)
                    or any(e <= cs and ce <= min(c1, e + FOLLOW_SCOPE) for cs, ce in follow))
-            hed = any(c0 <= cs and ce <= c1 for cs, ce in hedge)
+            cues = tuple(c for c, cs, ce in hedge if c0 <= cs and ce <= c1)
             asserted = not a.anchor or any(c0 <= cs and ce <= c1 for cs, ce in enlarge)
-            out.append(Mention(a.label, a.text, s, e, neg, hed, asserted))
+            out.append(Mention(a.label, a.text, s, e, neg, bool(cues), asserted, cues))
     return tuple(sorted(out, key=lambda m: (m.start, m.label)))
 
 
