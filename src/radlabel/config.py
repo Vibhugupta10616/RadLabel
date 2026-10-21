@@ -42,6 +42,11 @@ class Settings(BaseSettings):
 
     # Local models
     embed_base_model: str = "BAAI/bge-small-en-v1.5"
+    # search / RAG encoder: a fine-tuned model directory (M9) or empty = the base model; the verifier agent always
+    # uses the base model
+    search_embed_model: str = ""
+    # sentence points carry the predicted-label prefix (M8 comparison rows only; default plain sentences, SPEC §6.3)
+    index_sentence_prefix: bool = False
     reranker_model: str = "BAAI/bge-reranker-base"
     device: Literal["auto", "cpu", "cuda"] = "auto"
     model_store: str = "./models"

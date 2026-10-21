@@ -26,7 +26,7 @@ from eval.retrieval import check_points, load_results
 from radlabel.config import get_settings
 from radlabel.db.store import engine
 from radlabel.db.store import store as store_db
-from radlabel.embeddings import encode
+from radlabel.embeddings import search_encode
 from radlabel.index import store
 from radlabel.index.points import REPORT_KEYS, SENTENCE_KEYS, report_points
 from radlabel.preprocess.aliases import normalise
@@ -45,7 +45,7 @@ def main() -> dict[str, Any]:
     points = [p for i in sorted(res) for p in report_points(res[i])]
     check_points(points)
     client = QdrantClient(url=s.qdrant_url, timeout=120)
-    vec = encode([p.text for p in points])
+    vec = search_encode([p.text for p in points])  # the fine-tuned serving model once M9 selects it
     store.create(client, COLLECTION, vec.shape[1])
     store.upsert(client, COLLECTION, points, np.asarray(vec))
 
@@ -89,7 +89,8 @@ def main() -> dict[str, Any]:
            "check_payload_keys_whitelisted": not bad_keys, "check_no_forbidden_words_in_payloads": not bad_words,
            "check_indications_tested": checked, "check_indication_found_in_points": indication_hits,
            "indication_phrase_also_in_own_findings_or_impression": coincidental,
-           "embedding_model": s.embed_base_model, "source": "artifacts/predictions/verifier_agent_full.jsonl (M7 v2)"}
+           "embedding_model": s.search_embed_model or s.embed_base_model,
+           "source": "artifacts/predictions/verifier_agent_full.jsonl (M7 v2)"}
     assert not bad_keys and not bad_words and not indication_hits, out
     write_result("index_build", out, fold=None, mapping_version="v1", llm="none")
     return out

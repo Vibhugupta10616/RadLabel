@@ -24,7 +24,7 @@ from qdrant_client import QdrantClient
 
 from eval.labelling import PRED_DIR, PROC, TABLES, Items
 from radlabel.config import get_settings
-from radlabel.embeddings import QUERY_PREFIX, encode
+from radlabel.embeddings import QUERY_PREFIX, encode, load_encoder
 from radlabel.index import store
 from radlabel.index.points import REPORT_KEYS, SENTENCE_KEYS, IndexPoint, report_points
 from radlabel.labels import FINDING_LABELS, NO_FINDING
@@ -34,7 +34,12 @@ from radlabel.results import write_result
 
 SPEC = Path("eval/queries/retrieval_v1.yaml")
 MATERIALIZED = Path("eval/queries/retrieval_v1_queries.json")  # query texts and query report ids only, committed
-TMP, TMP_PLAIN = "radlabel_eval_tmp", "radlabel_eval_tmp_plain"
+TMP, TMP_PLAIN, TMP_FT = "radlabel_eval_tmp", "radlabel_eval_tmp_plain", "radlabel_eval_tmp_ft"
+# M9: model k (MODEL_STORE/eval/fold_k/model) on fold k; plain sentences, same queries and query prefix rule
+FT_VARIANTS = ("ft_sentence", "ft_sentence_filter", "ft_rrf_plain")
+# (fine-tuned, base) pairs; the first is the pre-committed primary comparison (SPEC §8.2)
+FT_COMPARISONS = (("ft_sentence", "dense_sentence"), ("ft_sentence_filter", "dense_sentence_filter"),
+                  ("ft_rrf_plain", "rrf_plain"))
 VARIANTS = ("bm25", "dense_report", "dense_sentence", "dense_sentence_filter", "rrf_plain", "dense_sentence_ctx",
             "dense_sentence_ctx_filter", "rrf")
 # "simpler" first (owner rule, before M9): one retriever before a filter before fusion; no prefix before the prefix
@@ -152,20 +157,20 @@ def check_points(points: list[IndexPoint]) -> None:
         assert set(p.payload) <= allowed, (p.id, set(p.payload) - allowed)
 
 
-def run() -> dict[str, Any]:
+def run(finetuned: bool = False) -> dict[str, Any]:
     it, sp = Items(), spec()
+    names = VARIANTS + (FT_VARIANTS if finetuned else ())
+    store_dir = Path(get_settings().model_store) / "eval"
     queries = json.loads(MATERIALIZED.read_text(encoding="utf-8"))["queries"]
     assert queries == materialize(it, sp), "materialized queries differ from the frozen spec"
     rel = Relevance(it)
     res = load_results()
-    points = {i: report_points(res[i]) for i in it.ids}
+    points = {i: report_points(res[i], prefix=True) for i in it.ids}  # the M8 prefix rows
     flat = [p for i in it.ids for p in points[i]]
     check_points(flat)
     vec = dict(zip([p.id for p in flat], encode([p.text for p in flat]), strict=True))
     # pure-embedding row: the same sentence points without the predicted-label prefix
-    raw = {i: {s.id: s.text for s in res[i].sentences} for i in it.ids}
-    plain = {i: [p.model_copy(update={"text": raw[i][p.payload["sentence_id"]]}) for p in points[i]
-                 if p.kind == "sentence"] for i in it.ids}
+    plain = {i: [p for p in report_points(res[i], prefix=False) if p.kind == "sentence"] for i in it.ids}
     flat_plain = [p for i in it.ids for p in plain[i]]
     vec_plain = dict(zip([p.id for p in flat_plain], encode([p.text for p in flat_plain]), strict=True))
     sents = {r["id"]: r["sentences"] for r in map(json.loads, (PROC / "reports.jsonl").open(encoding="utf-8"))}
@@ -175,7 +180,7 @@ def run() -> dict[str, Any]:
                                    for q in queries]), strict=True))
     client = QdrantClient(url=get_settings().qdrant_url, timeout=120)
     fold = dict(zip(it.ids, it.fold.tolist(), strict=True))
-    pairs: dict[str, dict[str, list[dict[str, Any]]]] = {v: {s: [] for s in SETS} for v in VARIANTS}
+    pairs: dict[str, dict[str, list[dict[str, Any]]]] = {v: {s: [] for s in SETS} for v in names}
     skipped = {s: 0 for s in SETS}
     for k in sorted(set(fold.values())):
         ids = [i for i in it.ids if fold[i] == k]
@@ -185,6 +190,14 @@ def run() -> dict[str, Any]:
         pp = [p for i in ids for p in plain[i]]
         store.create(client, TMP_PLAIN, len(next(iter(vec.values()))))
         store.upsert(client, TMP_PLAIN, pp, np.array([vec_plain[p.id] for p in pp]))
+        if finetuned:
+            model = load_encoder(str(store_dir / f"fold_{k}" / "model"))
+            store.create(client, TMP_FT, len(next(iter(vec.values()))))
+            store.upsert(client, TMP_FT, pp, np.asarray(model.encode([p.text for p in pp], normalize_embeddings=True,
+                                                                      batch_size=256)))
+            qvec_ft = dict(zip(qtext, model.encode(
+                [qtext[q["id"]] if q["set"] == "report_to_report" else QUERY_PREFIX + qtext[q["id"]] for q in queries],
+                normalize_embeddings=True, batch_size=256), strict=True))
         for q in queries:
             if q["set"] == "report_to_report" and q["fold"] != k:
                 continue
@@ -207,11 +220,20 @@ def run() -> dict[str, Any]:
                       "dense_sentence_ctx_filter": store.search_sentences(client, TMP, v, K + 1,
                                                                           exclude_negation_only=True),
                       "rrf": store.rrf([x for x in bm if x[0] != drop], [x for x in dn if x[0] != drop], top=K + 1)}
+            if finetuned:
+                vf = np.asarray(qvec_ft[q["id"]])
+                df = store.search_sentences(client, TMP_FT, vf, DEEP + 1)
+                ranked |= {"ft_sentence": df[:K + 1],
+                           "ft_sentence_filter": store.search_sentences(client, TMP_FT, vf, K + 1,
+                                                                        exclude_negation_only=True),
+                           "ft_rrf_plain": store.rrf([x for x in bm if x[0] != drop], [x for x in df if x[0] != drop],
+                                                     top=K + 1)}
             for name, rk in ranked.items():
                 order = [int(r) for r, _ in rk if r != drop]
                 pairs[name][q["set"]].append({"query": q["id"], "fold": k, **metrics(order, gains, q["target"], rel)})
-    client.delete_collection(TMP)
-    client.delete_collection(TMP_PLAIN)
+    for c in (TMP, TMP_PLAIN, TMP_FT):
+        if client.collection_exists(c):
+            client.delete_collection(c)
 
     out: dict[str, Any] = {"n_queries": dict(sorted({s: sum(q["set"] == s for q in queries) for s in SETS}.items())),
                            "skipped_pairs_no_relevant": skipped,
@@ -220,7 +242,7 @@ def run() -> dict[str, Any]:
                                      "negation_only_sentences": sum(bool(p.payload.get("negation_only"))
                                                                     for p in flat)},
                            "embedding_model": get_settings().embed_base_model, "variants": {}}
-    for name in VARIANTS:
+    for name in names:
         block: dict[str, Any] = {}
         for s in (*SETS, "all"):
             rows = [x for ss in SETS for x in pairs[name][ss]] if s == "all" else pairs[name][s]
@@ -232,11 +254,36 @@ def run() -> dict[str, Any]:
                         "contamination": _ci([x["contamination"] for x in rows if x["contamination"] is not None]),
                         "per_fold": per_fold}
         out["variants"][name] = block
-    out["best_base"] = best_base(out["variants"])
-    write_result("retrieval_base", out, fold="per fold + pooled", mapping_version="v1", eval_version="eval_v1.2",
+    out["best_base"] = best_base({v: out["variants"][v] for v in VARIANTS})
+    name = "retrieval_base"
+    if finetuned:
+        name = "retrieval_finetuned"
+        out["paired"] = {f"{a}_minus_{b}": {s: paired(pairs, a, b, s) for s in (*SETS, "all")}
+                         for a, b in FT_COMPARISONS}
+        p = out["paired"]["ft_sentence_minus_dense_sentence"]["all"]
+        out["use_rule"] = {
+            "rule": "fine-tuned plain vs base plain, pooled: nDCG@10 paired difference not significantly negative "
+                    "(CI hi >= 0) AND negation contamination@10 not higher",
+            "ndcg_difference": p["ndcg"], "contamination_difference": p["contamination"],
+            "use_finetuned_for_search": bool(p["ndcg"]["hi"] >= 0 and p["contamination"]["value"] <= 0)}
+        out["models"] = {str(k): str(store_dir / f"fold_{k}" / "model") for k in sorted(set(fold.values()))}
+    write_result(name, out, fold="per fold + pooled", mapping_version="v1", eval_version="eval_v1.2",
                  retrieval_spec=sp["version"], llm="none")
-    (TABLES / "retrieval_base.md").write_text(render(out), encoding="utf-8")
+    (TABLES / f"{name}.md").write_text(render(out), encoding="utf-8")
     return out
+
+
+def paired(pairs: dict[str, dict[str, list[dict[str, Any]]]], a: str, b: str, s: str) -> dict[str, Any]:
+    """Paired differences a - b over the same (query, fold) pairs (appended in the same order for every variant)."""
+    ra = [x for ss in SETS for x in pairs[a][ss]] if s == "all" else pairs[a][s]
+    rb = [x for ss in SETS for x in pairs[b][ss]] if s == "all" else pairs[b][s]
+    assert [(x["query"], x["fold"]) for x in ra] == [(x["query"], x["fold"]) for x in rb]
+    nd = [x["ndcg"] - y["ndcg"] for x, y in zip(ra, rb, strict=True)]
+    ct = [x["contamination"] - y["contamination"] for x, y in zip(ra, rb, strict=True)
+          if x["contamination"] is not None and y["contamination"] is not None]
+    d = _ci(nd)
+    return {"n_pairs": len(nd), "ndcg": {**d, "ci_excludes_zero": bool(d["lo"] > 0 or d["hi"] < 0)} if d else None,
+            "contamination": _ci(ct)}
 
 
 def best_base(variants: dict[str, Any]) -> dict[str, Any]:
@@ -256,7 +303,10 @@ NAMES = {"bm25": "BM25", "dense_report": "base bge-small, report-level",
          "rrf_plain": "base no-prefix sentences + BM25 (RRF)",
          "dense_sentence_ctx": "base bge-small, contextual sentences",
          "dense_sentence_ctx_filter": "base bge-small + negated-sentence payload filter (no training)",
-         "rrf": "base contextual sentences + BM25 (RRF)"}
+         "rrf": "base contextual sentences + BM25 (RRF)",
+         "ft_sentence": "fine-tuned, sentences without prefix",
+         "ft_sentence_filter": "fine-tuned, no prefix + negated-sentence filter",
+         "ft_rrf_plain": "fine-tuned no-prefix sentences + BM25 (RRF)"}
 
 
 def reading(out: dict[str, Any]) -> str:
@@ -295,7 +345,7 @@ def render(out: dict[str, Any], sets: tuple[str, ...] = (*SETS, "all")) -> str:
         lines += [f"**{s.replace('_', ' ')}** ({n} query–fold pairs)", "",
                   "| Variant | Recall@10 | nDCG@10 | Neg. contam.@10 |", "|---|---|---|---|"]
         lines += [f"| {NAMES[v]} | {f(out['variants'][v][s]['recall'])} | {f(out['variants'][v][s]['ndcg'])} | "
-                  f"{f(out['variants'][v][s]['contamination'])} |" for v in VARIANTS]
+                  f"{f(out['variants'][v][s]['contamination'])} |" for v in out["variants"]]
         lines.append("")
     return "\n".join(lines)
 
@@ -307,5 +357,5 @@ if __name__ == "__main__":
                                 encoding="utf-8")
         print({s: sum(q["set"] == s for q in qs) for s in SETS})
     else:
-        r = run()
-        print(json.dumps(r["n_queries"]), json.dumps(r["skipped_pairs_no_relevant"]))
+        r = run(finetuned="--finetuned" in sys.argv)
+        print(json.dumps(r["n_queries"]), json.dumps(r["skipped_pairs_no_relevant"]), json.dumps(r.get("use_rule")))

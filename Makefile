@@ -47,5 +47,10 @@ index:
 retrieval-eval:
 	$(PY) -m eval.retrieval run
 
+# M9 (extra "train"; GPU used when available, else CPU): per-fold evaluation models, then the fine-tuned rows
+train-embeddings:
+	$(PY) -m training.train_embeddings --folds 0 1 2 3 4
+	$(PY) -m eval.retrieval run --finetuned
+
 report:
 	$(PY) -m eval.report

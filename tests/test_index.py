@@ -38,7 +38,9 @@ def test_points_payloads_whitelisted_and_no_indication(tmp_path: Path) -> None:
 
 def test_contextual_prefix_and_negation_tags(tmp_path: Path) -> None:
     pts = {p.payload.get("sentence_id"): p for p in report_points(result(tmp_path))}
-    assert pts["F2"].text == "[Findings | report also mentions: cardiomegaly] No pleural effusion."
+    assert pts["F2"].text == "No pleural effusion."  # default: plain sentences (SPEC §6.3)
+    ctx = {p.payload.get("sentence_id"): p for p in report_points(result(tmp_path / "c"), prefix=True)}
+    assert ctx["F2"].text == "[Findings | report also mentions: cardiomegaly] No pleural effusion."  # M8 option
     assert pts["F2"].payload["negation_only"] and pts["F2"].payload["negated"] == ["Pleural Effusion"]
     assert pts["F1"].payload["affirmed"] == ["Cardiomegaly"] and not pts["F1"].payload["negation_only"]
     assert context_prefix("unknown", []) == "[Unknown] "

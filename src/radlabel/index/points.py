@@ -1,7 +1,8 @@
 """Index points (SPEC §6.3, M8), built from a PipelineResult only.
 
 - One report point (Findings + Impression) and one point per sentence, with its section ("unknown" when the parser
-  found no sections). Sentence text gets a contextual prefix from the PREDICTED labels:
+  found no sections). Sentences are embedded as plain text by default (SPEC §6.3; M8: plain 0.564 vs prefixed 0.491
+  nDCG@10). With `prefix=True` (or INDEX_SENTENCE_PREFIX) they get the M8 contextual prefix from the PREDICTED labels:
   "[Findings | report also mentions: cardiomegaly] No pleural effusion."
 - Payload: report_id, kind, predicted v2 labels (status, verification, evidence; not_mentioned left out), section,
   and the pipeline negation tags of the sentence. Never codes from the dataset, folds, eval mentions or the
@@ -15,6 +16,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from radlabel.config import get_settings
 from radlabel.labels import NO_FINDING
 from radlabel.pipeline import PipelineResult
 from radlabel.preprocess.negation import mentions
@@ -41,7 +43,9 @@ def context_prefix(section: str, present: list[str]) -> str:
     return f"[{section.capitalize()}{' | report also mentions: ' + ', '.join(present) if present else ''}] "
 
 
-def report_points(r: PipelineResult) -> list[IndexPoint]:
+def report_points(r: PipelineResult, prefix: bool | None = None) -> list[IndexPoint]:
+    """`prefix`: None = the INDEX_SENTENCE_PREFIX setting (default False)."""
+    prefix = get_settings().index_sentence_prefix if prefix is None else prefix
     labels = predicted_labels(r)
     present = [lab.lower() for lab, x in labels.items() if x["status"] == "present" and lab != NO_FINDING]
     out = [IndexPoint(id=str(uuid.uuid5(_NS, r.report_id)), kind="report",
@@ -53,7 +57,7 @@ def report_points(r: PipelineResult) -> list[IndexPoint]:
         ms = mentions(s.text)
         out.append(IndexPoint(
             id=str(uuid.uuid5(_NS, f"{r.report_id}:{s.id}")), kind="sentence",
-            text=context_prefix(section, present) + s.text,
+            text=(context_prefix(section, present) if prefix else "") + s.text,
             payload={"report_id": r.report_id, "kind": "sentence", "sentence_id": s.id, "section": section,
                      "labels": labels, "affirmed": sorted({m.label for m in ms if m.affirmed}),
                      "negated": sorted({m.label for m in ms if m.negated}),

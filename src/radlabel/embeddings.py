@@ -25,3 +25,21 @@ def _encoder() -> Any:
 def encode(texts: list[str], batch_size: int = 64) -> np.ndarray:
     """Unit-normalised embeddings, one row per text (tests replace this function)."""
     return np.asarray(_encoder().encode(texts, normalize_embeddings=True, batch_size=batch_size))
+
+
+@lru_cache
+def load_encoder(path: str) -> Any:
+    """A sentence-transformers model from a local directory (the private fine-tuned models, M9)."""
+    from sentence_transformers import SentenceTransformer  # optional extra "embed"
+
+    s = get_settings()
+    return SentenceTransformer(path, device=None if s.device == "auto" else s.device)
+
+
+def search_encode(texts: list[str], batch_size: int = 64) -> np.ndarray:
+    """Search / RAG encoder: SEARCH_EMBED_MODEL (the fine-tuned serving model, M9) if set, else the base model. The
+    verifier agent never uses this (it keeps the base model)."""
+    path = get_settings().search_embed_model
+    if not path:
+        return encode(texts, batch_size)
+    return np.asarray(load_encoder(path).encode(texts, normalize_embeddings=True, batch_size=batch_size))
