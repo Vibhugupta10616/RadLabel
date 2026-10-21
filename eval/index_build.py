@@ -66,12 +66,17 @@ def main() -> dict[str, Any]:
         if p.payload:
             by_report.setdefault(p.payload["report_id"], []).append(
                 normalise(text[str(p.id)] + " " + json.dumps(p.payload)))
-    checked = 0
+    checked = coincidental = 0
     for i, r in res.items():
         ind = normalise(r.parse.indication.replace("XXXX", " "))
         if len(ind) >= MIN_INDICATION_CHARS and r.sections_identified:
             checked += 1
-            indication_hits += any(ind in blob for blob in by_report.get(str(i), []))
+            found = any(ind in blob for blob in by_report.get(str(i), []))
+            # the report's own Findings / Impression may repeat the indication's words: that is report text, not
+            # the indication field leaking into the index
+            own = ind in normalise(r.parse.findings + " " + r.parse.impression)
+            indication_hits += found and not own
+            coincidental += found and own
     with eng.connect() as c:
         counts = {t: c.execute(sql(f"select count(*) from {t}")).scalar_one() for t in ("reports", "labels")}
         cols = {t: [r[0] for r in c.execute(sql(
@@ -83,6 +88,7 @@ def main() -> dict[str, Any]:
            "sentence_points": sum(p.payload.get("kind") == "sentence" for p in stored if p.payload),
            "check_payload_keys_whitelisted": not bad_keys, "check_no_forbidden_words_in_payloads": not bad_words,
            "check_indications_tested": checked, "check_indication_found_in_points": indication_hits,
+           "indication_phrase_also_in_own_findings_or_impression": coincidental,
            "embedding_model": s.embed_base_model, "source": "artifacts/predictions/verifier_agent_full.jsonl (M7 v2)"}
     assert not bad_keys and not bad_words and not indication_hits, out
     write_result("index_build", out, fold=None, mapping_version="v1", llm="none")
