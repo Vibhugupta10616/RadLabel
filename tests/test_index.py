@@ -96,13 +96,13 @@ def test_ties_are_broken_deterministically() -> None:
     from types import SimpleNamespace
 
     pts = [SimpleNamespace(id=f"p{i}", score=s, payload={"report_id": str(i)}) for i, s in
-           enumerate([0.9, 0.5, 0.5, 0.5, 0.5, 0.1])]
+           enumerate([0.9, 0.5, 0.5000000001, 0.4999999999, 0.5, 0.1])]  # ties up to float noise
 
     class Fake:
         def query_points(self, name: str, *, limit: int, score_threshold: float | None = None, **kw: object) -> object:
             hits = [p for p in pts if score_threshold is None or p.score >= score_threshold]
             random.shuffle(hits)  # arbitrary order, including among ties
-            return SimpleNamespace(points=sorted(hits, key=lambda p: -p.score)[:limit])
+            return SimpleNamespace(points=sorted(hits, key=lambda p: -round(p.score, 6))[:limit])
 
     tops = {tuple(store._top(Fake(), "c", [0.0], "dense", store._kind("report"), 3)) for _ in range(20)}  # type: ignore[arg-type]
     assert tops == {(("0", "p0", 0.9), ("1", "p1", 0.5), ("2", "p2", 0.5))}
