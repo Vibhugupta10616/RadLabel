@@ -267,10 +267,29 @@ def run(finetuned: bool = False) -> dict[str, Any]:
             "ndcg_difference": p["ndcg"], "contamination_difference": p["contamination"],
             "use_finetuned_for_search": bool(p["ndcg"]["hi"] >= 0 and p["contamination"]["value"] <= 0)}
         out["models"] = {str(k): str(store_dir / f"fold_{k}" / "model") for k in sorted(set(fold.values()))}
+    out["compute"] = compute_info()
     write_result(name, out, fold="per fold + pooled", mapping_version="v1", eval_version="eval_v1.2",
                  retrieval_spec=sp["version"], llm="none")
     (TABLES / f"{name}.md").write_text(render(out), encoding="utf-8")
     return out
+
+
+def compute_info() -> dict[str, Any]:
+    """Device and library versions of the embedding runs (GPU and CPU floats differ in the last digits)."""
+    import subprocess
+
+    import torch
+
+    info: dict[str, Any] = {"device": "cuda" if torch.cuda.is_available() else "cpu", "torch": torch.__version__,
+                            "cuda": torch.version.cuda}
+    if torch.cuda.is_available():
+        info["gpu"] = torch.cuda.get_device_name(0)
+        try:
+            info["driver"] = subprocess.run(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+                                            capture_output=True, text=True, check=True).stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            info["driver"] = None
+    return info
 
 
 def paired(pairs: dict[str, dict[str, list[dict[str, Any]]]], a: str, b: str, s: str) -> dict[str, Any]:

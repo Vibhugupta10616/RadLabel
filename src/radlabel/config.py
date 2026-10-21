@@ -42,9 +42,9 @@ class Settings(BaseSettings):
 
     # Local models
     embed_base_model: str = "BAAI/bge-small-en-v1.5"
-    # search / RAG encoder: a fine-tuned model directory (M9) or empty = the base model; the verifier agent always
-    # uses the base model
-    search_embed_model: str = ""
+    # search / RAG encoder: the fine-tuned serving model (M9 passed its use rule) or empty = the base model; the
+    # verifier agent always uses the base model. The model is private (MODEL_STORE), never in the repository.
+    search_embed_model: str = "./models/serving/model"
     # sentence points carry the predicted-label prefix (M8 comparison rows only; default plain sentences, SPEC §6.3)
     index_sentence_prefix: bool = False
     reranker_model: str = "BAAI/bge-reranker-base"

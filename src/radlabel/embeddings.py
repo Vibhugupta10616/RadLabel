@@ -5,6 +5,7 @@ fine-tuned model (M9) is for search and RAG only."""
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -42,4 +43,7 @@ def search_encode(texts: list[str], batch_size: int = 64) -> np.ndarray:
     path = get_settings().search_embed_model
     if not path:
         return encode(texts, batch_size)
+    if not Path(path).is_dir():
+        raise FileNotFoundError(f"search model {path!r} not found: train it (make train-embeddings, then --serving) "
+                                "or fetch it from the private MODEL_STORE; SEARCH_EMBED_MODEL= uses the base model")
     return np.asarray(load_encoder(path).encode(texts, normalize_embeddings=True, batch_size=batch_size))
