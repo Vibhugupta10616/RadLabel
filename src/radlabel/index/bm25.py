@@ -1,8 +1,14 @@
-"""BM25 as Qdrant sparse vectors (README §6.3): document weights tf * (k1 + 1) / (tf + k1 * (1 - b + b * dl / avgdl)),
-the IDF factor applied by Qdrant (sparse vector modifier IDF), query weights 1 per distinct term."""
+"""BM25 as Qdrant sparse vectors (README §6.3): document weight
+idf * tf * (k1 + 1) / (tf + k1 * (1 - b + b * dl / avgdl)), query weights 1 per distinct term, so the dot product is
+the BM25 score.
+
+IDF is computed here, over the reports being indexed (idf = ln(1 + (N - df + 0.5) / (df + 0.5))), not by Qdrant's IDF
+modifier: Qdrant's statistics depended on its segment state at query time, which made BM25 scores differ between
+identical runs (found after M8)."""
 
 from __future__ import annotations
 
+import math
 import zlib
 from collections import Counter
 
@@ -19,10 +25,15 @@ def term_id(term: str) -> int:
     return zlib.crc32(term.encode())  # ponytail: stable 32-bit hash ids; collisions are negligible at this vocabulary
 
 
-def doc_vector(text: str, avgdl: float) -> tuple[list[int], list[float]]:
+def idf(texts: list[str]) -> dict[int, float]:
+    df = Counter(i for t in texts for i in {term_id(x) for x in tokens(t)})
+    return {i: math.log(1 + (len(texts) - n + 0.5) / (n + 0.5)) for i, n in df.items()}
+
+
+def doc_vector(text: str, avgdl: float, idfs: dict[int, float]) -> tuple[list[int], list[float]]:
     tf = Counter(term_id(t) for t in tokens(text))
     dl = sum(tf.values())
-    items = sorted((i, n * (K1 + 1) / (n + K1 * (1 - B + B * dl / avgdl))) for i, n in tf.items())
+    items = sorted((i, idfs[i] * n * (K1 + 1) / (n + K1 * (1 - B + B * dl / avgdl))) for i, n in tf.items())
     return [i for i, _ in items], [w for _, w in items]
 
 

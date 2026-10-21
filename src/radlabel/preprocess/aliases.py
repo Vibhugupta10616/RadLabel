@@ -2,7 +2,7 @@
 CheXpert labeler mention phrases. Fixed, never tuned on data, and written independently of the eval lexicon
 (`eval/lexicon.yaml`), which must never be copied here.
 
-- Held-out aliases (embedding evaluation, M9): per label, the first 30% of aliases in SHA-1 order of
+- Held-out aliases (embedding evaluation, M10): per label, the first 30% of aliases in SHA-1 order of
   "label|alias", excluding the label's own name. A fixed hash rule, so the choice can't be cherry-picked.
 - Anchor aliases: anatomy-only phrases ("cardiac silhouette") that point at a label without asserting it.
   They mark evidence and negation ("heart size is normal"), and assert the finding only with an

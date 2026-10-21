@@ -36,7 +36,7 @@ variants:
   query_prefix: "bge retrieval instruction for label, alias, attribute and compositional queries; none for report-to-report"
 
 label_queries:
-  heldout_labels: [Fracture, Lung Lesion, Pleural Other]   # never used in M9 training (README §6.3)
+  heldout_labels: [Fracture, Lung Lesion, Pleural Other]   # never used in fine-tuning (M10, README §6.3)
   seen_label: "the label name, lower-case, for each finding label not held out (8); relevant: label coded (v1)"
   heldout_label: "the label name, lower-case, for each held-out label (3); relevant: label coded (v1)"
   heldout_alias: >-

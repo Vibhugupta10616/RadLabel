@@ -1,4 +1,4 @@
-"""Sentence embeddings (optional extra "embed"): the base model until M9 (EMBED_BASE_MODEL), then the fine-tuned one.
+"""Sentence embeddings (optional extra "embed"): the base model until M10 (EMBED_BASE_MODEL), then the fine-tuned one.
 Used by the verifier agent's find_by_meaning tool and by the index (README §6.3)."""
 
 from __future__ import annotations

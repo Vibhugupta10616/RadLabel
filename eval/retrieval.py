@@ -247,7 +247,8 @@ def reading(out: dict[str, Any]) -> str:
         "from the contextual prefix, which names the PREDICTED v2 labels: once the \"No X\" sentences are filtered "
         "out, sentences whose prefix mentions X come from reports predicted positive for X, so this row partly "
         "measures the labelling pipeline, not only the embeddings. It is the baseline the fine-tuned model must "
-        "beat (M9). Base models only; no held-out effect is expected before fine-tuning.")
+        "beat (M10, judged two ways, README §8.2). Base models only; no held-out effect is expected before "
+        "fine-tuning.")
 
 
 def render(out: dict[str, Any], sets: tuple[str, ...] = (*SETS, "all")) -> str:

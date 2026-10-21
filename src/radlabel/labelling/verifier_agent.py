@@ -4,7 +4,7 @@
 - Blind first: it gets the report sentences, the tagger's statuses WITHOUT the tagger's evidence, and the escalation
   reasons (free_checks.py). Never codes from the dataset, folds, eval mentions or metrics
   (tests/test_verifier_agent_leakage.py).
-- Tools: find_by_alias, find_by_meaning (sentence embeddings, base model until M9), check_negation,
+- Tools: find_by_alias, find_by_meaning (sentence embeddings, base model until M10), check_negation,
   compare_sections, check_redaction, get_label_definition (the frozen Tier 1 definitions), normal_check, submit.
 - Limits: MAX_TOOL_CALLS tool calls (submit included) and MAX_REPORT_TOKENS tokens per report; on a cap, the budget
   or a content-filter refusal, the escalated labels end `unverified` with the reason.

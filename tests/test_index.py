@@ -53,9 +53,10 @@ def test_postgres_rows_hold_predicted_labels_and_the_indication_separately(tmp_p
 
 
 def test_bm25_weights_and_rrf() -> None:
-    idx, val = bm25.doc_vector("effusion effusion small", avgdl=3.0)
+    idfs = bm25.idf(["effusion effusion small", "small heart", "small lungs"])
+    idx, val = bm25.doc_vector("effusion effusion small", avgdl=3.0, idfs=idfs)
     w = dict(zip(idx, val, strict=True))
-    assert w[bm25.term_id("effusion")] > w[bm25.term_id("small")] > 0
+    assert w[bm25.term_id("effusion")] > w[bm25.term_id("small")] > 0  # higher tf and rarer term
     assert bm25.query_vector("Small small effusion")[1] == [1.0, 1.0]
     fused = store.rrf([("a", 9.0), ("b", 8.0)], [("b", 0.9), ("c", 0.8)], top=3)
     assert [r for r, _ in fused] == ["b", "a", "c"]

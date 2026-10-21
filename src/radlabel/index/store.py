@@ -1,5 +1,5 @@
 """Qdrant collection (README §6.3): report points (dense + BM25 sparse) and contextual sentence points (dense).
-Dense cosine, BM25 with Qdrant's IDF modifier (IDF over report points only, the only points with a sparse vector).
+Dense cosine; BM25 sparse vectors carry the full BM25 weight (IDF computed in bm25.py over the indexed reports).
 Sentence hits aggregate to reports by max score. RRF fuses report rankings (k = 60)."""
 
 from __future__ import annotations
@@ -21,20 +21,22 @@ def create(client: QdrantClient, name: str, dim: int) -> None:
         client.delete_collection(name)
     client.create_collection(
         name, vectors_config={DENSE: models.VectorParams(size=dim, distance=models.Distance.COSINE)},
-        sparse_vectors_config={SPARSE: models.SparseVectorParams(modifier=models.Modifier.IDF)})
+        sparse_vectors_config={SPARSE: models.SparseVectorParams()})
     for key in ("kind", "report_id"):
         client.create_payload_index(name, key, models.PayloadSchemaType.KEYWORD)
     client.create_payload_index(name, "negation_only", models.PayloadSchemaType.BOOL)
 
 
 def upsert(client: QdrantClient, name: str, points: Sequence[IndexPoint], dense: np.ndarray, batch: int = 256) -> None:
-    """`dense`: one unit vector per point (same order). BM25 average length is computed over these report points."""
-    avgdl = bm25.avg_doc_len([p.text for p in points if p.kind == "report"])
+    """`dense`: one unit vector per point (same order). BM25 statistics (IDF, average length) are computed over the
+    report points passed here, so call it once with all of a collection's reports."""
+    reports = [p.text for p in points if p.kind == "report"]
+    avgdl, idfs = bm25.avg_doc_len(reports), bm25.idf(reports)
     out = []
     for p, v in zip(points, dense, strict=True):
         vec: dict[str, object] = {DENSE: v.tolist()}
         if p.kind == "report":
-            idx, val = bm25.doc_vector(p.text, avgdl)
+            idx, val = bm25.doc_vector(p.text, avgdl, idfs)
             vec[SPARSE] = models.SparseVector(indices=idx, values=val)
         out.append(models.PointStruct(id=p.id, vector=vec, payload=p.payload))
     for i in range(0, len(out), batch):
