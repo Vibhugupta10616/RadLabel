@@ -1,4 +1,4 @@
-// Typed client for the M9a backend. Contract assumptions: web/README.md.
+// Typed client for the session API (src/radlabel/api/). Contract assumptions: web/README.md.
 import type { Api } from './contract'
 import { mockApi } from './mocks'
 
@@ -33,6 +33,13 @@ export const httpApi: Api = {
   timeline: (id) => call(`/session/${id}/timeline`),
 }
 
-// Mock mode is the default until M9a exists; VITE_MOCK=false switches to the real API.
-export const MOCK = import.meta.env.VITE_MOCK !== 'false'
+// The built site calls the real API; the dev server and tests use the mock (design work) unless VITE_MOCK says
+// otherwise (VITE_MOCK=false npm run dev talks to the backend on :8000 through the proxy).
+const mockEnv = import.meta.env.VITE_MOCK
+export const MOCK = mockEnv ? mockEnv !== 'false' : !import.meta.env.PROD
 export const api: Api = MOCK ? mockApi : httpApi
+
+// Leaving the page or starting over deletes the session at once (otherwise the server expires it after an hour idle).
+export function endSession(id: string) {
+  if (!MOCK) fetch(`${import.meta.env.VITE_API_BASE ?? ''}/api/session/${id}`, { method: 'DELETE', keepalive: true }).catch(() => {})
+}

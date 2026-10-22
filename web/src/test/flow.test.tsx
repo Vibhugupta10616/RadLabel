@@ -108,3 +108,17 @@ test('real mode sends the question as JSON to /api/session/{id}/ask', async () =
   expect(url).toBe('/api/session/abc/ask')
   expect(JSON.parse(init!.body as string)).toEqual({ scope: 'all', question: 'When was the pacemaker first described?' })
 })
+
+test('a citation of an indication sentence highlights it', async () => {
+  vi.spyOn(mockApi, 'ask').mockResolvedValue({
+    answer: 'The indication was shortness of breath.', refusal: null, citations: [{ report_no: 1, sentence_id: 'N1' }],
+    retrieved_sentences: 1, retrieved_reports: 1,
+  })
+  const user = userEvent.setup()
+  renderAt('/upload')
+  await user.click(screen.getByRole('button', { name: 'Try a sample patient (5 reports)' }))
+  await screen.findByRole('heading', { level: 1, name: /Report 1/ })
+  await user.type(screen.getByLabelText('Your question'), 'Why was the first X-ray taken?{Enter}')
+  await user.click(await screen.findByRole('button', { name: 'Show report 1, sentence N1' }))
+  expect(reportText().getByText('Shortness of breath.')).toHaveClass('bg-hl')
+})

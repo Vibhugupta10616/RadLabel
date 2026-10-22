@@ -1,0 +1,15 @@
+# Licence and secrets: no data (except the synthetic sample), caches, weights or .env in any image
+.env
+.env.*
+data/*
+!data/sample/
+artifacts/
+models/
+.venv/
+.git/
+**/__pycache__/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+web/node_modules/
+web/dist/

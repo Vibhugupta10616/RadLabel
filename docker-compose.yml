@@ -29,6 +29,27 @@ services:
       interval: 5s
       retries: 10
 
+  # The website (docker compose --profile site up --build -d web, then http://localhost:8080). Uploads stay in the api
+  # process's memory; it needs no database. Mounted, never in the image: the private search model (falls back to the
+  # base model with a warning if missing) and the cost-ledger directory (aggregate website spend rows, D22).
+  api:
+    profiles: [site]
+    build: {context: ., dockerfile: deploy/api.Dockerfile}
+    env_file: [{path: .env, required: false}]
+    ports: ["8000:8000"]
+    volumes:
+      - ./models/serving:/app/models/serving:ro
+      - ./artifacts/llm_cache:/app/artifacts/llm_cache
+      - hf:/home/app/.cache/huggingface
+
+  web:
+    profiles: [site]
+    build: {context: ., dockerfile: deploy/web.Dockerfile}
+    ports: ["8080:80"]
+    depends_on:
+      api: {condition: service_healthy}
+
 volumes:
   pgdata:
   qdrant:
+  hf:

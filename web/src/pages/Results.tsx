@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { Fragment, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { api } from '../api'
 import type { AskResult, Citation, Label, LabelName, Report, Sentence, Status, TimelineRow } from '../contract'
@@ -214,8 +214,8 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
               <p className="m-0 mb-4 text-sm text-body">The report's sections couldn't be identified, so every sentence is read as Findings.</p>
             )}
             <div className="flex flex-col gap-[18px]">
-              <Prose title="Indication" note="(used for questions, not for labels)" sentences={cur.sections.indication} />
-              <Prose title="Comparison" sentences={cur.sections.comparison} />
+              <Prose title="Indication" note="(used for questions, not for labels)" sentences={cur.sections.indication} highlighted={highlighted} />
+              <Prose title="Comparison" sentences={cur.sections.comparison} highlighted={highlighted} />
               <Numbered title="Findings" sentences={cur.sections.findings} highlighted={highlighted} />
               <Numbered title="Impression" sentences={cur.sections.impression} highlighted={highlighted} />
             </div>
@@ -291,12 +291,21 @@ function ResultsView({ sessionId, reports, sample }: { sessionId: string; report
   )
 }
 
-function Prose({ title, note, sentences }: { title: string; note?: string; sentences: Sentence[] }) {
+// Indication / comparison: prose without IDs, but answers can cite them (N1.., C1..), so each sentence can be
+// scrolled to and highlighted.
+function Prose({ title, note, sentences, highlighted }: { title: string; note?: string; sentences: Sentence[]; highlighted: string[] }) {
   if (!sentences.length) return null
   return (
     <div>
       <h2 className={sectionHead}>{title} {note && <span className="font-normal normal-case tracking-normal">{note}</span>}</h2>
-      <p className="m-0 text-[15px] leading-relaxed text-body">{sentences.map((s) => s.text).join(' ')}</p>
+      <p className="m-0 text-[15px] leading-relaxed text-body">
+        {sentences.map((s, i) => (
+          <Fragment key={s.id}>
+            {i > 0 && ' '}
+            <span id={`s-${s.id}`} className={`scroll-mt-24 rounded transition-colors duration-300 ${highlighted.includes(s.id) ? 'bg-hl text-ink font-medium' : ''}`}>{s.text}</span>
+          </Fragment>
+        ))}
+      </p>
     </div>
   )
 }

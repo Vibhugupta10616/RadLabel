@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { MACRO_F1, MAX_FILES, REPORTS_TESTED, UNVERIFIED_RIGHT, VERIFIED_RIGHT } from '../numbers'
+import { MACRO_F1, MAX_FILES, NEGATED_TOP10_BASE, NEGATED_TOP10_FINETUNED, REPORTS_TESTED, SEARCH_NDCG_BASE, SEARCH_NDCG_FINETUNED, UNVERIFIED_RIGHT, VERIFIED_RIGHT } from '../numbers'
 import { useSession } from '../session'
 import type { LabelName, Status } from '../contract'
 import { Arrow, Check, GITHUB, LogoMark, Pop, Reveal, StatusGrid, StatusPill, Up } from '../ui'
@@ -251,6 +251,7 @@ function Features() {
             <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full bg-teal-dark text-white mb-3.5">Retrieval-augmented Q&amp;A</span>
             <h3 className={featureH3}>Ask across a whole patient series</h3>
             <p className={featureP}>Upload a patient's follow-up reports and ask how things changed. RadLabel builds a search index for your visit only, retrieves the relevant sentences from every report, and answers with citations. The index is deleted when you leave.</p>
+            <p className={`${featureP} mt-3`}>The search model is fine-tuned to tell "effusion" from "no effusion": in testing, results that only mention a finding as absent fell from {NEGATED_TOP10_BASE}% to {NEGATED_TOP10_FINETUNED}% of the top 10, and ranking quality (nDCG@10) rose from {SEARCH_NDCG_BASE} to {SEARCH_NDCG_FINETUNED}.</p>
           </Reveal>
           <Reveal className={`${featureCard} gap-4`}>
             <div aria-hidden="true" className="flex flex-col gap-4">
