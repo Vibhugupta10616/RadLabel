@@ -2,8 +2,8 @@
 m9c-frontend.
 
 - Everything in process memory: uploads, labels, the session index and the LLM cache (radlabel.llm with
-  memory_cache=True). Nothing is written to disk, logs, the evaluation cache or the IU index; logs carry no report
-  or question text.
+  memory_cache=True). No report or question text is written to disk, logs, the evaluation cache or the IU index;
+  the only disk write is one aggregate cost-ledger row per fresh LLM call (ts, endpoint, model, tokens, cost).
 - Labels only through run_pipeline (the evaluated v2 configuration).
 - Limits: WEB_MAX_REPORTS per session, WEB_MAX_TEXT_CHARS per report, WEB_MAX_FILE_BYTES per file, questions of at
   most 500 characters, API_RATE_LIMIT per client IP, WEB_DAILY_CAP_USD of LLM spend per day (then rules-only labels

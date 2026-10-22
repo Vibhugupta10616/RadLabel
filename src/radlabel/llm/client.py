@@ -89,13 +89,22 @@ def spent_usd(cache_dir: Path) -> float:
     return sum(json.loads(line)["cost_usd"] for line in ledger.open(encoding="utf-8"))
 
 
+def web_spent_today(cache_dir: Path) -> float:
+    """Today's (UTC) website spend from the ledger, so the daily cap survives restarts."""
+    ledger, day = cache_dir / "ledger.jsonl", datetime.now(UTC).date().isoformat()
+    if not ledger.exists():
+        return 0.0
+    rows = (json.loads(line) for line in ledger.open(encoding="utf-8"))
+    return sum(r["cost_usd"] for r in rows if r.get("source") == "web" and r["ts"].startswith(day))
+
+
 MEMORY_CACHE_ENTRIES = 2000
 
 
 class LLMClient:
-    """`memory_cache=True` (website requests): responses are cached in a bounded in-memory dict and spend is tracked
-    in memory only, so nothing is written to disk (no report or question text anywhere); the global stop still counts
-    the existing ledger (read only). `daily_cap_usd`: fresh calls stop once today's spend reaches it."""
+    """`memory_cache=True` (website requests): responses are cached in a bounded in-memory dict, never on disk; each
+    fresh call adds one aggregate ledger row (ts, endpoint, model, tokens, cost; never report or question text).
+    `daily_cap_usd`: fresh calls stop once today's website spend (read from the ledger at start) reaches it."""
 
     def __init__(self, settings: Settings | None = None, cache_dir: Path | None = None,
                  cache_only: bool = False, memory_cache: bool = False, daily_cap_usd: float | None = None) -> None:
@@ -109,6 +118,8 @@ class LLMClient:
         self._models: dict[str, str] = {}
         self._lock = threading.Lock()  # thread-safe ledger and running spend (callers may use a thread pool)
         self._spent = spent_usd(self.cache_dir)
+        if memory_cache:
+            self._day[datetime.now(UTC).date().isoformat()] = web_spent_today(self.cache_dir)
 
     @property
     def spent(self) -> float:
@@ -245,11 +256,15 @@ class LLMClient:
             self._spent += r.cost_usd
             day = datetime.now(UTC).date().isoformat()
             self._day[day] = self._day.get(day, 0.0) + r.cost_usd
-        if self._memory is not None:
-            return  # website requests: spend in memory only, nothing on disk
+        ts = datetime.now(UTC).isoformat(timespec="seconds")
+        if self._memory is not None:  # website: aggregate fields only (the prompt and answer are never written)
+            row: dict[str, Any] = {"ts": ts, "source": "web", "endpoint": "ask" if purpose.startswith("ask:")
+                                   else "reports", "model": r.model,
+                                   **r.model_dump(include={"input_tokens", "cached_input_tokens", "output_tokens",
+                                                           "cost_usd"})}
+        else:
+            row = {"ts": ts, "purpose": purpose, **r.model_dump(exclude={"text", "cached", "tool_calls"})}
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        row = {"ts": datetime.now(UTC).isoformat(timespec="seconds"), "purpose": purpose,
-               **r.model_dump(exclude={"text", "cached", "tool_calls"})}
         with self._lock, (self.cache_dir / "ledger.jsonl").open("a", encoding="utf-8") as f:
             f.write(json.dumps(row) + "\n")
 

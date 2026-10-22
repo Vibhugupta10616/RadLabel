@@ -1,6 +1,6 @@
 """Website session API (SPEC §6.5, M10a): every endpoint, the frontend contract shapes, limits, the citation check,
-the daily cap, and privacy (nothing written anywhere, no report or question text in logs). FakeLLM and a fake
-encoder: no network, no model download."""
+the daily cap, and privacy (only aggregate cost-ledger rows written, no report or question text in logs). FakeLLM
+and a fake encoder: no network, no model download."""
 
 import builtins
 import hashlib
@@ -192,6 +192,17 @@ def test_daily_cap_gives_rules_only_labels_and_unavailable_answers(tmp_path: Pat
     assert r["answer"] is None and "temporarily unavailable" in r["refusal"]
 
 
+def test_daily_cap_reads_the_ledger_so_it_survives_restarts(tmp_path: Path) -> None:
+    from datetime import UTC, datetime
+    row = {"ts": datetime.now(UTC).isoformat(timespec="seconds"), "source": "web", "endpoint": "ask",
+           "model": "fake", "input_tokens": 1, "cached_input_tokens": 0, "output_tokens": 1, "cost_usd": 0.6}
+    rows = [row, {**row, "source": None}]  # the second (an owner run) does not count toward the website cap
+    (tmp_path / "ledger.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    assert FakeLLM(responder, tmp_path, memory_cache=True, daily_cap_usd=1.0).spent_today == pytest.approx(0.6)
+    c, llm = client(tmp_path, cap=0.5)  # a restarted server: today's web spend 0.6 >= cap 0.5
+    assert llm.daily_cap_reached() and c.get("/ready").json()["daily_cap_reached"] is True
+
+
 def test_rate_limit_per_ip(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.setenv("API_RATE_LIMIT", "3/minute")
     get_settings.cache_clear()
@@ -227,8 +238,16 @@ def test_uploads_and_questions_are_written_nowhere(tmp_path: Path, monkeypatch: 
     c.post(f"/api/session/{sid}/reports", data={"text": REPORT})
     c.post(f"/api/session/{sid}/ask", json={"scope": "all", "question": QUESTION})
     c.post(f"/api/session/{sid}/ask", json={"scope": "report", "report_no": 1, "question": QUESTION})
-    assert writes == []  # no file opened for writing (no cache, no ledger, nothing)
-    assert not list(tmp_path.rglob("*"))  # the LLM client's cache dir stays empty
+    ledger = tmp_path / "ledger.jsonl"
+    assert {Path(w) for w in writes} == {ledger}  # only the cost ledger is written (no cache, no upload)
+    assert [p for p in tmp_path.rglob("*")] == [ledger]
+    rows = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
+    assert rows and {r["endpoint"] for r in rows} == {"reports", "ask"}
+    for r in rows:  # aggregate entries only: never report or question text
+        assert set(r) == {"ts", "source", "endpoint", "model", "input_tokens", "cached_input_tokens",
+                          "output_tokens", "cost_usd"}
+    text = ledger.read_text(encoding="utf-8")
+    assert "zq" not in text and "effusion" not in text
     logged = " ".join(r.getMessage() for r in caplog.records)
     assert "request" in logged and "zqcough" not in logged and "zqwhat" not in logged and "effusion" not in logged
 

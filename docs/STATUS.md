@@ -16,7 +16,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M7 | **Done** (owner-accepted 2026-10-22; tag `m7-verifier-agent`) (code `77e8abd`, `6729cb0`, `33e2667`) | Full run (prompt `verifier-v2`, owner-approved): headline macro-F1 (v1) **0.887** (0.874–0.899), strict 0.883; paired v2 − LLM + verifier + Tier 2 +0.022 (0.013–0.031), v2 − LLM only +0.025 (0.016–0.035), v2 − rule baseline +0.050 (0.037–0.063) → agent **kept** (pre-committed rule). Verified + verified_rules labels precision 0.938 vs unverified 0.393. Reports with any unverified label 2.9% (v1 review rate 30.5%). Escalated 1,290 (41.8%). Agent cost $2.07 new ($2.12 incl. the cached dev reports); rerun from cache $0, byte-identical. |
 | M8 | **Done** (owner-accepted 2026-10-22) (spec `8628794`, code `d4c154b`..`0f25dfa`) | Serving index from the M7 v2 outputs: Postgres 3,086 reports / 40,118 labels (Alembic `0001`), Qdrant 3,086 report + 19,006 contextual sentence points; leakage checks on the stored points pass (payload whitelist; indication text 0 of 2,192). Retrieval (spec frozen before the run, 259 queries, per fold + pooled): best pooled nDCG@10 the negated-sentence filter 0.528 ≈ RRF 0.526; seen-label nDCG 0.637 → 0.871 and contamination 0.310 → 0.070 with the filter; report-to-report best BM25 0.463. No LLM calls ($0). |
 | M9 | **Done** (owner-accepted 2026-10-22) (code `a793a6f`, `fe859bc`, `853ffd0`) | Fine-tuned bge-small (plain sentences, CachedGISTEmbedLoss, GPU): pooled nDCG@10 0.564 → 0.592, paired +0.028 (0.019–0.038), negation contamination 0.140 → 0.097 → **use rule passes**, search default = fine-tuned serving model. Seen labels +0.134, held-out aliases +0.069, compositional +0.045; held-out labels −0.010 (CI includes 0), attribute −0.013 (CI includes 0). With the filter: 0.582 → 0.602. |
-| M10a | **built, waiting for owner review** (code `b60e667`) | FastAPI session API in `src/radlabel/api/` matching the m9c-frontend contract; in memory only; frozen prompts `ask-report-v1`, `ask-all-v1`; sample patient precomputed (no LLM call on load). Real run on the sample: $0.008. |
+| M10a | **Done** (owner-accepted 2026-10-22) (code `b60e667`, `a100ccb`, `ad20f14`) | FastAPI session API in `src/radlabel/api/` matching the m9c-frontend contract; uploads in memory only (aggregate cost-ledger rows, D22); frozen prompts `ask-report-v1`, `ask-all-v1`; sample patient precomputed (no LLM call on load). Real run on the sample: $0.008. |
 | M10b | planned | Website evaluation: 20 frozen questions (`docs/m9b_handwritten_questions.md`) on the dev slice; session RAG vs all reports in the prompt on batches of 3/10/30/50; latency and cost. |
 | M10c | in progress (branch `m9c-frontend`) | Website frontend (React); runs on a mock API until M10a. |
 | M11 | planned | Deployment: Vercel (frontend) + Hugging Face Docker Space (backend); secrets as Space secrets; no private models in the image. |
@@ -267,6 +267,15 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - Limitation recorded (RESULTS, SPEC §11): no gain on the three held-out findings.
 - `docs/m9b_handwritten_questions.md` is frozen (committed in `4375486`, unchanged since).
 
+## After M10a (owner, 2026-10-22)
+- M10a accepted.
+- **D22:** website spend is written to the cost ledger as aggregate rows only; the daily cap reads them (survives
+  restarts).
+- Sample checks recorded in `docs/evaluation_notes.md` (not fixed): report 3 Lung Opacity `present` (agent-corrected)
+  is supported by its evidence; report 5 Cardiomegaly `uncertain` for "borderline" is wrong by the label definition
+  (no check promotes an `uncertain` whose only hedge is definition-present wording).
+- SPEC §6.5 / §12 updates approved; frontend merge (M10c integration) approved.
+
 ## M10a notes
 - Contract (`web/README.md`, `web/src/contract.ts` on m9c-frontend) matched. Additions, not changes: `DELETE
   /api/session/{id}`; optional `report_nos` / `labels` filters on ask scope "all"; `rules_only` always present.
@@ -275,10 +284,11 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - **Sample patient:** the contract says loading it needs no LLM call, so its pipeline outputs are computed once
   (`python -m radlabel.api.sample`, real pipeline, $0.0068) and committed as `data/sample/sample_results.json` with
   the texts' hash; they are synthetic, hand-written reports, not IU text. Recomputed only if the texts change.
-- Privacy: the website LLM client caches in memory and tracks spend in memory (no ledger lines, no cache files);
-  logs are JSON lines with route, status and timing only. Test: upload + ask open no file for writing and log no
-  report or question text. Consequence: website spend is not in `ledger.jsonl`; the daily cap ($1) and the global
-  stop (ledger total + in-memory spend) still apply.
+- Privacy: the website LLM client caches in memory (no cache files); logs are JSON lines with route, status and
+  timing only. Website spend (owner decision D22, 2026-10-22) goes to `ledger.jsonl` as aggregate rows only
+  (`ts, source="web", endpoint, model, tokens, cost`; never report or question text); the daily cap ($1) reads
+  today's web rows at start, so it survives restarts. Test: upload + ask write only the ledger, whose rows have
+  exactly those fields and no request text; no report or question text in logs.
 - Daily cap reached → `run_pipeline` falls back to rule labels (`rules_only`, all `unverified`), ask returns
   "temporarily unavailable".
 - Search: fine-tuned plain sentences (D21); a missing private model falls back to the base model with a warning.
