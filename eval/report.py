@@ -79,6 +79,17 @@ def _reading(paired: dict[str, Any], t2: dict[str, Any] | None) -> list[str]:
             "reports)."]
 
 
+def _heldout_limitation() -> list[str]:
+    ft = load_result("retrieval_finetuned")
+    if ft is None:
+        return []
+    d = ft["paired"]["ft_sentence_minus_dense_sentence"]["heldout_label"]["ndcg"]
+    if d["ci_excludes_zero"] and d["value"] > 0:
+        return []
+    return [f"- Embedding fine-tuning helps the findings it was trained on and their unseen wordings, not unseen "
+            f"findings: no gain on the three held-out findings (nDCG@10 change {_fmt(d)})."]
+
+
 def _v2_claim() -> str:
     p = load_result("labelling_v2_paired_diffs")
     if p is None or not (p["v2_minus_tier2"]["lo"] > 0 and p["v2_minus_llm_only"]["lo"] > 0):
@@ -107,6 +118,7 @@ def render() -> str:
         "labels.",
         "- The ground truth misses some clearly stated findings, so scores are a lower bound.",
         "- Labels describe the report text, not the images.",
+        *_heldout_limitation(),
         *_review_limitation(t2), "",
         "## Labelling (SPEC §8.1)", "",
         render_summary(systems, paired, standalone=False).rstrip(), "",
@@ -222,11 +234,11 @@ def search_line(best: str, b: dict[str, Any]) -> str:
                 f"query–fold pairs): **{b['ndcg']['value']:.3f}**. Negation-aware fine-tuning is in progress.")
     v, u = ft["variants"], ft["use_rule"]
     f, base = v["ft_sentence"]["all"], v["dense_sentence"]["all"]
-    return (f"- Search with negation-aware fine-tuned embeddings: nDCG@10 **{f['ndcg']['value']:.3f}** vs "
-            f"{base['ndcg']['value']:.3f} for the base model ({b['n_pairs']} query–fold pairs), negation contamination "
-            f"{f['contamination']['value']:.3f} vs {base['contamination']['value']:.3f}; "
-            + ("the fine-tuned model is used for search." if u["use_finetuned_for_search"]
-               else "the base model stays in use (pre-committed rule not met)."))
+    return (f"- Search (nDCG@10, {b['n_pairs']} query–fold pairs): base embeddings {_fmt(base['ndcg'])} → "
+            f"negation-aware fine-tuned **{_fmt(f['ndcg'])}**; reports that only mention the finding as negated drop "
+            f"from {_pct(base['contamination']['value'])} to {_pct(f['contamination']['value'])} of the top 10. "
+            + ("The fine-tuned model is used for search." if u["use_finetuned_for_search"]
+               else "The base model stays in use (pre-committed rule not met)."))
 
 
 def main() -> None:

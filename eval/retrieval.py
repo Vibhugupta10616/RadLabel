@@ -305,13 +305,13 @@ def paired(pairs: dict[str, dict[str, list[dict[str, Any]]]], a: str, b: str, s:
             "contamination": _ci(ct)}
 
 
-def best_base(variants: dict[str, Any]) -> dict[str, Any]:
-    """Best base combination by pooled nDCG@10 (owner rule, before M9): if the top two are within each other's 95% CI
-    they are tied and the simpler one (SIMPLICITY) is chosen."""
+def best_base(variants: dict[str, Any], simplicity: tuple[str, ...] = SIMPLICITY) -> dict[str, Any]:
+    """Best combination by pooled nDCG@10 (owner rule, before M9): if the top two are within each other's 95% CI
+    they are tied and the simpler one (`simplicity`, simplest first) is chosen."""
     order = sorted(variants, key=lambda v: -variants[v]["all"]["ndcg"]["value"])
     a, b = (variants[v]["all"]["ndcg"] for v in order[:2])
     tied = b["value"] >= a["lo"] and a["value"] <= b["hi"]
-    pick = min(order[:2], key=SIMPLICITY.index) if tied else order[0]
+    pick = min(order[:2], key=simplicity.index) if tied else order[0]
     return {"variant": pick, "top_two": order[:2], "tied": tied,
             "rule": "highest pooled nDCG@10; if the top two are within each other's 95% CI, the simpler one"}
 
