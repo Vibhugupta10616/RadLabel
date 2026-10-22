@@ -22,14 +22,14 @@ Out-of-fold, one report per exact text; hedged and Tier 1 pilot reports excluded
 
 | Metric | Rule baseline | LLM only | LLM + verifier | LLM + verifier + Tier 2 | run_pipeline, clean join (M6) | run_pipeline, 30% varied joins (M6) | LLM + free checks + verifier agent (v2) |
 |---|---|---|---|---|---|---|---|
-| Headline macro-F1, 9 labels (v1) | 0.838 (0.823–0.850) | 0.862 (0.848–0.875) | 0.860 (0.845–0.873) | 0.866 (0.851–0.878) | 0.860 (0.845–0.873) | 0.848 (0.833–0.861) | 0.887 (0.874–0.899) |
-| Headline macro-F1, 9 labels (strict) | 0.829 (0.814–0.843) | 0.863 (0.848–0.877) | 0.861 (0.846–0.875) | 0.868 (0.853–0.881) | 0.861 (0.846–0.875) | 0.850 (0.835–0.865) | 0.883 (0.869–0.895) |
+| Headline macro-F1, 9 labels (v1) | 0.838 (0.823–0.850) | 0.862 (0.848–0.875) | 0.860 (0.845–0.873) | 0.866 (0.851–0.878) | 0.860 (0.845–0.873) | 0.848 (0.833–0.861) | 0.892 (0.879–0.903) |
+| Headline macro-F1, 9 labels (strict) | 0.829 (0.814–0.843) | 0.863 (0.848–0.877) | 0.861 (0.846–0.875) | 0.868 (0.853–0.881) | 0.861 (0.846–0.875) | 0.850 (0.835–0.865) | 0.887 (0.873–0.899) |
 | Pooled rare micro-F1 (v1) | 0.742 (0.677–0.805) | 0.831 (0.771–0.882) | 0.838 (0.777–0.889) | 0.829 (0.769–0.882) | 0.838 (0.777–0.889) | 0.824 (0.764–0.875) | 0.783 (0.723–0.832) |
-| Abnormal subset: headline macro-F1 (v1) | 0.761 (0.748–0.773) | 0.767 (0.754–0.781) | 0.765 (0.752–0.778) | 0.771 (0.758–0.783) | 0.765 (0.752–0.778) | 0.757 (0.744–0.770) | 0.792 (0.780–0.804) |
+| Abnormal subset: headline macro-F1 (v1) | 0.761 (0.748–0.773) | 0.767 (0.754–0.781) | 0.765 (0.752–0.778) | 0.771 (0.758–0.783) | 0.765 (0.752–0.778) | 0.757 (0.744–0.770) | 0.796 (0.784–0.808) |
 | negation_only FP rate (pooled) | 41 / 6164 (0.0067) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 6 / 6164 (0.0010) | 14 / 6164 (0.0023) |
 | *Sensitivity, not headline:* macro-F1 (v1) with `uncertain` = positive for all labels | 0.839 (0.825–0.852) | 0.853 (0.839–0.866) | 0.853 (0.839–0.866) | 0.861 (0.848–0.874) | 0.853 (0.839–0.866) | 0.841 (0.828–0.855) | 0.880 (0.867–0.893) |
-| *Sensitivity, not headline:* macro-F1 (v1), all reports incl. Tier 1 pilot | 0.837 (0.823–0.850) | 0.862 (0.848–0.876) | 0.860 (0.846–0.873) | 0.866 (0.852–0.878) | 0.860 (0.846–0.873) | 0.848 (0.834–0.861) | 0.889 (0.876–0.900) |
-| *Sensitivity, not headline:* macro-F1 (v1), `suggested` labels ignored | – | – | – | – | – | – | 0.875 (0.862–0.888) |
+| *Sensitivity, not headline:* macro-F1 (v1), all reports incl. Tier 1 pilot | 0.837 (0.823–0.850) | 0.862 (0.848–0.876) | 0.860 (0.846–0.873) | 0.866 (0.852–0.878) | 0.860 (0.846–0.873) | 0.848 (0.834–0.861) | 0.893 (0.880–0.904) |
+| *Sensitivity, not headline:* macro-F1 (v1), `suggested` labels ignored | – | – | – | – | – | – | 0.880 (0.866–0.892) |
 
 Per-label tables: `artifacts/tables/labelling_*.md`.
 
@@ -46,9 +46,9 @@ Headline macro-F1 (9 labels, v1), same out-of-fold reports and the same 1,000 cl
 | LLM + verifier + Tier 2 − LLM only | 0.003 (0.000–0.007) | no |
 | run_pipeline, clean join − LLM + verifier | 0.000 (0.000–0.000) | no |
 | run_pipeline, varied joins − clean join | -0.012 (-0.017–-0.007) | yes |
-| LLM + free checks + verifier agent (v2) − LLM only | 0.025 (0.016–0.035) | yes |
-| v2 − LLM + verifier + Tier 2 | 0.022 (0.013–0.031) | yes |
-| v2 − rule baseline | 0.050 (0.037–0.063) | yes |
+| LLM + free checks + verifier agent (v2) − LLM only | 0.029 (0.020–0.039) | yes |
+| v2 − LLM + verifier + Tier 2 | 0.026 (0.017–0.036) | yes |
+| v2 − rule baseline | 0.054 (0.041–0.067) | yes |
 
 **Reading (v1).** The verifier's hedge downgrade costs 0.002 macro-F1 and Tier 2 recovers 0.006, so the full pipeline **matches** LLM-only macro-F1 (difference 0.003 (0.000–0.007); the 95% CI includes 0). The guardrails do not improve F1 over LLM only. What the v1 guardrails added is label-level correction (Tier 2: 29 labels wrong → right vs 5 right → wrong) and routing of uncertain cases to human review (30.5% of reports).
 
@@ -111,24 +111,24 @@ Section subsets (as parsed; headline macro-F1, v1, hedged + pilot excluded):
 
 ## Verifier agent (M7, v2)
 
-**Reading (M7).** On this dataset and protocol, v2 improves headline macro-F1 over v1 (LLM + verifier + Tier 2) by 0.022 (0.013–0.031), 95% CI excludes 0, and over LLM only by 0.025 (0.016–0.035), 95% CI excludes 0. Most of the gain comes from Lung Lesion (+0.016 of the macro-F1); it holds without Other Abnormality (0.028 (0.018–0.039), 95% CI excludes 0). Verified labels are far more accurate than unverified ones: precision 0.938 (verified + verified_rules) vs 0.393 (unverified). The agent changes many labels in both directions (194 wrong → right vs 121 right → wrong), and its suggested labels have precision 0.54. Reports with any unverified label: 2.9% vs the v1 review rate of 30.5%. This is not like for like: v1 sent the whole report to human review for any remaining failure or escalating flag, while v2 marks only the labels the agent could not settle after checking the report itself, so the two rates count different things. The normal check does not separate right from wrong normals (tagger wrong in 1.1% of passed vs 0.7% of failed checks). "Blind first" is only partly blind: recall-scan hints carry the rule labeller's sentence IDs, and in 142 of 617 recall-scan escalations such an ID is a sentence the tagger also cited.
+**Reading (M7).** On this dataset and protocol, v2 improves headline macro-F1 over v1 (LLM + verifier + Tier 2) by 0.026 (0.017–0.036), 95% CI excludes 0, and over LLM only by 0.029 (0.020–0.039), 95% CI excludes 0. Most of the gain comes from Lung Lesion (+0.016 of the macro-F1); it holds without Other Abnormality (0.028 (0.018–0.039), 95% CI excludes 0). Verified labels are far more accurate than unverified ones: precision 0.938 (verified + verified_rules) vs 0.393 (unverified). The agent changes many labels in both directions (218 wrong → right vs 122 right → wrong), and its suggested labels have precision 0.54. Reports with any unverified label: 2.9% vs the v1 review rate of 30.5%. This is not like for like: v1 sent the whole report to human review for any remaining failure or escalating flag, while v2 marks only the labels the agent could not settle after checking the report itself, so the two rates count different things. The normal check does not separate right from wrong normals (tagger wrong in 1.1% of passed vs 0.7% of failed checks). "Blind first" is only partly blind: recall-scan hints carry the rule labeller's sentence IDs, and in 142 of 617 recall-scan escalations such an ID is a sentence the tagger also cited.
 
-**Keep/drop (pre-committed):** v2 − LLM + verifier + Tier 2 = 0.022 (0.013–0.031) → keep the verifier agent: **yes** (keep iff v2 − LLM + verifier + Tier 2 is not significantly negative (CI hi >= 0)).
+**Keep/drop (pre-committed):** v2 − LLM + verifier + Tier 2 = 0.026 (0.017–0.036) → keep the verifier agent: **yes** (keep iff v2 − LLM + verifier + Tier 2 is not significantly negative (CI hi >= 0)).
 
 Escalated to the agent: 1,290 reports (41.8%; hedged 67.0% vs clear 39.3%). Reports with any `unverified` label: 90 (2.9%; hedged 3.2% vs clear 2.9%); unverified labels 183 (0.5%). v1 review rate: 30.5%, so v2 **reduced** the share of reports needing attention.
 
-Label changes vs LLM + verifier (scored reports; present = positive vs the codes): 445 status changes, wrong → right 194, right → wrong 121. Per label: No Finding 10/3; Cardiomegaly 2/3; Lung Opacity 55/45; Lung Lesion 33/15; Atelectasis 14/3; Pleural Effusion 6/0; Fracture 0/4; Support Devices 23/2; Other Abnormality 47/24; Edema 2/1; Pleural Other 1/3; Consolidation 0/18; Pneumothorax 1/0.
+Label changes vs LLM + verifier (scored reports; present = positive vs the codes): 470 status changes, wrong → right 218, right → wrong 122. Per label: No Finding 10/3; Cardiomegaly 26/4; Lung Opacity 55/45; Lung Lesion 33/15; Atelectasis 14/3; Pleural Effusion 6/0; Fracture 0/4; Support Devices 23/2; Other Abnormality 47/24; Edema 2/1; Pleural Other 1/3; Consolidation 0/18; Pneumothorax 1/0.
 
 **Verified vs unverified** (scored reports, all labels; present = positive):
 
 | Verification | Labels | Predicted present | Precision | Recall | F1 | Accuracy |
 |---|---|---|---|---|---|---|
-| verified rules | 33,711 | 3380 | 0.954 | 0.946 | 0.950 | 0.990 |
-| verified | 956 | 469 | 0.829 | 0.772 | 0.800 | 0.796 |
-| corrected | 264 | 121 | 0.612 | 0.902 | 0.729 | 0.792 |
+| verified rules | 33,687 | 3380 | 0.954 | 0.953 | 0.953 | 0.991 |
+| verified | 955 | 469 | 0.829 | 0.773 | 0.800 | 0.797 |
+| corrected | 289 | 146 | 0.671 | 0.925 | 0.778 | 0.806 |
 | suggested | 171 | 153 | 0.536 | 0.932 | 0.680 | 0.550 |
 | unverified | 135 | 61 | 0.393 | 0.727 | 0.511 | 0.659 |
-| verified or verified rules | 34,667 | 3849 | 0.938 | 0.924 | 0.931 | 0.985 |
+| verified or verified rules | 34,642 | 3849 | 0.938 | 0.929 | 0.934 | 0.985 |
 
 Suggested labels: 171 (153 present, 18 uncertain); precision of the present ones 0.536.
 
@@ -147,12 +147,12 @@ No Finding precision 0.991 before (recall 0.873) → 0.991 after (recall 0.884).
 
 | Level | Labels | Precision |
 |---|---|---|
-| both | 1,151 | 0.943 |
-| single | 2,972 | 0.903 |
+| both | 1,155 | 0.943 |
+| single | 2,993 | 0.903 |
 | none | 0 | – |
 | unverified | 61 | 0.393 |
 
-Headline micro-F1 if only these levels count as present: both 0.411, both or single 0.919, all but unverified 0.919, all 0.918.
+Headline micro-F1 if only these levels count as present: both 0.412, both or single 0.922, all but unverified 0.922, all 0.921.
 
 Agent: prompt `verifier-v2` (frozen), 1,290 runs, mean tool calls 2.12; tools {'check_negation': 272, 'check_redaction': 95, 'compare_sections': 55, 'find_by_alias': 827, 'find_by_meaning': 79, 'get_label_definition': 21, 'normal_check': 101, 'submit': 1285}; stops {'content_filtered': 1, 'submitted': 1285, 'tool_cap': 4}; caps hit 4, content-filter refusals 1, budget stops 0; cost $2.12 ($0.0016 per report); embeddings: BAAI/bge-small-en-v1.5 (sentence-transformers 6.1.0).
 
@@ -181,6 +181,21 @@ Suggested labels per label (scored reports): Cardiomegaly 2 (present 2, precisio
 Known issue: Consolidation, v2 vs LLM + verifier wrong → right 0, right → wrong 18; candidate for a future prompt version developed on a new dev slice.
 
 **Normal-check ablation (chosen after seeing the results; v2 stays the headline):** the 160 reports escalated only by the normal check skip the agent (tagger labels, No Finding `unverified`). Macro-F1 (v1) 0.887 (0.874–0.899); ablation − v2 0.000 (0.000–0.000); saves 160 agent runs (250 calls, $0.25); reports with an unverified label rise to 250 (8.1%), because those normals stay unconfirmed. Not significantly worse: **yes**. Serving configuration: **v2** (v2: the ablation changes no label but would show ~99%-correct normals as unverified (owner, 2026-10-22)).
+
+### Final borderline rule (after M10a)
+
+Final deterministic rule after the verifier agent (owner decision after M10a): an `uncertain` label whose only hedge-like wording is wording its definition counts as present (Cardiomegaly: "borderline", "mild") becomes `present`; any other hedge cue in the cited sentences keeps it `uncertain`. No LLM call changes; v2 re-scored from the cache. Found on the hand-written sample patient, not on test results. Before = results at `11f5f2e`.
+
+| | Before | After |
+|---|---|---|
+| Macro-F1, 9 headline labels (v1) | 0.887 (0.874–0.899) | 0.892 (0.879–0.903) |
+| Macro-F1, 9 headline labels (strict) | 0.883 (0.869–0.895) | 0.887 (0.873–0.899) |
+| Pooled rare micro-F1 (v1) | 0.783 (0.723–0.832) | 0.783 (0.723–0.832) |
+| Cardiomegaly F1 (v1) | 0.943 (0.924–0.960) | 0.981 (0.971–0.990) |
+| Cardiomegaly precision / recall | 0.983 / 0.906 | 0.981 / 0.981 |
+| Cardiomegaly present / uncertain (all reports) | 369 / 46 | 396 / 19 |
+
+Paired headline macro-F1 (v1), after − before: 0.004 (0.003–0.006). Labels changed: 27 (uncertain -> present 27; by label {'Cardiomegaly': 27}; by verification state {'corrected': 27}); in hedged reports 2, in the Tier 1 pilot reports 0. Scored against the codes (present = positive, hedged and pilot reports excluded): v1 wrong → right 24, right → wrong 1; strict wrong → right 22, right → wrong 1.
 
 ### Escalation before any agent call, and the dev slice
 

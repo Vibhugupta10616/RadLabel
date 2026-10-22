@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "abc918b271d5ec375ae1bbe694eee8c74916f2e6",
+  "git_commit": "cb7e07fd4dd91dc592b43ea23312fffd32e834a6",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,13 +23,13 @@
   },
   "mapping_version": "v1+strict",
   "fold": "oof",
-  "created": "2026-10-21T17:09:57+00:00",
+  "created": "2026-10-22T14:36:57+00:00",
   "system": "llm_agent_v2",
   "eval_version": "eval_v1.2",
   "llm": "gpt-4.1-mini+gpt-5-mini",
   "prompt": "tier1-v1+verifier-v2",
   "new_spend_this_run_usd": 0.0,
-  "llm_spend_total_usd": 5.429183450000007
+  "llm_spend_total_usd": 5.439566300000007
  },
  "results": {
   "v1": {
@@ -50,17 +50,17 @@
     },
     "Cardiomegaly": {
      "f1": {
-      "value": 0.943089430894309,
-      "lo": 0.9237907535699137,
-      "hi": 0.9600091463414634
+      "value": 0.98125,
+      "lo": 0.9705416066405982,
+      "hi": 0.9904799107142858
      },
-     "precision": 0.9830508474576272,
-     "recall": 0.90625,
+     "precision": 0.98125,
+     "recall": 0.98125,
      "n_pos": 320,
      "n_items": 2711,
-     "tp": 290,
-     "fp": 5,
-     "fn": 30
+     "tp": 314,
+     "fp": 6,
+     "fn": 6
     },
     "Lung Opacity": {
      "f1": {
@@ -218,9 +218,9 @@
     }
    },
    "macro_f1_headline": {
-    "value": 0.887433568529705,
-    "lo": 0.8741186766551156,
-    "hi": 0.8992312046945169
+    "value": 0.8916736317636705,
+    "lo": 0.8789143814430145,
+    "hi": 0.9034126577158536
    },
    "rare_micro_f1": {
     "value": 0.7829457364341085,
@@ -246,17 +246,17 @@
     },
     "Cardiomegaly": {
      "f1": {
-      "value": 0.9461279461279462,
-      "lo": 0.9274849871159123,
-      "hi": 0.9634588920812773
+      "value": 0.9821717990275527,
+      "lo": 0.9715033723819667,
+      "hi": 0.991818683402876
      },
-     "precision": 0.9825174825174825,
-     "recall": 0.9123376623376623,
+     "precision": 0.9805825242718447,
+     "recall": 0.9837662337662337,
      "n_pos": 308,
      "n_items": 2699,
-     "tp": 281,
-     "fp": 5,
-     "fn": 27
+     "tp": 303,
+     "fp": 6,
+     "fn": 5
     },
     "Lung Opacity": {
      "f1": {
@@ -414,9 +414,9 @@
     }
    },
    "macro_f1_headline": {
-    "value": 0.8827492586883445,
-    "lo": 0.869236762432417,
-    "hi": 0.8950941446781909
+    "value": 0.8867541312327452,
+    "lo": 0.8734655185733644,
+    "hi": 0.8992899546149701
    },
    "rare_micro_f1": {
     "value": 0.7871485943775101,
@@ -426,9 +426,9 @@
   },
   "sensitivity_all_reports_incl_pilot": {
    "v1_macro_f1_headline": {
-    "value": 0.888789211087943,
-    "lo": 0.8761422588604125,
-    "hi": 0.9004009371988387
+    "value": 0.8928801185021131,
+    "lo": 0.8801682220354786,
+    "hi": 0.9041806525789459
    }
   },
   "sensitivity_uncertain_as_present_all_labels": {
@@ -463,17 +463,17 @@
      },
      "Cardiomegaly": {
       "f1": {
-       "value": 0.943089430894309,
-       "lo": 0.9237907535699137,
-       "hi": 0.9600091463414634
+       "value": 0.98125,
+       "lo": 0.9705416066405982,
+       "hi": 0.9904799107142858
       },
-      "precision": 0.9830508474576272,
-      "recall": 0.90625,
+      "precision": 0.98125,
+      "recall": 0.98125,
       "n_pos": 320,
       "n_items": 2077,
-      "tp": 290,
-      "fp": 5,
-      "fn": 30
+      "tp": 314,
+      "fp": 6,
+      "fn": 6
      },
      "Lung Opacity": {
       "f1": {
@@ -575,9 +575,9 @@
      }
     },
     "macro_f1_headline": {
-     "value": 0.79176076647799,
-     "lo": 0.7802560037287742,
-     "hi": 0.8035612264117529
+     "value": 0.7960008297119557,
+     "lo": 0.7844269429442855,
+     "hi": 0.8076065135943346
     }
    },
    "redaction_adjacent": {
@@ -734,17 +734,17 @@
       },
       "Cardiomegaly": {
        "f1": {
-        "value": 0.9763779527559056,
-        "lo": 0.9454402290622763,
+        "value": 0.9922480620155039,
+        "lo": 0.9752066115702479,
         "hi": 1.0
        },
-       "precision": 0.9841269841269841,
-       "recall": 0.96875,
+       "precision": 0.9846153846153847,
+       "recall": 1.0,
        "n_pos": 64,
        "n_items": 279,
-       "tp": 62,
+       "tp": 64,
        "fp": 1,
-       "fn": 2
+       "fn": 0
       },
       "Lung Opacity": {
        "f1": {
@@ -846,9 +846,9 @@
       }
      },
      "macro_f1_headline": {
-      "value": 0.7123586328993213,
-      "lo": 0.6776321132061838,
-      "hi": 0.8305751482630257
+      "value": 0.71412197837261,
+      "lo": 0.6791578411669992,
+      "hi": 0.831878325240188
      }
     },
     "uncertain_as_present": {
@@ -1112,9 +1112,9 @@
     "not_mentioned": 2501
    },
    "Cardiomegaly": {
-    "present": 369,
+    "present": 396,
     "absent": 2551,
-    "uncertain": 46,
+    "uncertain": 19,
     "not_mentioned": 120
    },
    "Lung Opacity": {
@@ -1188,9 +1188,9 @@
   "n_hedged_excluded": 279,
   "sensitivity_suggested_ignored": {
    "v1_macro_f1_headline": {
-    "value": 0.8752802499515437,
-    "lo": 0.8616496744117482,
-    "hi": 0.8876144929996833
+    "value": 0.879520208176989,
+    "lo": 0.865593140925913,
+    "hi": 0.8922699017273683
    },
    "v1_rare_micro_f1": {
     "value": 0.792156862745098,
@@ -1276,37 +1276,37 @@
   },
   "verification_groups": {
    "verified_rules": {
-    "n": 33711,
+    "n": 33687,
     "predicted_present": 3380,
     "tp": 3223,
     "fp": 157,
-    "fn": 183,
+    "fn": 160,
     "precision": 0.9535502958579881,
-    "recall": 0.9462712859659425,
-    "f1": 0.9498968464485705,
-    "accuracy": 0.9899142713061019
+    "recall": 0.9527046999704404,
+    "f1": 0.9531273103652225,
+    "accuracy": 0.9905898417787277
    },
    "verified": {
-    "n": 956,
+    "n": 955,
     "predicted_present": 469,
     "tp": 389,
     "fp": 80,
-    "fn": 115,
+    "fn": 114,
     "precision": 0.8294243070362474,
-    "recall": 0.7718253968253969,
-    "f1": 0.7995889003083249,
-    "accuracy": 0.7960251046025104
+    "recall": 0.7733598409542743,
+    "f1": 0.8004115226337448,
+    "accuracy": 0.7968586387434555
    },
    "corrected": {
-    "n": 264,
-    "predicted_present": 121,
-    "tp": 74,
-    "fp": 47,
+    "n": 289,
+    "predicted_present": 146,
+    "tp": 98,
+    "fp": 48,
     "fn": 8,
-    "precision": 0.6115702479338843,
-    "recall": 0.9024390243902439,
-    "f1": 0.7290640394088669,
-    "accuracy": 0.7916666666666666
+    "precision": 0.6712328767123288,
+    "recall": 0.9245283018867925,
+    "f1": 0.7777777777777778,
+    "accuracy": 0.8062283737024222
    },
    "suggested": {
     "n": 171,
@@ -1331,15 +1331,15 @@
     "accuracy": 0.6592592592592592
    },
    "verified_or_verified_rules": {
-    "n": 34667,
+    "n": 34642,
     "predicted_present": 3849,
     "tp": 3612,
     "fp": 237,
-    "fn": 298,
+    "fn": 274,
     "precision": 0.9384255650818394,
-    "recall": 0.9237851662404092,
-    "f1": 0.9310478154401339,
-    "accuracy": 0.984567456082153
+    "recall": 0.9294904786412764,
+    "f1": 0.9339366515837104,
+    "accuracy": 0.9852491195658449
    }
   },
   "suggested": {
@@ -1395,26 +1395,26 @@
   "corroboration": {
    "precision_by_level": {
     "both": {
-     "n": 1151,
-     "predicted_present": 1151,
-     "tp": 1085,
+     "n": 1155,
+     "predicted_present": 1155,
+     "tp": 1089,
      "fp": 66,
      "fn": 0,
-     "precision": 0.9426585577758471,
+     "precision": 0.9428571428571428,
      "recall": 1.0,
-     "f1": 0.9704830053667263,
-     "accuracy": 0.9426585577758471
+     "f1": 0.9705882352941176,
+     "accuracy": 0.9428571428571428
     },
     "single": {
-     "n": 2972,
-     "predicted_present": 2972,
-     "tp": 2683,
-     "fp": 289,
+     "n": 2993,
+     "predicted_present": 2993,
+     "tp": 2703,
+     "fp": 290,
      "fn": 0,
-     "precision": 0.9027590847913862,
+     "precision": 0.9031072502505847,
      "recall": 1.0,
-     "f1": 0.948894783377542,
-     "accuracy": 0.9027590847913862
+     "f1": 0.9490870786516854,
+     "accuracy": 0.9031072502505847
     },
     "none": {
      "n": 0,
@@ -1440,10 +1440,10 @@
     }
    },
    "headline_micro_f1_if_only": {
-    "both": 0.41106099235144145,
-    "both_or_single": 0.9191628023561849,
-    "all_but_unverified": 0.9191628023561849,
-    "all": 0.9182734170916781
+    "both": 0.41230648638056044,
+    "both_or_single": 0.9222888555722139,
+    "all_but_unverified": 0.9222888555722139,
+    "all": 0.9213789682539683
    },
    "suggested_uncertain_excluded": 18
   },
@@ -1456,10 +1456,10 @@
       "right_to_wrong": 3
      },
      "Cardiomegaly": {
-      "status_changed": 43,
+      "status_changed": 70,
+      "wrong_to_right": 32,
       "no_effect_on_score": 33,
-      "right_to_wrong": 4,
-      "wrong_to_right": 6
+      "right_to_wrong": 5
      },
      "Lung Opacity": {
       "status_changed": 158,
@@ -1526,9 +1526,9 @@
      }
     },
     "total": {
-     "status_changed": 570,
-     "wrong_to_right": 273,
-     "right_to_wrong": 144,
+     "status_changed": 597,
+     "wrong_to_right": 299,
+     "right_to_wrong": 145,
      "no_effect_on_score": 153
     }
    },
@@ -1540,10 +1540,10 @@
       "right_to_wrong": 3
      },
      "Cardiomegaly": {
-      "status_changed": 34,
+      "status_changed": 59,
+      "wrong_to_right": 26,
       "no_effect_on_score": 29,
-      "right_to_wrong": 3,
-      "wrong_to_right": 2
+      "right_to_wrong": 4
      },
      "Lung Opacity": {
       "status_changed": 120,
@@ -1609,9 +1609,9 @@
      }
     },
     "total": {
-     "status_changed": 445,
-     "wrong_to_right": 194,
-     "right_to_wrong": 121,
+     "status_changed": 470,
+     "wrong_to_right": 218,
+     "right_to_wrong": 122,
      "no_effect_on_score": 130
     }
    }

@@ -276,6 +276,18 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
   (no check promotes an `uncertain` whose only hedge is definition-present wording).
 - SPEC §6.5 / §12 updates approved; frontend merge (M10c integration) approved.
 
+## After M10c integration (owner, 2026-10-22)
+- SPEC edits approved and done: §6.4 (cross-report questions: fine-tuned dense model on plain sentences, D21), the
+  status line, §9, §12 (frontend merged, no branch).
+- **D23: final borderline rule** after the verifier agent (docs/evaluation_notes.md; RESULTS "Final borderline
+  rule"): an `uncertain` label whose only hedge-like wording is wording its definition counts as present becomes
+  `present`. Found on the hand-written sample, not on test results. v2 re-scored from cache ($0); the website's
+  numbers and the README summary now show the v2 + rule result. The M7 row above keeps the M7 numbers.
+- Frontend UX change (frontend only): the landing buttons go to /upload; "Load sample patient (5 reports)" fills the
+  upload list with five readable file cards; "Analyze reports" then shows the results; no confirmation needed for the
+  sample.
+- M10b spec (question sets, metrics, estimates) is committed in docs/evaluation_notes.md before any run.
+
 ## M10c integration notes
 - `m9c-frontend` merged into main with `--no-ff` (the branch itself is unchanged).
 - API mode: the built site calls the real API; `npm run dev` and the tests use the mock unless `VITE_MOCK` is set.

@@ -1,0 +1,129 @@
+{
+ "provenance": {
+  "git_commit": "cb7e07fd4dd91dc592b43ea23312fffd32e834a6",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "oof",
+  "created": "2026-10-22T14:37:36+00:00",
+  "eval_version": "eval_v1.2",
+  "note": "found on the hand-written sample, not on test results"
+ },
+ "results": {
+  "before_ref": "11f5f2e5ba819eb34ff79553b8d8fcf98e39b4e0",
+  "changed_labels": 27,
+  "changed_by_label": {
+   "Cardiomegaly": 27
+  },
+  "changed_by_transition": {
+   "uncertain -> present": 27
+  },
+  "changed_by_verification": {
+   "corrected": 27
+  },
+  "changed_in_hedged_reports": 2,
+  "changed_in_pilot_reports": 0,
+  "changes_v1": {
+   "wrong_to_right": 24,
+   "right_to_wrong": 1,
+   "no_effect_or_not_scored": 2
+  },
+  "changes_strict": {
+   "wrong_to_right": 22,
+   "right_to_wrong": 1,
+   "no_effect_or_not_scored": 4
+  },
+  "before": {
+   "macro_f1_v1": {
+    "value": 0.887433568529705,
+    "lo": 0.8741186766551156,
+    "hi": 0.8992312046945169
+   },
+   "macro_f1_strict": {
+    "value": 0.8827492586883445,
+    "lo": 0.869236762432417,
+    "hi": 0.8950941446781909
+   },
+   "rare_micro_f1_v1": {
+    "value": 0.7829457364341085,
+    "lo": 0.7230616740088106,
+    "hi": 0.8321167883211679
+   },
+   "cardiomegaly_f1": {
+    "value": 0.943089430894309,
+    "lo": 0.9237907535699137,
+    "hi": 0.9600091463414634
+   },
+   "cardiomegaly_precision": 0.9830508474576272,
+   "cardiomegaly_recall": 0.90625,
+   "cardiomegaly_status_counts": {
+    "present": 369,
+    "absent": 2551,
+    "uncertain": 46,
+    "not_mentioned": 120
+   },
+   "unverified_report_rate": 0.02916396629941672,
+   "precision_verified": 0.9384255650818394,
+   "precision_unverified": 0.39344262295081966
+  },
+  "after": {
+   "macro_f1_v1": {
+    "value": 0.8916736317636705,
+    "lo": 0.8789143814430145,
+    "hi": 0.9034126577158536
+   },
+   "macro_f1_strict": {
+    "value": 0.8867541312327452,
+    "lo": 0.8734655185733644,
+    "hi": 0.8992899546149701
+   },
+   "rare_micro_f1_v1": {
+    "value": 0.7829457364341085,
+    "lo": 0.7230616740088106,
+    "hi": 0.8321167883211679
+   },
+   "cardiomegaly_f1": {
+    "value": 0.98125,
+    "lo": 0.9705416066405982,
+    "hi": 0.9904799107142858
+   },
+   "cardiomegaly_precision": 0.98125,
+   "cardiomegaly_recall": 0.98125,
+   "cardiomegaly_status_counts": {
+    "present": 396,
+    "absent": 2551,
+    "uncertain": 19,
+    "not_mentioned": 120
+   },
+   "unverified_report_rate": 0.02916396629941672,
+   "precision_verified": 0.9384255650818394,
+   "precision_unverified": 0.39344262295081966
+  },
+  "paired_after_minus_before": {
+   "value": 0.00424006323396553,
+   "lo": 0.0026204759125105087,
+   "hi": 0.006102622232468946,
+   "a": 0.8916736317636705,
+   "b": 0.887433568529705,
+   "ci_excludes_zero": true
+  }
+ }
+}

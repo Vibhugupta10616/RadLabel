@@ -2,7 +2,7 @@
 
 **Chest X-ray report intelligence: verified findings with evidence, and questions answered with citations, over the user's own reports. Full specification for development; the short overview is the [README](../README.md).**
 
-**Status:** done: M0–M9 (v1 labelling M3–M5; v2 parser, single `run_pipeline` entry point and ReAct verifier agent M6–M7; evaluation search index and retrieval evaluation M8; negation-aware embedding fine-tuning M9, used for search). Next: M10 website (M10a backend, M10b evaluation, M10c frontend, started on branch `m9c-frontend`), M11 deployment (Vercel + Hugging Face). Results: [RESULTS.md](RESULTS.md); roadmap §12.
+**Status:** done: M0–M9, M10a, M10c integration (v1 labelling M3–M5; v2 parser, single `run_pipeline` entry point and ReAct verifier agent M6–M7; evaluation search index and retrieval evaluation M8; negation-aware embedding fine-tuning M9, used for search). M10a (session API) and M10c (frontend, merged into main and wired to the API) done; next: M10b (website evaluation), then M11 deployment (Vercel + Hugging Face). Results: [RESULTS.md](RESULTS.md); roadmap §12.
 
 > Engineering and research project. **Not a medical device and not for clinical use.** Labels are derived from report text, not from images.
 
@@ -357,7 +357,7 @@ The IU index is the **evaluation test bed** (M8, §8.2) and the source of traini
 
 ### 6.4 Questions: one report or session RAG (`src/radlabel/api/`)
 - **Scope "report":** the question, that report's sentences (with IDs) and its final labels go to the LLM (the Tier 1 deployment, gpt-4.1-mini); it answers or refuses, citing sentence IDs.
-- **Scope "all":** **session RAG** over the user's own uploads: the session's sentences are embedded (plain, no prefix; base bge-small, or the fine-tuned model once M9 passes §8.2) and BM25-indexed in memory, fused with RRF; the top sentences, with their `report_no`, go to the LLM, which answers with `report_no:sentence_id` citations or refuses.
+- **Scope "all":** **session RAG** over the user's own uploads (LangGraph: retrieve → answer → check): every sentence of every report (indication and comparison included, for questions only) is embedded in memory with the **fine-tuned dense model on plain sentences** (no prefix, no BM25, no negation filter: D21, the simpler of two tied configurations; the base model with a warning if the private model is missing) and the top 12 by cosine, with their `report_no`, go to the LLM, which answers with `report_no:sentence_id` citations or refuses.
 - **Guardrails:** every citation is checked in code (the sentence exists in that report; otherwise the answer becomes a refusal); refusal when retrieval finds nothing relevant; out-of-scope refusal (CT, age, which is redacted, treatment or diagnosis advice); questions of at most 500 characters; every LLM call through `radlabel.llm` (cached, cost-capped).
 - There is no query agent over the IU corpus and no SQL over the evaluation tables.
 
@@ -541,7 +541,7 @@ radlabel/
 ├── eval/                   # cv.py, labelling.py, retrieval.py, index_build.py, verifier_agent.py, bootstrap.py,
 │   │                       # subsets.py, entry_point.py, report.py, pilot.py, m4_analysis.py, repair.py (v1),
 │   │                       # lexicon.yaml, negex_termset.yaml, baselines/, queries/
-├── web/                    # React frontend (M10c; branch m9c-frontend)
+├── web/                    # React frontend (M10c)
 ├── deploy/                 # Dockerfile for the Hugging Face Space, Vercel settings (M11)
 ├── docs/                   # SPEC.md, RESULTS.md (generated), evaluation_notes.md, STATUS.md, model_card.md
 ├── tests/
@@ -605,7 +605,7 @@ All results are generated into [RESULTS.md](RESULTS.md) by `python -m eval.repor
 | **M9** | Negation-aware embedding fine-tuning on plain sentences: pairs from training folds, `CachedGISTEmbedLoss` per fold, held-out evaluation, serving model on all data (stored privately); switch the evaluation index to plain sentence points | §8.2 fine-tuned rows judged two ways (pure embedding vs base without prefix; full system vs the best base combination), seen vs held-out split; pre-committed use rule applied | done |
 | **M10a** | Website backend: session API (`/api/session`, `/reports`, `/ask` with scope report or all, `/timeline`), in memory and nothing stored; single-report answers and session RAG with citations checked in code; cost cap with the rules-only fallback | Endpoints match the frontend contract (`web/README.md`); a test shows nothing is stored; leakage tests cover the API; CI green | done |
 | **M10b** | Website evaluation (§8.3, §8.4): the 20 frozen questions on the dev slice, session RAG vs all reports in the prompt on batches of 3/10/30/50, latency and cost | Results file and tables; cost estimated before any paid run | planned |
-| **M10c** | Website frontend (React; started on branch `m9c-frontend`) | Runs against the real backend; end-to-end smoke test (upload → findings → question with citations) | in progress |
+| **M10c** | Website frontend (React, `web/`; merged into main) | Runs against the real backend; end-to-end smoke test (upload → findings → question with citations) | done (merged into main, wired to the real API, checked locally in a browser against the real backend) |
 | **M11** | Deployment: frontend on Vercel, backend as a Hugging Face Docker Space (Azure OpenAI keys as Space secrets; no private models or data in the image), rate and size limits, cost cap, attribution, model card | Deployed URLs pass the smoke test (`/health`, one upload, one ask); budget alert set | planned |
 | *Stretch* | CheXpert labeler Docker baseline; noise-adjusted scores; delete-the-cited-sentence test (does the label change?); CheXpert Plus scale ingest (machine labels, throughput and cost only, never accuracy) | — | planned |
 

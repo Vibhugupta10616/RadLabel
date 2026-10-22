@@ -345,3 +345,22 @@ The sample (`data/sample/`, synthetic text written by hand) is never used to tun
   promotes an `uncertain` whose only hedge is definition-present wording. Same family as the "borderline
   cardiomegaly" disagreement above. A fix would be a new free check (escalate such `uncertain` labels to the agent);
   that changes the frozen pipeline and needs an out-of-fold re-run, so it is left to the owner.
+
+## Final borderline rule (owner decision after M10a, 2026-10-22)
+Found on the hand-written sample patient (report 5, "Heart size is borderline." labelled `uncertain`), not on test
+results; the before/after numbers are in docs/RESULTS.md (generated, "Final borderline rule").
+- **Rule** (`verifier.definition_present`, applied last in `final_labels`, so it also covers the agent's decisions):
+  a label is `uncertain`, one of its cited sentences contains a word the label definition counts as present
+  (`DEFINITION_PRESENT`: Cardiomegaly "borderline" / "mild"), **no other hedge cue** occurs anywhere in the cited
+  sentences, and at least one cited mention of the label is not negated → status `present`. Verification becomes
+  `corrected` with a fixed reason (`suggested` stays `suggested`; `unverified` keeps its state and reason).
+  "Possible mild cardiomegaly" stays `uncertain`; so does an `uncertain` with no definition wording at all.
+- No LLM call changes (tagger and agent outputs are the cached ones; `verifier-v2` untouched). v2 re-scored from the
+  cache, $0. The sample's precomputed outputs were regenerated (report 5 Cardiomegaly is now `present`).
+- The rule uses the label definition (the frozen Tier 1 prompt and the M6 hedge fix), not the expert codes; it was
+  not tuned on out-of-fold results. It is a consistency rule between the label definition and the hedge handling,
+  like the M6 fix, and the rest of the pipeline is unchanged.
+- Scope: Cardiomegaly only (the only label whose definition counts hedge-like wording as present). The M8 evaluation
+  index and the retrieval results were built before the rule; plain-sentence search does not read predicted labels,
+  only the M8 prefix rows do, so those results are left as they were.
+- Sample check update: the report-5 known issue (above) is resolved by this rule; the report-3 check stands.

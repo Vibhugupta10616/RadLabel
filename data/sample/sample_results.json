@@ -1785,14 +1785,14 @@
     },
     {
      "label": "Cardiomegaly",
-     "status": "uncertain",
+     "status": "present",
      "evidence": [
       "F2",
       "I2"
      ],
-     "verification": "verified_rules",
-     "reason": "",
-     "corroboration": null
+     "verification": "corrected",
+     "reason": "Wording the label definition counts as present (borderline / mild); no other hedge.",
+     "corroboration": "both"
     },
     {
      "label": "Lung Opacity",

@@ -47,7 +47,7 @@ Out-of-fold on 3,086 expert-coded reports (Indiana University chest X-ray collec
 |---|---|
 | Keyword rules (baseline) | 0.838 (0.823–0.850) |
 | LLM tagger only | 0.862 (0.848–0.875) |
-| **Full pipeline (tagger + checks + verifier agent)** | **0.887 (0.874–0.899)** |
+| **Full pipeline (tagger + checks + verifier agent)** | **0.892 (0.879–0.903)** |
 
 - Verified labels are right far more often than unverified ones: precision **0.938 vs 0.393**.
 - Only **2.9%** of reports end with any unverified label.
