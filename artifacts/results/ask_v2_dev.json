@@ -1,0 +1,102 @@
+{
+ "provenance": {
+  "git_commit": "007ad155d73e2ba0ba48526a265dfa049a4799ac",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": null,
+  "created": "2026-10-22T15:33:23+00:00",
+  "eval_version": "eval_v1.2",
+  "note": "prompt development on the dev slice only (ask v2, iteration v2a); rag1@base = M10b configuration on the dev batches"
+ },
+ "results": {
+  "rag1@base": {
+   "n": 30.0,
+   "n_TC": 10.0,
+   "scored": 30.0,
+   "correct_codes": 17.0,
+   "scored_TC": 10.0,
+   "correct_TC": 5.0,
+   "unreadable": 4.0,
+   "which_listed": 6.0,
+   "negated_listed": 0.0,
+   "n_C": 10.0,
+   "scored_C": 10.0,
+   "correct_C": 5.0,
+   "n_D": 10.0,
+   "D_questions": 10.0,
+   "D_refusal_field": 7.0,
+   "D_lenient": 10.0,
+   "scored_D": 10.0,
+   "correct_D": 7.0
+  },
+  "rag2@v2a": {
+   "n": 30.0,
+   "n_TC": 10.0,
+   "scored": 30.0,
+   "correct_codes": 23.0,
+   "scored_TC": 10.0,
+   "correct_TC": 7.0,
+   "which_listed": 8.0,
+   "negated_listed": 0.0,
+   "unreadable": 0.0,
+   "n_C": 10.0,
+   "scored_C": 10.0,
+   "correct_C": 7.0,
+   "n_D": 10.0,
+   "D_questions": 10.0,
+   "D_refusal_field": 9.0,
+   "D_lenient": 10.0,
+   "scored_D": 10.0,
+   "correct_D": 9.0
+  },
+  "report1@m10b": {
+   "n": 105.0,
+   "n_B": 30.0,
+   "scored": 98.0,
+   "correct_codes": 94.0,
+   "scored_B": 28.0,
+   "correct_B": 26.0,
+   "unreadable": 0.0,
+   "n_D": 75.0,
+   "D_questions": 75.0,
+   "D_refusal_field": 72.0,
+   "D_lenient": 75.0,
+   "scored_D": 70.0,
+   "correct_D": 68.0
+  },
+  "report2@v2a": {
+   "n": 105.0,
+   "n_D": 75.0,
+   "D_questions": 75.0,
+   "D_refusal_field": 75.0,
+   "D_lenient": 75.0,
+   "scored": 98.0,
+   "correct_codes": 95.0,
+   "scored_D": 70.0,
+   "correct_D": 70.0,
+   "unreadable": 0.0,
+   "n_B": 30.0,
+   "scored_B": 28.0,
+   "correct_B": 25.0
+  }
+ }
+}
