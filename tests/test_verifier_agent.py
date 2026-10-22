@@ -11,7 +11,7 @@ from test_free_checks import tagged
 from test_repair_agent import call, script
 
 from radlabel.labelling import verifier_agent as va
-from radlabel.labelling.free_checks import escalations
+from radlabel.labelling.free_checks import Escalation, escalations
 from radlabel.llm import FakeLLM
 from radlabel.preprocess.sentences import report_sentences
 
@@ -133,3 +133,37 @@ def test_section_corroboration_level(tmp_path: Path) -> None:
                Cardiomegaly=("present", ["F2"]))
     assert by(f)["Cardiomegaly"].corroboration == "findings" and by(f)["Pleural Effusion"].corroboration == "findings"
     assert by(f)["Atelectasis"].corroboration is None  # only present / suggested labels get a level
+
+
+def final_for(findings: str, status: str = "uncertain", impression: str = "", **kw: Any) -> va.FinalLabel:
+    v, s = tagged(findings, impression, Cardiomegaly=(status, ["F1"]))
+    return by(va.final_labels(v, s, escalations(v, s), None, **kw))["Cardiomegaly"]
+
+
+def test_definition_wording_makes_an_uncertain_label_present() -> None:
+    """Owner rule (found on the hand-written sample): borderline / mild is present for Cardiomegaly by definition."""
+    for text in ("Heart size is borderline.", "Borderline cardiomegaly.", "The heart is borderline enlarged."):
+        x = final_for(text)
+        assert (x.status, x.verification, x.evidence, x.corroboration) == ("present", "corrected", ["F1"], "findings")
+        assert "borderline" in x.reason
+    assert final_for("Mild cardiomegaly.").status == "present"  # a definition word, no other hedge
+
+
+def test_any_other_hedge_keeps_the_label_uncertain() -> None:
+    for text in ("Possible mild cardiomegaly.", "Possible borderline cardiomegaly.", "Heart size is borderline, "
+                 "cannot exclude cardiomegaly.", "Heart size is borderline but possibly rotated."):
+        assert final_for(text).status == "uncertain", text
+    assert final_for("Heart size cannot be assessed.").status == "uncertain"  # no definition wording at all
+    assert final_for("No borderline cardiomegaly.").status == "uncertain"  # negated mention only
+
+
+def test_definition_rule_scope() -> None:
+    assert final_for("Heart size is borderline.", "present").verification == "verified_rules"  # nothing to change
+    assert final_for("Heart size is borderline.", "absent").status == "absent"  # only `uncertain` is promoted
+    v, s = tagged("Possible small effusion. Heart size is borderline.", "", Cardiomegaly=("uncertain", ["F2"]))
+    x = by(va.final_labels(v, s, [], None))["Cardiomegaly"]  # a hedge in a sentence that is not cited is ignored
+    assert x.status == "present"
+    v, s = tagged("Heart size is borderline.", "", Cardiomegaly=("uncertain", ["F1"]))
+    esc = [Escalation(label="Cardiomegaly", reason="section_rule", detail="x")]
+    x = by(va.final_labels(v, s, esc, None))["Cardiomegaly"]  # escalated, agent not run: stays unverified, same reason
+    assert (x.status, x.verification, x.reason) == ("present", "unverified", "agent not run")

@@ -27,7 +27,7 @@ import yaml
 from radlabel.labelling.schema import LabelOut, ReportLabels, VerifierMessage
 from radlabel.labels import NO_FINDING, OTHER
 from radlabel.preprocess.aliases import normalise
-from radlabel.preprocess.negation import Mention, mentions, redaction_adjacent
+from radlabel.preprocess.negation import HEDGE, Mention, mentions, redaction_adjacent
 from radlabel.preprocess.sentences import Sentence
 from radlabel.preprocess.text import REDACTED
 
@@ -106,6 +106,21 @@ def verify(out: ReportLabels, sentences: list[Sentence]) -> ReportLabels:
             msgs.append(_msg("no_finding_exclusivity", NO_FINDING, "fail", f"No Finding present with {others}"))
 
     return out.model_copy(update={"labels": labels, "verifier_messages": msgs})
+
+
+def definition_present(label: str, evidence: list[str], sentences: list[Sentence]) -> bool:
+    """Final consistency rule (owner, M10b; found on the hand-written sample, not on test results). An `uncertain`
+    label is `present` if its cited sentences hold a word the label's definition counts as present ("borderline",
+    "mild") and no other hedge cue, and at least one cited mention of the label is not negated. Any other hedge cue
+    anywhere in the cited sentences ("possible mild cardiomegaly") keeps it uncertain."""
+    exempt = DEFINITION_PRESENT.get(label, frozenset())
+    by_id = {s.id: s for s in sentences}
+    cited = [by_id[e] for e in evidence if e in by_id]
+    toks = [normalise(s.text).split() for s in cited]
+    cues = {c for t in toks for c in HEDGE if any(t[i:i + len(c.split())] == c.split() for i in range(len(t)))}
+    word = any(w in (x, x.removesuffix("ly")) for t in toks for x in t for w in exempt)
+    return bool(word and cues <= exempt
+                and any(not m.negated for s in cited for m in mentions(s.text) if m.label == label))
 
 
 def section_rule(label: str, status: str, sentences: list[Sentence], ments: dict[str, list[Mention]]) -> str | None:

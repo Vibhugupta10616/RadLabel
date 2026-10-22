@@ -16,7 +16,12 @@
 
 - `analysis`: free analyses of the full run ($0): normal-check ablation, per-label table, suggested labels.
 
-Usage: python -m eval.verifier_agent escalation | dev | full | analysis  [--cache-only]
+- `borderline`: the final consistency rule (owner, after M10a: an `uncertain` label whose only hedge-like wording is
+  wording its definition counts as present becomes `present`; found on the hand-written sample, not on test results),
+  re-scored from the cache ($0): v2 before (git ref) vs after, macro-F1 v1 / strict, Cardiomegaly F1, changed labels
+  right / wrong against the codes. Needs the pre-rule predictions kept as BEFORE_BORDERLINE before `full` is rerun.
+
+Usage: python -m eval.verifier_agent escalation | dev | full | analysis | borderline <git ref>  [--cache-only]
 """
 
 from __future__ import annotations
@@ -52,7 +57,7 @@ from radlabel.labelling import verifier_agent as va
 from radlabel.labels import HEADLINE, LABELS, NO_FINDING
 from radlabel.llm import LLMClient
 from radlabel.pipeline import PipelineResult, run_pipeline
-from radlabel.results import write_result
+from radlabel.results import RESULTS_DIR, write_result
 
 log = logging.getLogger(__name__)
 DEV_SPEND_CAP = 1.0  # USD of new spend per dev run
@@ -412,6 +417,62 @@ def full(cache_only: bool = False) -> dict[str, Any]:
     return {"agent": agent, "rates": rates, "paired": paired, "decision": decision, "new_spend_usd": new_spend}
 
 
+BEFORE_BORDERLINE = PRED_DIR / "verifier_agent_full_before_borderline.jsonl"  # git-ignored (report text)
+
+
+def borderline_fix(ref: str) -> dict[str, Any]:
+    """v2 before the final borderline rule (results at git `ref`, predictions kept in BEFORE_BORDERLINE) and after
+    (current files): headline numbers, Cardiomegaly, and every changed label scored against the codes."""
+    it = Items()
+    pos = {i: k for k, i in enumerate(it.ids)}
+    keep = ~it.subset["hedged"] & ~it.pilot
+
+    def load(f: Any) -> dict[int, PipelineResult]:
+        return {int(r.report_id): r for r in map(PipelineResult.model_validate_json, f.open(encoding="utf-8"))}
+    old, new = load(BEFORE_BORDERLINE), load(PRED_DIR / "verifier_agent_full.jsonl")
+    before = {i: {f.label: f.status for f in r.final} for i, r in old.items()}
+    after = {i: {f.label: f.status for f in r.final} for i, r in new.items()}
+    changed = [(i, lab) for i in it.ids for lab in LABELS if before[i][lab] != after[i][lab]]
+    out: dict[str, Any] = {"before_ref": ref, "changed_labels": len(changed),
+                           "changed_by_label": _tally(lab for _, lab in changed),
+                           "changed_by_transition": _tally(f"{before[i][lab]} -> {after[i][lab]}"
+                                                   for i, lab in changed),
+                           "changed_by_verification": _tally(
+                               next(f.verification for f in new[i].final if f.label == lab) for i, lab in changed),
+                           "changed_in_hedged_reports": sum(bool(it.subset["hedged"][pos[i]]) for i, _ in changed),
+                           "changed_in_pilot_reports": sum(bool(it.pilot[pos[i]]) for i, _ in changed)}
+    for m in ("v1", "strict"):  # present = positive; a change counts only where the label is scored
+        right = wrong = unscored = 0
+        for i, lab in changed:
+            k = pos[i]
+            if not keep[k] or it.excluded[m][lab][k] or (lab == NO_FINDING and it.ignored_only[k]):
+                unscored += 1
+                continue
+            g, was, now = bool(it.gold[m][lab][k]), before[i][lab] == "present", after[i][lab] == "present"
+            if was == now:
+                unscored += 1
+            elif now == g:
+                right += 1
+            else:
+                wrong += 1
+        out[f"changes_{m}"] = {"wrong_to_right": right, "right_to_wrong": wrong, "no_effect_or_not_scored": unscored}
+
+    def summary(r: dict[str, Any]) -> dict[str, Any]:
+        c = r["v1"]["labels"]["Cardiomegaly"]
+        return {"macro_f1_v1": r["v1"]["macro_f1_headline"], "macro_f1_strict": r["strict"]["macro_f1_headline"],
+                "rare_micro_f1_v1": r["v1"]["rare_micro_f1"], "cardiomegaly_f1": c["f1"],
+                "cardiomegaly_precision": c["precision"], "cardiomegaly_recall": c["recall"],
+                "cardiomegaly_status_counts": r["status_counts"]["Cardiomegaly"],
+                "unverified_report_rate": r["rates"]["unverified_report_rate"],
+                "precision_verified": r["verification_groups"]["verified_or_verified_rules"]["precision"],
+                "precision_unverified": r["verification_groups"]["unverified"]["precision"]}
+    from eval.entry_point import _git_result
+    after_res = json.loads((RESULTS_DIR / "labelling_llm_agent_v2.json").read_text(encoding="utf-8"))["results"]
+    out["before"], out["after"] = summary(_git_result(ref, "labelling_llm_agent_v2")), summary(after_res)
+    out["paired_after_minus_before"] = paired_diff(it, after, before)
+    return out
+
+
 def analysis() -> dict[str, Any]:
     """Free analyses of the M7 full run (owner, after M7; $0, from the run's predictions, no LLM call).
 
@@ -637,6 +698,41 @@ def render_full(v2: dict[str, Any], paired: dict[str, Any], decision: dict[str, 
     return "\n".join(lines) + "\n"
 
 
+def render_borderline(b: dict[str, Any]) -> str:
+    """docs/RESULTS.md block for the final borderline consistency rule (eval/report.py)."""
+    nl = chr(10)
+    def row(name: str, x: dict[str, Any], y: dict[str, Any]) -> str:
+        return f"| {name} | {_fmt(x)} | {_fmt(y)} |"
+    be, af = b["before"], b["after"]
+    c1, cs = b["changes_v1"], b["changes_strict"]
+    cb, ca = be["cardiomegaly_status_counts"], af["cardiomegaly_status_counts"]
+    d = b["paired_after_minus_before"]
+    return nl.join([
+        "Final deterministic rule after the verifier agent (owner decision after M10a): an `uncertain` label whose "
+        "only "
+        "hedge-like wording is wording its definition counts as present (Cardiomegaly: \"borderline\", \"mild\") "
+        "becomes `present`; any other hedge cue in the cited sentences keeps it `uncertain`. No LLM call changes; v2 "
+        f"re-scored from the cache. Found on the hand-written sample patient, not on test results. Before = results at "
+        f"`{b['before_ref'][:7]}`.", "",
+        "| | Before | After |", "|---|---|---|",
+        row("Macro-F1, 9 headline labels (v1)", be["macro_f1_v1"], af["macro_f1_v1"]),
+        row("Macro-F1, 9 headline labels (strict)", be["macro_f1_strict"], af["macro_f1_strict"]),
+        row("Pooled rare micro-F1 (v1)", be["rare_micro_f1_v1"], af["rare_micro_f1_v1"]),
+        row("Cardiomegaly F1 (v1)", be["cardiomegaly_f1"], af["cardiomegaly_f1"]),
+        f"| Cardiomegaly precision / recall | {be['cardiomegaly_precision']:.3f} / {be['cardiomegaly_recall']:.3f} | "
+        f"{af['cardiomegaly_precision']:.3f} / {af['cardiomegaly_recall']:.3f} |",
+        f"| Cardiomegaly present / uncertain (all reports) | {cb.get('present', 0)} / {cb.get('uncertain', 0)} | "
+        f"{ca.get('present', 0)} / {ca.get('uncertain', 0)} |", "",
+        f"Paired headline macro-F1 (v1), after − before: {_fmt(d)}. Labels changed: {b['changed_labels']} "
+        f"({', '.join(f'{k} {v}' for k, v in b['changed_by_transition'].items())}; by label "
+        f"{b['changed_by_label']}; by verification state {b['changed_by_verification']}); in hedged reports "
+        f"{b['changed_in_hedged_reports']}, in the Tier 1 pilot reports {b['changed_in_pilot_reports']}. "
+        "Scored against "
+        f"the codes (present = positive, hedged and pilot reports excluded): v1 wrong → right "
+        f"{c1['wrong_to_right']}, right → wrong {c1['right_to_wrong']}; strict wrong → right {cs['wrong_to_right']}, "
+        f"right → wrong {cs['right_to_wrong']}."]) + nl
+
+
 def render(esc: dict[str, Any], dev: dict[str, Any] | None) -> str:
     """docs/RESULTS.md block (eval/report.py): escalation before any agent call, and dev-slice behaviour."""
     def pct(x: float | None) -> str:
@@ -681,6 +777,11 @@ def escalation_counts() -> int:
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "escalation"
     co = "--cache-only" in sys.argv
-    r = (escalation() if mode == "escalation" else dev(cache_only=co) if mode == "dev" else analysis()
-         if mode == "analysis" else full(cache_only=co))
+    if mode == "borderline":
+        r = borderline_fix(sys.argv[2])
+        write_result("labelling_v2_borderline_fix", r, fold="oof", mapping_version="v1", eval_version="eval_v1.2",
+                     note="found on the hand-written sample, not on test results")
+    else:
+        r = (escalation() if mode == "escalation" else dev(cache_only=co) if mode == "dev" else analysis()
+             if mode == "analysis" else full(cache_only=co))
     print(json.dumps(r, indent=1))

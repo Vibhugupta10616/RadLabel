@@ -28,7 +28,7 @@ from radlabel.labelling.extractor import STATUSES
 from radlabel.labelling.free_checks import Escalation, normal_check
 from radlabel.labelling.repair_agent import _ment_json, definitions
 from radlabel.labelling.schema import ReportLabels
-from radlabel.labelling.verifier import section_rule
+from radlabel.labelling.verifier import DEFINITION_PRESENT, definition_present, section_rule
 from radlabel.labels import LABELS, NO_FINDING
 from radlabel.llm import LLMClient
 from radlabel.preprocess.aliases import normalise
@@ -38,6 +38,7 @@ from radlabel.preprocess.text import REDACTED
 
 PROMPT_VERSION = "verifier-v2"  # FROZEN on the dev slice (v1-v3 tried, v2 kept by the pre-set rule); hash test
 MAX_TOOL_CALLS = 8  # SPEC §6.2
+DEFINITION_REASON = "Wording the label definition counts as present (borderline / mild); no other hedge."
 MAX_REPORT_TOKENS = 80_000  # input + output over all calls of one report
 MAX_COMPLETION_TOKENS = 4_000  # per call, reasoning included
 REASONING_EFFORT = "low"
@@ -344,6 +345,12 @@ def final_labels(tagger: ReportLabels, sentences: list[Sentence], esc: list[Esca
             label=NO_FINDING, status="present", evidence=sorted({i for v in nc.covered.values() for i in v}),
             verification="verified_rules" if nc.ok else "unverified",
             reason="" if nc.ok else "derived after the agent's changes; normal check not passed")
+    for lab in DEFINITION_PRESENT:  # last, so it also covers the agent's decisions; before corroboration is set
+        x = out[lab]
+        if x.status == "uncertain" and definition_present(lab, x.evidence, sentences):
+            out[lab] = x.model_copy(update={"status": "present"} if x.verification == "unverified" else {
+                "status": "present", "reason": DEFINITION_REASON,
+                "verification": "suggested" if x.verification == "suggested" else "corrected"})
     section = {s.id: s.section for s in sentences}
     for lab, x in out.items():
         if x.status == "present" or x.verification == "suggested":

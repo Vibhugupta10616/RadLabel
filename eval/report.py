@@ -178,6 +178,9 @@ def render() -> str:
         if an is not None:
             lines += ["", "### Per label, suggested labels and the normal-check ablation (after M7)", "",
                       verifier_agent.render_analysis(an).rstrip()]
+        bf = load_result("labelling_v2_borderline_fix")
+        if bf is not None:
+            lines += ["", "### Final borderline rule (after M10a)", "", verifier_agent.render_borderline(bf).rstrip()]
     esc = load_result("verifier_escalation")
     if esc is not None:
         lines += ["", "### Escalation before any agent call, and the dev slice", "",
