@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from eval import entry_point, retrieval, verifier_agent
+from eval import ask_score, entry_point, retrieval, verifier_agent
 from eval.labelling import _fmt, load_result, render_summary, summary_inputs
 from radlabel.results import RESULTS_DIR
 
@@ -207,6 +207,9 @@ def render() -> str:
                   retrieval.render_finetuned(ft, load_result("embedding_training"),
                                              load_result("embedding_serving_model")).rstrip(), "",
                   "### All rows, fine-tuning run", "", retrieval.render(ft).rstrip()]
+    ask = load_result("ask_eval")
+    if ask is not None:
+        lines += ["", "## Ask evaluation (M10b, SPEC §8.3)", "", ask_score.render(ask).rstrip()]
     return "\n".join(lines) + "\n"
 
 
@@ -229,7 +232,7 @@ def summary() -> str:
         f"- Verified labels are right far more often than unverified ones: precision "
         f"**{g['verified_or_verified_rules']['precision']:.3f} vs {g['unverified']['precision']:.3f}**.",
         f"- Only **{_pct(r['unverified_report_rate'])}** of reports end with any unverified label.",
-        search_line(best, b)]) + "\n"
+        search_line(best, b), *([ask_score.summary_line(ask)] if (ask := load_result("ask_eval")) else [])]) + "\n"
 
 
 def search_line(best: str, b: dict[str, Any]) -> str:
