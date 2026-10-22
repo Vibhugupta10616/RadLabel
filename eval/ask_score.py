@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 from collections import Counter, defaultdict
 from collections.abc import Callable
 from typing import Any
@@ -56,7 +57,24 @@ def classify(q: dict[str, Any], rec: dict[str, Any]) -> dict[str, Any]:
     unreadable = cls is None or cls == "other"
     codes = None if q.get("hedged") else ok(q["codes"])
     return {"cls": "unreadable" if unreadable else (sorted(cls) if isinstance(cls, set) else cls),
-            "unreadable": unreadable, "correct_codes": codes, "correct_v2": ok(q["v2"])}
+            "unreadable": unreadable, "correct_codes": codes, "correct_v2": ok(q["v2"]),
+            "lenient": lenient_refusal(rec) if kind == "refuse" else None}
+
+
+NOT_STATED_RE = re.compile(r"\b(do(?:es)? not|don't|doesn't|cannot|can't|unable to)\b.*\b(state|specify|provide|"
+                           r"mention|describe|contain|determine|include|say|give|know)\b|\bno (?:information|mention)\b|"
+                           r"\bnot (?:stated|mentioned|provided|specified|available|described)\b")
+
+
+def lenient_refusal(rec: dict[str, Any]) -> bool:
+    """POST-HOC (not pre-registered): the frozen scoring note also accepts an answer that says the reports don't state
+    it, with no invented value. True if the record is a refusal, or its answer says "not stated" and contains no
+    digit and no diagnosis word (a redacted age such as "[REDACTED]-year-old" is not an invented value)."""
+    a = rec["answer"]
+    if a is None:
+        return True
+    t = a.lower().replace("[redacted]", "")
+    return bool(NOT_STATED_RE.search(t)) and not re.search(r"\d|cancer|malignan|carcinoma|tumou?r", t)
 
 
 def affirms(q: dict[str, Any], rec: dict[str, Any], c: dict[str, Any]) -> bool:
@@ -217,7 +235,8 @@ def main() -> dict[str, Any]:
 
     def acc(rs: list[dict[str, Any]], s: str) -> dict[str, Any]:
         return {"codes": rate(rs, "correct_codes", "cluster", s + "c"), "v2": rate(rs, "correct_v2", "cluster", s + "v"),
-                "unreadable": sum(r["unreadable"] for r in rs), "n_questions": len(rs)}
+                "unreadable": sum(r["unreadable"] for r in rs), "n_questions": len(rs),
+                "lenient": rate(rs, "lenient", "cluster", s + "l")}
     # Part 1
     p1: dict[str, Any] = {"groups": {g: acc([r for r in single if r["group"] == g], seed + g)
                                      for g in ("T1", "T2", "A", "B", "D")}}
@@ -262,6 +281,7 @@ def main() -> dict[str, Any]:
         hw[str(n)] = {"question": fq[n][0], "scopes": {k: {"n": len(v), "codes": rate(v, "correct_codes", "cluster",
                                                                                    f"{seed}hw{n}{k}c"),
                                                            "v2": rate(v, "correct_v2", "cluster", f"{seed}hw{n}{k}v"),
+                                                           "lenient": rate(v, "lenient", "cluster", f"{seed}hw{n}{k}l"),
                                                            "unreadable": sum(x["unreadable"] for x in v)}
                                                        for k, v in scopes.items() if v}}
     out["hand_written"] = hw
@@ -313,7 +333,11 @@ def render(res: dict[str, Any]) -> str:
              "B": "Frozen B (tricky wording)", "D": "Frozen D (must refuse)"}
     for g, x in p1["groups"].items():
         L.append(f"| {names[g]} | {x['n_questions']} | {pcts(x['codes'])} | {pcts(x['v2'])} | {x['unreadable']} |")
-    L += ["", "Is there <finding>? by label (vs codes):", "", "| Label | Coded present | Not coded |", "|---|---|---|"]
+    dl = p1["groups"]["D"]["lenient"]
+    L += ["", "Frozen D is scored by the pre-registered rule (a refusal, `answer` null). Post-hoc, not pre-registered: the "
+          "frozen scoring note also accepts an answer that says the reports don't state it, with no number or diagnosis "
+          f"(a redacted age is not a value); on that reading {pcts(dl)}.", "",
+          "Is there <finding>? by label (vs codes):", "", "| Label | Coded present | Not coded |", "|---|---|---|"]
     for lab, x in p1["t1_by_label"].items():
         L.append(f"| {lab} | {pcts(x['positives_codes']['codes'])} | {pcts(x['negatives_codes']['codes'])} |")
     c, rf = p1["citations"], p1["refusals"]
@@ -329,14 +353,16 @@ def render(res: dict[str, Any]) -> str:
           "dev slice), upload order = batch order. RAG = the website configuration (fold-k fine-tuned model, top 12 "
           "sentences); all in prompt = every sentence of every report. 15 questions per batch (5 templated, frozen C "
           "and D).", "",
-          "| Reports | Method | Correct vs codes (all) | Templated | Frozen C | Frozen D (refuse) | Correct vs v2 | "
-          "Mean input tokens | Cost / request | Latency p50 / p95 s |", "|---|---|---|---|---|---|---|---|---|---|"]
+          "| Reports | Method | Correct vs codes (all) | Templated | Frozen C | Frozen D (refuse) | D, post-hoc lenient | "
+          "Correct vs v2 | Unreadable | Mean input tokens | Cost / request | Latency p50 / p95 s |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for n, e in p2.items():
         for m, label in (("rag", "RAG"), ("full", "all in prompt")):
             x, co = e[m], e[m]["cost"]
             L.append(f"| {n} | {label} | {pcts(x['all']['codes'])} | {pcts(x['templated']['codes'])} | "
                      f"{pcts(x['hand_written_C']['codes'])} | {pcts(x['hand_written_D']['codes'])} | "
-                     f"{pcts(x['all']['v2'])} | {co['mean_input_tokens']:.0f} | ${co['mean_cost_usd']:.5f} | "
+                     f"{pcts(x['hand_written_D']['lenient'])} | {pcts(x['all']['v2'])} | "
+                     f"{x['all']['unreadable']} of {x['all']['n_questions']} | {co['mean_input_tokens']:.0f} | ${co['mean_cost_usd']:.5f} | "
                      f"{_c(co['latency_p50_s'], 2)} / {_c(co['latency_p95_s'], 2)} |")
     L += ["", "| Reports | Paired RAG − all in prompt, vs codes | vs v2 | Reading (pre-registered rule) | Retrieved mention of "
           "a coded report's label |", "|---|---|---|---|---|"]
@@ -361,8 +387,8 @@ def render(res: dict[str, Any]) -> str:
         cells = []
         for k in ("report", "rag", "full"):
             s = x["scopes"].get(k)
-            cells.append("–" if s is None else f"{pcts(s['codes'])}" if s["codes"]["n"] else
-                         f"{pcts(s['v2'])} (v2 only)")
+            cells.append("–" if s is None else (f"{pcts(s['codes'])}" if s["codes"]["n"] else
+                         f"{pcts(s['v2'])} (v2 only)") + (f"; post-hoc lenient {pcts(s['lenient'])}" if s["lenient"]["n"] else ""))
         L.append(f"| {n} | {x['question']} | {cells[0]} | {cells[1]} | {cells[2]} |")
     return "\n".join(L) + "\n"
 

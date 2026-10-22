@@ -52,6 +52,7 @@ Out-of-fold on 3,086 expert-coded reports (Indiana University chest X-ray collec
 - Verified labels are right far more often than unverified ones: precision **0.938 vs 0.393**.
 - Only **2.9%** of reports end with any unverified label.
 - Search (nDCG@10, 494 query–fold pairs): base embeddings 0.564 (0.537–0.589) → negation-aware fine-tuned **0.592 (0.565–0.618)**; reports that only mention the finding as negated drop from 14.0% to 9.7% of the top 10. The fine-tuned model is used for search.
+- Questions (M10b): on 576 "Is there …?" questions about 102 dev reports 97.7% match the expert codes, and 77.0% of affirming answers cite a sentence that names the finding. Across 50 reports, searching the session answers 33.3% of questions correctly vs 48.9% with every report in the prompt, at 4× lower cost per request.
 
 <!-- summary:end -->
 

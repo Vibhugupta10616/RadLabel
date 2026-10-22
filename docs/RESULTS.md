@@ -446,3 +446,91 @@ Serving model: all reports, 3 epochs, 4,398 triplets; stored privately (MODEL_ST
 | fine-tuned, sentences without prefix | 0.688 (0.660–0.714) | 0.592 (0.565–0.618) | 0.097 (0.075–0.120) |
 | fine-tuned, no prefix + negated-sentence filter | 0.700 (0.672–0.725) | 0.602 (0.575–0.628) | 0.066 (0.048–0.085) |
 | fine-tuned no-prefix sentences + BM25 (RRF) | 0.675 (0.647–0.701) | 0.585 (0.557–0.610) | 0.139 (0.109–0.170) |
+
+## Ask evaluation (M10b, SPEC §8.3)
+
+Pre-registered in [evaluation_notes.md](evaluation_notes.md#ask-evaluation-m10b-owner-2026-10-22-pre-committed-before-any-run). Frozen website prompts through the real code, gpt-4.1-mini, one run per question; answers parsed by rules; expected answers from the expert codes (v1, `present` = positive; hedged reports left out of that column) and from the v2 labels; citations checked in code. Cells: share correct (95% bootstrap CI) n.
+
+New spend 0.639 USD (1,594 answers).
+
+**Part 1: one report, the 102 dev-slice reports** (the frozen questions of groups A, B, D on a seeded sample of 30 of them).
+
+| Question group | Questions | Correct vs codes | Correct vs v2 | Unreadable answers |
+|---|---|---|---|---|
+| Is there <finding>? (6 labels) | 612 | 97.7% (96–99) n=576 | 98.2% (97–99) n=612 | 0 |
+| What supports <label>? | 172 | 96.1% (93–99) n=154 | 98.3% (96–100) n=172 | 0 |
+| Frozen A (answerable) | 180 | 96.4% (93–99) n=168 | 96.7% (94–99) n=180 | 0 |
+| Frozen B (tricky wording) | 120 | 71.4% (65–78) n=112 | 71.7% (66–77) n=120 | 15 |
+| Frozen D (must refuse) | 150 | 95.7% (92–99) n=140 | 95.3% (92–98) n=150 | 0 |
+
+Is there <finding>? by label (vs codes):
+
+| Label | Coded present | Not coded |
+|---|---|---|
+| Cardiomegaly | 100.0% (100–100) n=11 | 98.8% (96–100) n=85 |
+| Pleural Effusion | 100.0% (100–100) n=5 | 100.0% (100–100) n=91 |
+| Support Devices | 81.8% (64–100) n=11 | 97.6% (94–100) n=85 |
+| Lung Opacity | 86.7% (67–100) n=15 | 95.1% (90–99) n=81 |
+| Atelectasis | 80.0% (50–100) n=10 | 100.0% (100–100) n=86 |
+| Pneumothorax | 100.0% (100–100) n=1 | 100.0% (100–100) n=95 |
+
+Citations (Part 1): 1,687 of 1,687 cited sentences existed among the given ones (100.0%; the rest were dropped by the code check; 0 answers became "not stated" because no valid citation was left). Of 165 answers that affirm a finding, at least one cited sentence names it (eval detector, not negated) in 77.0% (66–86) n=165; every cited sentence does in 66.1% (55–75) n=165.
+Refusals (Part 1): precision 0.993, recall 0.953 (143 of 150 unanswerable questions refused; 1 of 143 answerable-and-positive questions wrongly refused).
+
+**Part 2: across reports.** Synthetic patients: 3 batches of random out-of-fold IU reports per size (never the dev slice), upload order = batch order. RAG = the website configuration (fold-k fine-tuned model, top 12 sentences); all in prompt = every sentence of every report. 15 questions per batch (5 templated, frozen C and D).
+
+| Reports | Method | Correct vs codes (all) | Templated | Frozen C | Frozen D (refuse) | Correct vs v2 | Mean input tokens | Cost / request | Latency p50 / p95 s |
+|---|---|---|---|---|---|---|---|---|---|
+| 3 | RAG | 71.1% (58–84) n=45 | 60.0% (33–80) n=15 | 66.7% (40–87) n=15 | 86.7% (67–100) n=15 | 71.1% (58–84) n=45 | 664 | $0.00034 | 1.21 / 1.84 |
+| 3 | all in prompt | 68.9% (56–82) n=45 | 80.0% (60–100) n=15 | 53.3% (27–80) n=15 | 73.3% (53–93) n=15 | 68.9% (56–82) n=45 | 934 | $0.00045 | 1.21 / 2.36 |
+| 10 | RAG | 53.3% (40–67) n=45 | 33.3% (13–60) n=15 | 53.3% (27–80) n=15 | 73.3% (53–93) n=15 | 48.9% (36–64) n=45 | 687 | $0.00037 | 1.28 / 2.55 |
+| 10 | all in prompt | 53.3% (40–67) n=45 | 26.7% (7–47) n=15 | 53.3% (27–80) n=15 | 80.0% (60–100) n=15 | 51.1% (38–67) n=45 | 2083 | $0.00042 | 1.40 / 3.03 |
+| 30 | RAG | 51.1% (38–67) n=45 | 40.0% (20–67) n=15 | 53.3% (27–80) n=15 | 60.0% (33–87) n=15 | 46.7% (33–62) n=45 | 674 | $0.00037 | 1.38 / 2.40 |
+| 30 | all in prompt | 60.0% (47–73) n=45 | 20.0% (0–40) n=15 | 66.7% (47–87) n=15 | 93.3% (80–100) n=15 | 60.0% (47–73) n=45 | 5345 | $0.00086 | 1.59 / 3.91 |
+| 50 | RAG | 33.3% (20–47) n=45 | 20.0% (0–40) n=15 | 26.7% (7–47) n=15 | 53.3% (27–80) n=15 | 35.6% (22–49) n=45 | 663 | $0.00040 | 1.54 / 2.53 |
+| 50 | all in prompt | 48.9% (36–62) n=45 | 46.7% (20–73) n=15 | 20.0% (0–40) n=15 | 80.0% (60–100) n=15 | 46.7% (33–60) n=45 | 8274 | $0.00142 | 2.00 / 7.30 |
+
+| Reports | Paired RAG − all in prompt, vs codes | vs v2 | Reading (pre-registered rule) | Retrieved mention of a coded report's label |
+|---|---|---|---|---|
+| 3 | +2.2 pts (-8.9 to +13.3) | +2.2 pts (-8.9 to +13.3) | no detectable difference | 100.0% of 20 |
+| 10 | +0.0 pts (-11.2 to +13.3) | -2.2 pts (-13.3 to +8.9) | no detectable difference | 97.0% of 33 |
+| 30 | -8.9 pts (-24.5 to +8.9) | -13.3 pts (-28.9 to +2.2) | no detectable difference | 64.4% of 59 |
+| 50 | -15.6 pts (-28.9 to -2.2) | -11.1 pts (-26.7 to +2.2) | all-in-prompt better | 51.1% of 88 |
+
+Citations (Part 2), structural validity and support by the eval detector (at least one / every cited sentence):
+
+| Reports | Method | Cited sentences that existed | Affirming answers | Support (≥1) | Support (all) | Refusal precision / recall |
+|---|---|---|---|---|---|---|
+| 3 | RAG | 100.0% | 14 | 78.6% (57–100) n=14 | 64.3% (43–86) n=14 | 1.00 / 0.87 |
+| 3 | all in prompt | 100.0% | 14 | 92.9% (79–100) n=14 | 92.9% (79–100) n=14 | 1.00 / 0.73 |
+| 10 | RAG | 100.0% | 19 | 84.2% (68–100) n=19 | 73.7% (53–89) n=19 | 1.00 / 0.73 |
+| 10 | all in prompt | 100.0% | 20 | 75.0% (55–90) n=20 | 55.0% (35–75) n=20 | 1.00 / 0.80 |
+| 30 | RAG | 100.0% | 20 | 70.0% (50–90) n=20 | 45.0% (25–70) n=20 | 1.00 / 0.60 |
+| 30 | all in prompt | 100.0% | 18 | 83.3% (61–100) n=18 | 55.6% (33–78) n=18 | 1.00 / 0.93 |
+| 50 | RAG | 100.0% | 21 | 76.2% (57–90) n=21 | 52.4% (33–71) n=21 | 1.00 / 0.53 |
+| 50 | all in prompt | 100.0% | 20 | 65.0% (45–85) n=20 | 40.0% (20–60) n=20 | 1.00 / 0.80 |
+
+**Hand-written questions** (the 20 frozen ones, scored with their scoring notes; correct vs codes, n answers scored): 
+
+| # | Question | One report | RAG (3–50 reports) | All in prompt (3–50 reports) |
+|---|---|---|---|---|
+| 1 | Is the heart enlarged? | 96.4% (89–100) n=28 | – | – |
+| 2 | Is there fluid around the lungs? | 100.0% (100–100) n=28 | – | – |
+| 3 | Does the patient have any tubes, lines or devices in place? | 96.4% (89–100) n=28 | – | – |
+| 4 | Is there any air outside the lung, a pneumothorax? | 100.0% (100–100) n=28 | – | – |
+| 5 | Are any broken bones described? | 100.0% (100–100) n=28 | – | – |
+| 6 | Is the report completely normal? | 85.7% (71–96) n=28 | – | – |
+| 7 | Is there any sign of pulmonary edema? | 96.4% (89–100) n=28 | – | – |
+| 8 | Is a lung nodule or mass definitely present? | 89.3% (79–100) n=28 | – | – |
+| 9 | Does the report state that there is no pleural effusion? | 85.7% (71–96) n=28 | – | – |
+| 10 | Is the lung opacity described with certainty, or only as possible? | 14.3% (4–29) n=28 | – | – |
+| 11 | Which reports describe an enlarged heart? | – | 58.3% (33–83) n=12 | 50.0% (25–75) n=12 |
+| 12 | In how many reports is a pleural effusion present? | – | 41.7% (17–67) n=12 | 33.3% (8–58) n=12 |
+| 13 | In which report is a tube, line or device first mentioned? | – | 50.0% (25–75) n=12 | 58.3% (33–83) n=12 |
+| 14 | Is there any report without abnormal findings? | – | 8.3% (0–25) n=12 | 0.0% (0–0) n=12 |
+| 15 | Does any report describe a pneumothorax as present? | – | 91.7% (75–100) n=12 | 100.0% (100–100) n=12 |
+| 16 | How old is the patient? | 78.6% (61–93) n=28 | 16.7% (0–42) n=12 | 25.0% (8–50) n=12 |
+| 17 | Is this cancer? | 100.0% (100–100) n=28 | 83.3% (58–100) n=12 | 100.0% (100–100) n=12 |
+| 18 | What treatment should the patient receive? | 100.0% (100–100) n=28 | 100.0% (100–100) n=12 | 100.0% (100–100) n=12 |
+| 19 | What does the patient's CT scan show? | 100.0% (100–100) n=28 | 50.0% (25–75) n=12 | 83.3% (58–100) n=12 |
+| 20 | What was the patient's oxygen saturation? | 100.0% (100–100) n=28 | 91.7% (75–100) n=12 | 100.0% (100–100) n=12 |

@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "839bd6f340ba78cf12132e196cc0f69c14076500",
+  "git_commit": "c37afdc6d5cf6d2396a92c69cdfec4f526d30725",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,113 +23,151 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-22T14:53:49+00:00",
+  "created": "2026-10-22T15:08:16+00:00",
   "eval_version": "eval_v1.2",
   "prompts": "ask-report-v1, ask-all-v1, baseline (eval/ask.py)"
  },
  "results": {
-  "records": 499,
+  "records": 1594,
   "single_expected": 1234,
   "rag_expected": 360,
   "part1": {
    "groups": {
     "T1": {
      "codes": {
-      "n": 264,
-      "k": 256,
-      "value": 0.9696969696969697,
-      "lo": 0.946969696969697,
-      "hi": 0.9886363636363636
+      "n": 576,
+      "k": 563,
+      "value": 0.9774305555555556,
+      "lo": 0.9635416666666666,
+      "hi": 0.9895833333333334
      },
      "v2": {
-      "n": 276,
-      "k": 270,
-      "value": 0.9782608695652174,
-      "lo": 0.9601449275362319,
-      "hi": 0.9927536231884058
+      "n": 612,
+      "k": 601,
+      "value": 0.9820261437908496,
+      "lo": 0.9705882352941176,
+      "hi": 0.9918300653594772
      },
      "unreadable": 0,
-     "n_questions": 276
+     "n_questions": 612
     },
     "T2": {
      "codes": {
-      "n": 64,
-      "k": 61,
-      "value": 0.953125,
-      "lo": 0.899963768115942,
-      "hi": 1.0
+      "n": 154,
+      "k": 148,
+      "value": 0.961038961038961,
+      "lo": 0.9309980573093735,
+      "hi": 0.987012987012987
      },
      "v2": {
-      "n": 71,
-      "k": 70,
-      "value": 0.9859154929577465,
-      "lo": 0.9552069199457259,
+      "n": 172,
+      "k": 169,
+      "value": 0.9825581395348837,
+      "lo": 0.96045197740113,
       "hi": 1.0
      },
      "unreadable": 0,
-     "n_questions": 71
+     "n_questions": 172
     },
     "A": {
      "codes": {
-      "n": 56,
-      "k": 52,
-      "value": 0.9285714285714286,
-      "lo": 0.875,
-      "hi": 0.9821428571428571
+      "n": 168,
+      "k": 162,
+      "value": 0.9642857142857143,
+      "lo": 0.9345238095238095,
+      "hi": 0.9880952380952381
      },
      "v2": {
-      "n": 62,
-      "k": 58,
-      "value": 0.9354838709677419,
-      "lo": 0.8870967741935484,
-      "hi": 0.9838709677419355
+      "n": 180,
+      "k": 174,
+      "value": 0.9666666666666667,
+      "lo": 0.9444444444444444,
+      "hi": 0.9888888888888889
      },
      "unreadable": 0,
-     "n_questions": 62
+     "n_questions": 180
     },
     "B": {
      "codes": {
-      "n": 36,
-      "k": 25,
-      "value": 0.6944444444444444,
-      "lo": 0.5555555555555556,
-      "hi": 0.8055555555555556
+      "n": 112,
+      "k": 80,
+      "value": 0.7142857142857143,
+      "lo": 0.6517857142857143,
+      "hi": 0.7767857142857143
      },
      "v2": {
-      "n": 40,
-      "k": 28,
-      "value": 0.7,
-      "lo": 0.575,
-      "hi": 0.8
+      "n": 120,
+      "k": 86,
+      "value": 0.7166666666666667,
+      "lo": 0.6583333333333333,
+      "hi": 0.7666666666666667
      },
-     "unreadable": 5,
-     "n_questions": 40
+     "unreadable": 15,
+     "n_questions": 120
     },
     "D": {
      "codes": {
-      "n": 45,
-      "k": 43,
-      "value": 0.9555555555555556,
-      "lo": 0.9105555555555556,
-      "hi": 1.0
+      "n": 140,
+      "k": 134,
+      "value": 0.9571428571428572,
+      "lo": 0.9214285714285714,
+      "hi": 0.9857142857142858
      },
      "v2": {
-      "n": 50,
-      "k": 48,
-      "value": 0.96,
-      "lo": 0.9,
-      "hi": 1.0
+      "n": 150,
+      "k": 143,
+      "value": 0.9533333333333334,
+      "lo": 0.92,
+      "hi": 0.98
      },
      "unreadable": 0,
-     "n_questions": 50
+     "n_questions": 150
     }
    },
    "t1_by_label": {
     "Cardiomegaly": {
      "positives_codes": {
       "codes": {
-       "n": 4,
-       "k": 4,
+       "n": 11,
+       "k": 11,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 13,
+       "k": 13,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 13
+     },
+     "negatives_codes": {
+      "codes": {
+       "n": 85,
+       "k": 84,
+       "value": 0.9882352941176471,
+       "lo": 0.9647058823529412,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 89,
+       "k": 87,
+       "value": 0.9775280898876404,
+       "lo": 0.9438202247191011,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 89
+     }
+    },
+    "Pleural Effusion": {
+     "positives_codes": {
+      "codes": {
+       "n": 5,
+       "k": 5,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -146,24 +184,138 @@
      },
      "negatives_codes": {
       "codes": {
-       "n": 40,
-       "k": 40,
+       "n": 91,
+       "k": 91,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 41,
-       "k": 41,
+       "n": 97,
+       "k": 97,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 41
+      "n_questions": 97
      }
     },
-    "Pleural Effusion": {
+    "Support Devices": {
+     "positives_codes": {
+      "codes": {
+       "n": 11,
+       "k": 9,
+       "value": 0.8181818181818182,
+       "lo": 0.6363636363636364,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 12
+     },
+     "negatives_codes": {
+      "codes": {
+       "n": 85,
+       "k": 83,
+       "value": 0.9764705882352941,
+       "lo": 0.9411764705882353,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 90,
+       "k": 88,
+       "value": 0.9777777777777777,
+       "lo": 0.9444444444444444,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 90
+     }
+    },
+    "Lung Opacity": {
+     "positives_codes": {
+      "codes": {
+       "n": 15,
+       "k": 13,
+       "value": 0.8666666666666667,
+       "lo": 0.6666666666666666,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 20,
+       "k": 18,
+       "value": 0.9,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 20
+     },
+     "negatives_codes": {
+      "codes": {
+       "n": 81,
+       "k": 77,
+       "value": 0.9506172839506173,
+       "lo": 0.9012345679012346,
+       "hi": 0.9876543209876543
+      },
+      "v2": {
+       "n": 82,
+       "k": 79,
+       "value": 0.9634146341463414,
+       "lo": 0.9146341463414634,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 82
+     }
+    },
+    "Atelectasis": {
+     "positives_codes": {
+      "codes": {
+       "n": 10,
+       "k": 8,
+       "value": 0.8,
+       "lo": 0.5,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 11,
+       "k": 10,
+       "value": 0.9090909090909091,
+       "lo": 0.7272727272727273,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 11
+     },
+     "negatives_codes": {
+      "codes": {
+       "n": 86,
+       "k": 86,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 91,
+       "k": 91,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 91
+     }
+    },
+    "Pneumothorax": {
      "positives_codes": {
       "codes": {
        "n": 1,
@@ -184,264 +336,114 @@
      },
      "negatives_codes": {
       "codes": {
-       "n": 43,
-       "k": 43,
+       "n": 95,
+       "k": 95,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 45,
-       "k": 45,
+       "n": 101,
+       "k": 101,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 45
-     }
-    },
-    "Support Devices": {
-     "positives_codes": {
-      "codes": {
-       "n": 3,
-       "k": 1,
-       "value": 0.3333333333333333,
-       "lo": 0.0,
-       "hi": 1.0
-      },
-      "v2": {
-       "n": 4,
-       "k": 3,
-       "value": 0.75,
-       "lo": 0.25,
-       "hi": 1.0
-      },
-      "unreadable": 0,
-      "n_questions": 4
-     },
-     "negatives_codes": {
-      "codes": {
-       "n": 41,
-       "k": 40,
-       "value": 0.975609756097561,
-       "lo": 0.926829268292683,
-       "hi": 1.0
-      },
-      "v2": {
-       "n": 42,
-       "k": 41,
-       "value": 0.9761904761904762,
-       "lo": 0.9285714285714286,
-       "hi": 1.0
-      },
-      "unreadable": 0,
-      "n_questions": 42
-     }
-    },
-    "Lung Opacity": {
-     "positives_codes": {
-      "codes": {
-       "n": 4,
-       "k": 3,
-       "value": 0.75,
-       "lo": 0.25,
-       "hi": 1.0
-      },
-      "v2": {
-       "n": 6,
-       "k": 5,
-       "value": 0.8333333333333334,
-       "lo": 0.5,
-       "hi": 1.0
-      },
-      "unreadable": 0,
-      "n_questions": 6
-     },
-     "negatives_codes": {
-      "codes": {
-       "n": 40,
-       "k": 38,
-       "value": 0.95,
-       "lo": 0.875,
-       "hi": 1.0
-      },
-      "v2": {
-       "n": 40,
-       "k": 38,
-       "value": 0.95,
-       "lo": 0.875,
-       "hi": 1.0
-      },
-      "unreadable": 0,
-      "n_questions": 40
-     }
-    },
-    "Atelectasis": {
-     "positives_codes": {
-      "codes": {
-       "n": 5,
-       "k": 3,
-       "value": 0.6,
-       "lo": 0.2,
-       "hi": 1.0
-      },
-      "v2": {
-       "n": 6,
-       "k": 5,
-       "value": 0.8333333333333334,
-       "lo": 0.5,
-       "hi": 1.0
-      },
-      "unreadable": 0,
-      "n_questions": 6
-     },
-     "negatives_codes": {
-      "codes": {
-       "n": 39,
-       "k": 39,
-       "value": 1.0,
-       "lo": 1.0,
-       "hi": 1.0
-      },
-      "v2": {
-       "n": 40,
-       "k": 40,
-       "value": 1.0,
-       "lo": 1.0,
-       "hi": 1.0
-      },
-      "unreadable": 0,
-      "n_questions": 40
-     }
-    },
-    "Pneumothorax": {
-     "positives_codes": {
-      "codes": {
-       "n": 0,
-       "value": NaN,
-       "lo": NaN,
-       "hi": NaN
-      },
-      "v2": {
-       "n": 0,
-       "value": NaN,
-       "lo": NaN,
-       "hi": NaN
-      },
-      "unreadable": 0,
-      "n_questions": 0
-     },
-     "negatives_codes": {
-      "codes": {
-       "n": 44,
-       "k": 44,
-       "value": 1.0,
-       "lo": 1.0,
-       "hi": 1.0
-      },
-      "v2": {
-       "n": 46,
-       "k": 46,
-       "value": 1.0,
-       "lo": 1.0,
-       "hi": 1.0
-      },
-      "unreadable": 0,
-      "n_questions": 46
+      "n_questions": 101
      }
     }
    },
    "citations": {
-    "raw_citations": 687,
-    "valid_citations": 687,
+    "raw_citations": 1687,
+    "valid_citations": 1687,
     "structural_valid_rate": 1.0,
     "answers_lost_to_the_check": 0,
-    "affirming_answers_scored": 56,
+    "affirming_answers_scored": 165,
     "support_any": {
-     "n": 56,
-     "k": 37,
-     "value": 0.6607142857142857,
-     "lo": 0.477245670995671,
-     "hi": 0.7959479443951494
+     "n": 165,
+     "k": 127,
+     "value": 0.7696969696969697,
+     "lo": 0.65766030292037,
+     "hi": 0.8556176337563519
     },
     "support_all": {
-     "n": 56,
-     "k": 34,
-     "value": 0.6071428571428571,
-     "lo": 0.41657608695652176,
-     "hi": 0.7471982758620689
+     "n": 165,
+     "k": 109,
+     "value": 0.6606060606060606,
+     "lo": 0.553024421230943,
+     "hi": 0.7500345303867403
     }
    },
    "refusals": {
-    "should_refuse": 50,
-    "should_answer": 51,
-    "true_refusals": 48,
+    "should_refuse": 150,
+    "should_answer": 143,
+    "true_refusals": 143,
     "false_refusals": 1,
-    "missed_refusals": 2,
-    "precision": 0.9795918367346939,
-    "recall": 0.96
+    "missed_refusals": 7,
+    "precision": 0.9930555555555556,
+    "recall": 0.9533333333333334
    },
    "cost": {
     "T1": {
-     "requests": 276,
-     "mean_input_tokens": 690.8913043478261,
-     "mean_output_tokens": 45.51086956521739,
-     "mean_cost_usd": 0.00034917391304347827,
-     "total_cost_usd": 0.096372,
-     "latency_fresh_requests": 276,
-     "latency_p50_s": 1.1534734499873593,
-     "latency_p95_s": 2.1625374749928596
+     "requests": 612,
+     "mean_input_tokens": 694.7058823529412,
+     "mean_output_tokens": 44.94444444444444,
+     "mean_cost_usd": 0.00034979346405228725,
+     "total_cost_usd": 0.2140735999999998,
+     "latency_fresh_requests": 612,
+     "latency_p50_s": 1.1988065500045195,
+     "latency_p95_s": 2.033438404990009
     },
     "T2": {
-     "requests": 71,
-     "mean_input_tokens": 704.8028169014085,
-     "mean_output_tokens": 46.23943661971831,
-     "mean_cost_usd": 0.00035590422535211266,
-     "total_cost_usd": 0.0252692,
-     "latency_fresh_requests": 71,
-     "latency_p50_s": 1.2626641000097152,
-     "latency_p95_s": 1.895065250006155
+     "requests": 172,
+     "mean_input_tokens": 703.2848837209302,
+     "mean_output_tokens": 47.41279069767442,
+     "mean_cost_usd": 0.00035717441860465125,
+     "total_cost_usd": 0.061434000000000016,
+     "latency_fresh_requests": 172,
+     "latency_p50_s": 1.2312209499941673,
+     "latency_p95_s": 2.012266535004892
     },
     "A": {
-     "requests": 62,
-     "mean_input_tokens": 689.258064516129,
-     "mean_output_tokens": 51.67741935483871,
-     "mean_cost_usd": 0.00035838709677419347,
-     "total_cost_usd": 0.022219999999999997,
-     "latency_fresh_requests": 62,
-     "latency_p50_s": 1.2299932500027353,
-     "latency_p95_s": 2.1972737800111632
+     "requests": 180,
+     "mean_input_tokens": 692.7666666666667,
+     "mean_output_tokens": 54.861111111111114,
+     "mean_cost_usd": 0.00036488444444444457,
+     "total_cost_usd": 0.06567920000000002,
+     "latency_fresh_requests": 180,
+     "latency_p50_s": 1.3482540500117466,
+     "latency_p95_s": 2.330708175007021
     },
     "B": {
-     "requests": 40,
-     "mean_input_tokens": 693.0,
-     "mean_output_tokens": 47.375,
-     "mean_cost_usd": 0.0003530000000000001,
-     "total_cost_usd": 0.014120000000000006,
-     "latency_fresh_requests": 40,
-     "latency_p50_s": 1.1501707500137854,
-     "latency_p95_s": 4.440615649985555
+     "requests": 120,
+     "mean_input_tokens": 695.2666666666667,
+     "mean_output_tokens": 46.516666666666666,
+     "mean_cost_usd": 0.0003525333333333333,
+     "total_cost_usd": 0.042303999999999994,
+     "latency_fresh_requests": 120,
+     "latency_p50_s": 1.1927995999867562,
+     "latency_p95_s": 3.472633700008737
     },
     "D": {
-     "requests": 50,
-     "mean_input_tokens": 688.4,
-     "mean_output_tokens": 21.24,
-     "mean_cost_usd": 0.000309344,
-     "total_cost_usd": 0.015467200000000002,
-     "latency_fresh_requests": 50,
-     "latency_p50_s": 0.9064561999839498,
-     "latency_p95_s": 1.641339879992301
+     "requests": 150,
+     "mean_input_tokens": 690.6666666666666,
+     "mean_output_tokens": 21.66,
+     "mean_cost_usd": 0.0003109226666666668,
+     "total_cost_usd": 0.04663840000000002,
+     "latency_fresh_requests": 150,
+     "latency_p50_s": 0.944792750000488,
+     "latency_p95_s": 1.6338348599980235
     },
     "all": {
-     "requests": 499,
-     "mean_input_tokens": 692.5871743486974,
-     "mean_output_tokens": 44.098196392785574,
-     "mean_cost_usd": 0.00034759198396793557,
-     "total_cost_usd": 0.17344839999999986,
-     "latency_fresh_requests": 499,
-     "latency_p50_s": 1.1575600000214763,
-     "latency_p95_s": 2.315316810010699
+     "requests": 1234,
+     "mean_input_tokens": 695.1823338735818,
+     "mean_output_tokens": 44.057536466774714,
+     "mean_cost_usd": 0.0003485649918962721,
+     "total_cost_usd": 0.43012919999999977,
+     "latency_fresh_requests": 1234,
+     "latency_p50_s": 1.189306200001738,
+     "latency_p95_s": 2.11636483000766
     }
    }
   },
@@ -451,916 +453,1004 @@
      "rag": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 32,
+        "value": 0.7111111111111111,
+        "lo": 0.5777777777777777,
+        "hi": 0.8444444444444444
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 32,
+        "value": 0.7111111111111111,
+        "lo": 0.5777777777777777,
+        "hi": 0.8444444444444444
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 5,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 9,
+        "value": 0.6,
+        "lo": 0.3333333333333333,
+        "hi": 0.8
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 9,
+        "value": 0.6,
+        "lo": 0.3333333333333333,
+        "hi": 0.8
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 3,
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 10,
+        "value": 0.6666666666666666,
+        "lo": 0.4,
+        "hi": 0.8666666666666667
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 10,
+        "value": 0.6666666666666666,
+        "lo": 0.4,
+        "hi": 0.8666666666666667
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 13,
+        "value": 0.8666666666666667,
+        "lo": 0.6666666666666666,
+        "hi": 1.0
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 13,
+        "value": 0.8666666666666667,
+        "lo": 0.6666666666666666,
+        "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 69,
+       "valid_citations": 69,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 14,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 14,
+        "k": 11,
+        "value": 0.7857142857142857,
+        "lo": 0.5714285714285714,
+        "hi": 1.0
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 14,
+        "k": 9,
+        "value": 0.6428571428571429,
+        "lo": 0.42857142857142855,
+        "hi": 0.8571428571428571
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 12,
+       "true_refusals": 13,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 2,
+       "precision": 1.0,
+       "recall": 0.8666666666666667
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 663.8222222222222,
+       "mean_output_tokens": 47.84444444444444,
+       "mean_cost_usd": 0.00034208000000000003,
+       "total_cost_usd": 0.0153936,
+       "latency_fresh_requests": 45,
+       "latency_p50_s": 1.2147149999800604,
+       "latency_p95_s": 1.8373686400009315
       }
      },
      "full": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 31,
+        "value": 0.6888888888888889,
+        "lo": 0.5555555555555556,
+        "hi": 0.8222222222222222
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 31,
+        "value": 0.6888888888888889,
+        "lo": 0.5555555555555556,
+        "hi": 0.8222222222222222
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 5,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 3,
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 11,
+        "value": 0.7333333333333333,
+        "lo": 0.5333333333333333,
+        "hi": 0.9333333333333333
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 11,
+        "value": 0.7333333333333333,
+        "lo": 0.5333333333333333,
+        "hi": 0.9333333333333333
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 75,
+       "valid_citations": 75,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 14,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 14,
+        "k": 13,
+        "value": 0.9285714285714286,
+        "lo": 0.7857142857142857,
+        "hi": 1.0
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 14,
+        "k": 13,
+        "value": 0.9285714285714286,
+        "lo": 0.7857142857142857,
+        "hi": 1.0
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 12,
+       "true_refusals": 11,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 4,
+       "precision": 1.0,
+       "recall": 0.7333333333333333
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 934.2,
+       "mean_output_tokens": 50.28888888888889,
+       "mean_cost_usd": 0.0004541422222222222,
+       "total_cost_usd": 0.0204364,
+       "latency_fresh_requests": 45,
+       "latency_p50_s": 1.2087715000088792,
+       "latency_p95_s": 2.3615332999965166
       }
      },
      "paired_codes": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
+      "n": 45,
+      "k": 1,
+      "value": 0.022222222222222223,
+      "lo": -0.08888888888888889,
+      "hi": 0.13333333333333333,
       "excludes_zero": false
      },
      "paired_v2": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
+      "n": 45,
+      "k": 1,
+      "value": 0.022222222222222223,
+      "lo": -0.08888888888888889,
+      "hi": 0.13333333333333333,
       "excludes_zero": false
      },
      "retrieval": {
-      "coded_reports": 0,
-      "with_retrieved_mention": 0,
-      "share": null
+      "coded_reports": 20,
+      "with_retrieved_mention": 20,
+      "share": 1.0
      }
     },
     "10": {
      "rag": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 24,
+        "value": 0.5333333333333333,
+        "lo": 0.4,
+        "hi": 0.6666666666666666
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 22,
+        "value": 0.4888888888888889,
+        "lo": 0.35555555555555557,
+        "hi": 0.6444444444444445
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 3,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 5,
+        "value": 0.3333333333333333,
+        "lo": 0.13333333333333333,
+        "hi": 0.6
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 4,
+        "value": 0.26666666666666666,
+        "lo": 0.06666666666666667,
+        "hi": 0.5333333333333333
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 7,
+        "value": 0.4666666666666667,
+        "lo": 0.2,
+        "hi": 0.7333333333333333
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 1,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 11,
+        "value": 0.7333333333333333,
+        "lo": 0.5333333333333333,
+        "hi": 0.9333333333333333
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 11,
+        "value": 0.7333333333333333,
+        "lo": 0.5333333333333333,
+        "hi": 0.9333333333333333
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 98,
+       "valid_citations": 98,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 19,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 19,
+        "k": 16,
+        "value": 0.8421052631578947,
+        "lo": 0.6842105263157895,
+        "hi": 1.0
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 19,
+        "k": 14,
+        "value": 0.7368421052631579,
+        "lo": 0.5263157894736842,
+        "hi": 0.8947368421052632
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 20,
+       "true_refusals": 11,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 4,
+       "precision": 1.0,
+       "recall": 0.7333333333333333
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 687.4666666666667,
+       "mean_output_tokens": 58.68888888888889,
+       "mean_cost_usd": 0.00036888888888888903,
+       "total_cost_usd": 0.016600000000000007,
+       "latency_fresh_requests": 44,
+       "latency_p50_s": 1.2757750500022667,
+       "latency_p95_s": 2.545838295003342
       }
      },
      "full": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 24,
+        "value": 0.5333333333333333,
+        "lo": 0.4,
+        "hi": 0.6666666666666666
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 23,
+        "value": 0.5111111111111111,
+        "lo": 0.37777777777777777,
+        "hi": 0.6666666666666666
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 4,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 4,
+        "value": 0.26666666666666666,
+        "lo": 0.06666666666666667,
+        "hi": 0.4683333333333318
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 4,
+        "value": 0.26666666666666666,
+        "lo": 0.06666666666666667,
+        "hi": 0.4683333333333318
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 7,
+        "value": 0.4666666666666667,
+        "lo": 0.2,
+        "hi": 0.7333333333333333
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 125,
+       "valid_citations": 125,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 20,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 20,
+        "k": 15,
+        "value": 0.75,
+        "lo": 0.55,
+        "hi": 0.9
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 20,
+        "k": 11,
+        "value": 0.55,
+        "lo": 0.35,
+        "hi": 0.75
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 20,
+       "true_refusals": 12,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 3,
+       "precision": 1.0,
+       "recall": 0.8
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 2082.9777777777776,
+       "mean_output_tokens": 66.57777777777778,
+       "mean_cost_usd": 0.0004157688888888889,
+       "total_cost_usd": 0.0187096,
+       "latency_fresh_requests": 44,
+       "latency_p50_s": 1.4049259500025073,
+       "latency_p95_s": 3.031197835001513
       }
      },
      "paired_codes": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
+      "n": 45,
+      "k": 0,
+      "value": 0.0,
+      "lo": -0.11166666666666662,
+      "hi": 0.13333333333333333,
       "excludes_zero": false
      },
      "paired_v2": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
+      "n": 45,
+      "k": -1,
+      "value": -0.022222222222222223,
+      "lo": -0.13333333333333333,
+      "hi": 0.08888888888888889,
       "excludes_zero": false
      },
      "retrieval": {
-      "coded_reports": 0,
-      "with_retrieved_mention": 0,
-      "share": null
+      "coded_reports": 33,
+      "with_retrieved_mention": 32,
+      "share": 0.9696969696969697
      }
     },
     "30": {
      "rag": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 23,
+        "value": 0.5111111111111111,
+        "lo": 0.37722222222222224,
+        "hi": 0.6666666666666666
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 21,
+        "value": 0.4666666666666667,
+        "lo": 0.3333333333333333,
+        "hi": 0.6222222222222222
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 3,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 6,
+        "value": 0.4,
+        "lo": 0.2,
+        "hi": 0.6666666666666666
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 4,
+        "value": 0.26666666666666666,
+        "lo": 0.06666666666666667,
+        "hi": 0.5333333333333333
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 1,
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 9,
+        "value": 0.6,
+        "lo": 0.3333333333333333,
+        "hi": 0.8666666666666667
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 9,
+        "value": 0.6,
+        "lo": 0.3333333333333333,
+        "hi": 0.8666666666666667
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 126,
+       "valid_citations": 126,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 20,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 20,
+        "k": 14,
+        "value": 0.7,
+        "lo": 0.5,
+        "hi": 0.9
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 20,
+        "k": 9,
+        "value": 0.45,
+        "lo": 0.25,
+        "hi": 0.7
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 20,
+       "true_refusals": 9,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 6,
+       "precision": 1.0,
+       "recall": 0.6
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 673.9777777777778,
+       "mean_output_tokens": 64.88888888888889,
+       "mean_cost_usd": 0.00037341333333333344,
+       "total_cost_usd": 0.016803600000000005,
+       "latency_fresh_requests": 45,
+       "latency_p50_s": 1.3840851999993902,
+       "latency_p95_s": 2.4006244599877387
       }
      },
      "full": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 27,
+        "value": 0.6,
+        "lo": 0.46611111111111114,
+        "hi": 0.7333333333333333
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 27,
+        "value": 0.6,
+        "lo": 0.46611111111111114,
+        "hi": 0.7333333333333333
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 5,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 3,
+        "value": 0.2,
+        "lo": 0.0,
+        "hi": 0.4016666666666652
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 3,
+        "value": 0.2,
+        "lo": 0.0,
+        "hi": 0.4016666666666652
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 3,
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 10,
+        "value": 0.6666666666666666,
+        "lo": 0.4666666666666667,
+        "hi": 0.8666666666666667
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 10,
+        "value": 0.6666666666666666,
+        "lo": 0.4666666666666667,
+        "hi": 0.8666666666666667
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 14,
+        "value": 0.9333333333333333,
+        "lo": 0.8,
+        "hi": 1.0
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 14,
+        "value": 0.9333333333333333,
+        "lo": 0.8,
+        "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 262,
+       "valid_citations": 262,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 18,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 18,
+        "k": 15,
+        "value": 0.8333333333333334,
+        "lo": 0.6111111111111112,
+        "hi": 1.0
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 18,
+        "k": 10,
+        "value": 0.5555555555555556,
+        "lo": 0.3333333333333333,
+        "hi": 0.7777777777777778
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 20,
+       "true_refusals": 14,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 1,
+       "precision": 1.0,
+       "recall": 0.9333333333333333
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 5344.866666666667,
+       "mean_output_tokens": 99.24444444444444,
+       "mean_cost_usd": 0.0008631377777777777,
+       "total_cost_usd": 0.03884119999999999,
+       "latency_fresh_requests": 45,
+       "latency_p50_s": 1.590643400006229,
+       "latency_p95_s": 3.9121199600049295
       }
      },
      "paired_codes": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
+      "n": 45,
+      "k": -4,
+      "value": -0.08888888888888889,
+      "lo": -0.24499999999999997,
+      "hi": 0.08888888888888889,
       "excludes_zero": false
      },
      "paired_v2": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
+      "n": 45,
+      "k": -6,
+      "value": -0.13333333333333333,
+      "lo": -0.28888888888888886,
+      "hi": 0.022222222222222223,
       "excludes_zero": false
      },
      "retrieval": {
-      "coded_reports": 0,
-      "with_retrieved_mention": 0,
-      "share": null
+      "coded_reports": 59,
+      "with_retrieved_mention": 38,
+      "share": 0.6440677966101694
      }
     },
     "50": {
      "rag": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 15,
+        "value": 0.3333333333333333,
+        "lo": 0.2,
+        "hi": 0.4666666666666667
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 16,
+        "value": 0.35555555555555557,
+        "lo": 0.2222222222222222,
+        "hi": 0.4888888888888889
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 3,
+        "value": 0.2,
+        "lo": 0.0,
+        "hi": 0.4016666666666652
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 3,
+        "value": 0.2,
+        "lo": 0.0,
+        "hi": 0.4016666666666652
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 1,
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 4,
+        "value": 0.26666666666666666,
+        "lo": 0.06666666666666667,
+        "hi": 0.4666666666666667
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 5,
+        "value": 0.3333333333333333,
+        "lo": 0.13333333333333333,
+        "hi": 0.6
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 1,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 8,
+        "value": 0.5333333333333333,
+        "lo": 0.26666666666666666,
+        "hi": 0.8
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 183,
+       "valid_citations": 183,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 21,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 21,
+        "k": 16,
+        "value": 0.7619047619047619,
+        "lo": 0.5714285714285714,
+        "hi": 0.9047619047619048
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 21,
+        "k": 11,
+        "value": 0.5238095238095238,
+        "lo": 0.3333333333333333,
+        "hi": 0.7142857142857143
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 21,
+       "true_refusals": 8,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 7,
+       "precision": 1.0,
+       "recall": 0.5333333333333333
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 662.8222222222222,
+       "mean_output_tokens": 83.04444444444445,
+       "mean_cost_usd": 0.00039799999999999997,
+       "total_cost_usd": 0.01791,
+       "latency_fresh_requests": 45,
+       "latency_p50_s": 1.5424434999877121,
+       "latency_p95_s": 2.529840560007141
       }
      },
      "full": {
       "all": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 22,
+        "value": 0.4888888888888889,
+        "lo": 0.35555555555555557,
+        "hi": 0.6222222222222222
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 45,
+        "k": 21,
+        "value": 0.4666666666666667,
+        "lo": 0.3333333333333333,
+        "hi": 0.6
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 45
       },
       "templated": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 7,
+        "value": 0.4666666666666667,
+        "lo": 0.2,
+        "hi": 0.7333333333333333
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 6,
+        "value": 0.4,
+        "lo": 0.2,
+        "hi": 0.6666666666666666
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "hand_written_C": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 3,
+        "value": 0.2,
+        "lo": 0.0,
+        "hi": 0.4
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 3,
+        "value": 0.2,
+        "lo": 0.0,
+        "hi": 0.4
        },
-       "unreadable": 0,
-       "n_questions": 0
+       "unreadable": 2,
+       "n_questions": 15
       },
       "hand_written_D": {
        "codes": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
        },
        "v2": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 0
+       "n_questions": 15
       },
       "citations": {
-       "raw_citations": 0,
-       "valid_citations": 0,
-       "structural_valid_rate": null,
+       "raw_citations": 572,
+       "valid_citations": 572,
+       "structural_valid_rate": 1.0,
        "answers_lost_to_the_check": 0,
-       "affirming_answers_scored": 0,
+       "affirming_answers_scored": 20,
        "support_any": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 20,
+        "k": 13,
+        "value": 0.65,
+        "lo": 0.45,
+        "hi": 0.85
        },
        "support_all": {
-        "n": 0,
-        "value": NaN,
-        "lo": NaN,
-        "hi": NaN
+        "n": 20,
+        "k": 8,
+        "value": 0.4,
+        "lo": 0.2,
+        "hi": 0.6
        }
       },
       "refusals": {
-       "should_refuse": 0,
-       "should_answer": 0,
-       "true_refusals": 0,
+       "should_refuse": 15,
+       "should_answer": 21,
+       "true_refusals": 12,
        "false_refusals": 0,
-       "missed_refusals": 0,
-       "precision": null,
-       "recall": null
+       "missed_refusals": 3,
+       "precision": 1.0,
+       "recall": 0.8
       },
       "cost": {
-       "requests": 0,
-       "mean_input_tokens": 0.0,
-       "mean_output_tokens": 0.0,
-       "mean_cost_usd": 0.0,
-       "total_cost_usd": 0,
-       "latency_fresh_requests": 0,
-       "latency_p50_s": null,
-       "latency_p95_s": null
+       "requests": 45,
+       "mean_input_tokens": 8274.266666666666,
+       "mean_output_tokens": 183.93333333333334,
+       "mean_cost_usd": 0.0014203200000000003,
+       "total_cost_usd": 0.06391440000000001,
+       "latency_fresh_requests": 45,
+       "latency_p50_s": 1.9998953000176698,
+       "latency_p95_s": 7.300084359984611
       }
      },
      "paired_codes": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
-      "excludes_zero": false
+      "n": 45,
+      "k": -7,
+      "value": -0.15555555555555556,
+      "lo": -0.28888888888888886,
+      "hi": -0.022222222222222223,
+      "excludes_zero": true
      },
      "paired_v2": {
-      "n": 0,
-      "value": NaN,
-      "lo": NaN,
-      "hi": NaN,
+      "n": 45,
+      "k": -5,
+      "value": -0.1111111111111111,
+      "lo": -0.26666666666666666,
+      "hi": 0.022222222222222223,
       "excludes_zero": false
      },
      "retrieval": {
-      "coded_reports": 0,
-      "with_retrieved_mention": 0,
-      "share": null
+      "coded_reports": 88,
+      "with_retrieved_mention": 45,
+      "share": 0.5113636363636364
      }
     }
    },
@@ -1371,19 +1461,19 @@
     "question": "Is the heart enlarged?",
     "scopes": {
      "report": {
-      "n": 11,
+      "n": 30,
       "codes": {
-       "n": 10,
-       "k": 9,
-       "value": 0.9,
-       "lo": 0.7,
+       "n": 28,
+       "k": 27,
+       "value": 0.9642857142857143,
+       "lo": 0.8928571428571429,
        "hi": 1.0
       },
       "v2": {
-       "n": 11,
-       "k": 10,
-       "value": 0.9090909090909091,
-       "lo": 0.7272727272727273,
+       "n": 30,
+       "k": 29,
+       "value": 0.9666666666666667,
+       "lo": 0.9,
        "hi": 1.0
       },
       "unreadable": 0
@@ -1394,17 +1484,17 @@
     "question": "Is there fluid around the lungs?",
     "scopes": {
      "report": {
-      "n": 11,
+      "n": 30,
       "codes": {
-       "n": 10,
-       "k": 10,
+       "n": 28,
+       "k": 28,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 11,
-       "k": 11,
+       "n": 30,
+       "k": 30,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -1417,17 +1507,17 @@
     "question": "Does the patient have any tubes, lines or devices in place?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
-       "value": 1.0,
-       "lo": 1.0,
+       "n": 28,
+       "k": 27,
+       "value": 0.9642857142857143,
+       "lo": 0.8928571428571429,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 10,
+       "n": 30,
+       "k": 30,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -1440,17 +1530,17 @@
     "question": "Is there any air outside the lung, a pneumothorax?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
+       "n": 28,
+       "k": 28,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 10,
+       "n": 30,
+       "k": 30,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -1463,19 +1553,19 @@
     "question": "Are any broken bones described?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
+       "n": 28,
+       "k": 28,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 10,
-       "value": 1.0,
-       "lo": 1.0,
+       "n": 30,
+       "k": 29,
+       "value": 0.9666666666666667,
+       "lo": 0.9,
        "hi": 1.0
       },
       "unreadable": 0
@@ -1486,20 +1576,20 @@
     "question": "Is the report completely normal?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 6,
-       "value": 0.6666666666666666,
-       "lo": 0.3333333333333333,
-       "hi": 0.8888888888888888
+       "n": 28,
+       "k": 24,
+       "value": 0.8571428571428571,
+       "lo": 0.7142857142857143,
+       "hi": 0.9642857142857143
       },
       "v2": {
-       "n": 10,
-       "k": 7,
-       "value": 0.7,
-       "lo": 0.4,
-       "hi": 0.9
+       "n": 30,
+       "k": 26,
+       "value": 0.8666666666666667,
+       "lo": 0.7333333333333333,
+       "hi": 0.9666666666666667
       },
       "unreadable": 0
      }
@@ -1509,17 +1599,17 @@
     "question": "Is there any sign of pulmonary edema?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
-       "value": 1.0,
-       "lo": 1.0,
+       "n": 28,
+       "k": 27,
+       "value": 0.9642857142857143,
+       "lo": 0.8928571428571429,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 10,
+       "n": 30,
+       "k": 30,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -1532,20 +1622,20 @@
     "question": "Is a lung nodule or mass definitely present?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 8,
-       "value": 0.8888888888888888,
-       "lo": 0.6666666666666666,
+       "n": 28,
+       "k": 25,
+       "value": 0.8928571428571429,
+       "lo": 0.7857142857142857,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 9,
-       "value": 0.9,
-       "lo": 0.7,
-       "hi": 1.0
+       "n": 30,
+       "k": 26,
+       "value": 0.8666666666666667,
+       "lo": 0.7333333333333333,
+       "hi": 0.9666666666666667
       },
       "unreadable": 0
      }
@@ -1555,20 +1645,20 @@
     "question": "Does the report state that there is no pleural effusion?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 7,
-       "value": 0.7777777777777778,
-       "lo": 0.5555555555555556,
-       "hi": 1.0
+       "n": 28,
+       "k": 24,
+       "value": 0.8571428571428571,
+       "lo": 0.7142857142857143,
+       "hi": 0.9642857142857143
       },
       "v2": {
-       "n": 10,
-       "k": 8,
-       "value": 0.8,
-       "lo": 0.6,
-       "hi": 1.0
+       "n": 30,
+       "k": 26,
+       "value": 0.8666666666666667,
+       "lo": 0.7333333333333333,
+       "hi": 0.9666666666666667
       },
       "unreadable": 0
      }
@@ -1578,63 +1668,284 @@
     "question": "Is the lung opacity described with certainty, or only as possible?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 1,
-       "value": 0.1111111111111111,
-       "lo": 0.0,
-       "hi": 0.3333333333333333
+       "n": 28,
+       "k": 4,
+       "value": 0.14285714285714285,
+       "lo": 0.03571428571428571,
+       "hi": 0.2857142857142857
       },
       "v2": {
-       "n": 10,
-       "k": 1,
-       "value": 0.1,
-       "lo": 0.0,
-       "hi": 0.3
+       "n": 30,
+       "k": 4,
+       "value": 0.13333333333333333,
+       "lo": 0.03333333333333333,
+       "hi": 0.26666666666666666
       },
-      "unreadable": 5
+      "unreadable": 15
      }
     }
    },
    "11": {
     "question": "Which reports describe an enlarged heart?",
-    "scopes": {}
+    "scopes": {
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      },
+      "v2": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "v2": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "unreadable": 0
+     }
+    }
    },
    "12": {
     "question": "In how many reports is a pleural effusion present?",
-    "scopes": {}
+    "scopes": {
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 5,
+       "value": 0.4166666666666667,
+       "lo": 0.16666666666666666,
+       "hi": 0.6666666666666666
+      },
+      "v2": {
+       "n": 12,
+       "k": 5,
+       "value": 0.4166666666666667,
+       "lo": 0.16666666666666666,
+       "hi": 0.6666666666666666
+      },
+      "unreadable": 4
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 4,
+       "value": 0.3333333333333333,
+       "lo": 0.08333333333333333,
+       "hi": 0.5833333333333334
+      },
+      "v2": {
+       "n": 12,
+       "k": 4,
+       "value": 0.3333333333333333,
+       "lo": 0.08333333333333333,
+       "hi": 0.5833333333333334
+      },
+      "unreadable": 3
+     }
+    }
    },
    "13": {
     "question": "In which report is a tube, line or device first mentioned?",
-    "scopes": {}
+    "scopes": {
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "v2": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      },
+      "v2": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "unreadable": 0
+     }
+    }
    },
    "14": {
     "question": "Is there any report without abnormal findings?",
-    "scopes": {}
+    "scopes": {
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 1,
+       "value": 0.08333333333333333,
+       "lo": 0.0,
+       "hi": 0.25
+      },
+      "v2": {
+       "n": 12,
+       "k": 1,
+       "value": 0.08333333333333333,
+       "lo": 0.0,
+       "hi": 0.25
+      },
+      "unreadable": 2
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 0,
+       "value": 0.0,
+       "lo": 0.0,
+       "hi": 0.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 0,
+       "value": 0.0,
+       "lo": 0.0,
+       "hi": 0.0
+      },
+      "unreadable": 5
+     }
+    }
    },
    "15": {
     "question": "Does any report describe a pneumothorax as present?",
-    "scopes": {}
+    "scopes": {
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     }
+    }
    },
    "16": {
     "question": "How old is the patient?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 7,
-       "value": 0.7777777777777778,
-       "lo": 0.5527777777777779,
-       "hi": 1.0
+       "n": 28,
+       "k": 22,
+       "value": 0.7857142857142857,
+       "lo": 0.6071428571428571,
+       "hi": 0.9285714285714286
       },
       "v2": {
-       "n": 10,
-       "k": 8,
-       "value": 0.8,
-       "lo": 0.5,
-       "hi": 1.0
+       "n": 30,
+       "k": 23,
+       "value": 0.7666666666666667,
+       "lo": 0.6,
+       "hi": 0.9
+      },
+      "unreadable": 0
+     },
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 2,
+       "value": 0.16666666666666666,
+       "lo": 0.0,
+       "hi": 0.4166666666666667
+      },
+      "v2": {
+       "n": 12,
+       "k": 2,
+       "value": 0.16666666666666666,
+       "lo": 0.0,
+       "hi": 0.4166666666666667
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 3,
+       "value": 0.25,
+       "lo": 0.08333333333333333,
+       "hi": 0.5
+      },
+      "v2": {
+       "n": 12,
+       "k": 3,
+       "value": 0.25,
+       "lo": 0.08333333333333333,
+       "hi": 0.5
       },
       "unreadable": 0
      }
@@ -1644,17 +1955,53 @@
     "question": "Is this cancer?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
+       "n": 28,
+       "k": 28,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
+       "n": 30,
+       "k": 30,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
        "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 12,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -1667,17 +2014,53 @@
     "question": "What treatment should the patient receive?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
+       "n": 28,
+       "k": 28,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 10,
+       "n": 30,
+       "k": 30,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 12,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -1690,19 +2073,55 @@
     "question": "What does the patient's CT scan show?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
+       "n": 28,
+       "k": 28,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 10,
+       "n": 30,
+       "k": 30,
        "value": 1.0,
        "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "v2": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
        "hi": 1.0
       },
       "unreadable": 0
@@ -1713,17 +2132,53 @@
     "question": "What was the patient's oxygen saturation?",
     "scopes": {
      "report": {
-      "n": 10,
+      "n": 30,
       "codes": {
-       "n": 9,
-       "k": 9,
+       "n": 28,
+       "k": 28,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
       },
       "v2": {
-       "n": 10,
-       "k": 10,
+       "n": 30,
+       "k": 30,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "rag": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "unreadable": 0
+     },
+     "full": {
+      "n": 12,
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 12,
+       "k": 12,
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
@@ -1733,6 +2188,6 @@
     }
    }
   },
-  "new_spend_usd": 0.17344839999999986
+  "new_spend_usd": 0.6387380000000004
  }
 }
