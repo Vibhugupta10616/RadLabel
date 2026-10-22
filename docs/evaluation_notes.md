@@ -364,3 +364,95 @@ results; the before/after numbers are in docs/RESULTS.md (generated, "Final bord
   index and the retrieval results were built before the rule; plain-sentence search does not read predicted labels,
   only the M8 prefix rows do, so those results are left as they were.
 - Sample check update: the report-5 known issue (above) is resolved by this rule; the report-3 check stands.
+
+## Ask evaluation (M10b; owner, 2026-10-22; pre-committed before any run)
+Code: `eval/ask.py` (`estimate` → `run` → `score`); records in `artifacts/predictions/ask_eval.jsonl` (git-ignored, holds
+report text); results in `artifacts/results/ask_eval.json` → docs/RESULTS.md and one README line. **No prompt is
+changed after seeing results; if a prompt needs fixing, that is reported and the work stops.** No LLM-judged metric.
+
+### What runs
+- **Prompts and code path:** the frozen website prompts (`ask-report-v1`, `ask-all-v1`) through the real functions
+  `ask_report` / `ask_all`, gpt-4.1-mini, temperature 0, one run per question. The baseline is **all sentences of all
+  reports in the prompt**: `BASELINE_SYSTEM` in `eval/ask.py` (evaluation only, never shipped) = the `ask-all-v1`
+  rules with "ALL sentences of ALL the reports" instead of "only these sentences were retrieved", same output schema,
+  same code-side citation check.
+- **Labels the model sees** (scope "report") and the session sentences come from the v2 outputs
+  (`verifier_agent_full.jsonl`, with the borderline rule); no new labelling call, so the ask calls are the only spend.
+- **Part 1, single report:** the 102 dev-slice reports (Tier 1 pilot).
+  - `T1` "Is there <finding>?" for 6 labels (Cardiomegaly, Pleural Effusion, Support Devices, Lung Opacity,
+    Atelectasis, Pneumothorax; with lay noun phrases) on **every** dev report (612 questions).
+  - `T2` "What supports <label>?" for every (report, label) of those 6 that is coded present or v2 present/uncertain
+    (positives), plus **one control** per report: a label that is neither (chosen by a seeded shuffle).
+  - **Frozen questions of groups A, B, D** (15 per report) on a fixed seeded sample of **30** of the 102 dev reports
+    (15 × 102 would not fit the $1 limit; see the estimate).
+- **Part 2, across reports:** synthetic patient batches of **3, 10, 30 and 50** reports, **3 replicates per size**
+  (folds 0, 1, 2; seed derived from `SEED`; independent draws), sampled from that fold's reports **excluding the dev
+  slice and `hedged` reports**; upload order = batch order (IU reports have no real patient or time order, so "first"
+  means first in upload order). RAG = the website configuration (top 12 sentences by cosine, fine-tuned dense model,
+  plain sentences, no BM25, no filter) with the **fold-k model for a fold-k batch** (the serving model saw every fold
+  in training, so it cannot be used out-of-fold); baseline = all sentences in the prompt. Both answer the same 15
+  questions per batch (180 questions, 360 calls):
+  - frozen **C** (11–15) and **D** (16–20);
+  - templated (5): "Which reports describe X?", "In how many reports is X present?", "In which report is X first
+    mentioned?" for L1 = the label coded most often in the batch among Cardiomegaly, Pleural Effusion, Support
+    Devices, Lung Opacity, Atelectasis (ties: that order; none coded → Cardiomegaly), and "Which reports describe Y?",
+    "In how many reports is Y present?" for L0 = the first of Pneumothorax, Fracture, Edema coded nowhere in the batch.
+- **Hand-written questions** (the 20 frozen ones) are also scored and reported separately, per question.
+
+### Expected answers
+- **Codes** (v1, `present` = positive; eval side only) and **v2** (the labels the website shows). Both are scored.
+  Hedged reports (6 on the dev slice) are left out of the codes-based scores (decision D6), not the v2-based ones.
+- `yn` (T1, A1–A6, B7–B9): expected `yes` if coded, else `no` or `notstated`. v2: present → `yes`, uncertain →
+  `uncertain`, else `no` / `notstated`. B7 (edema): a report that only negates edema must give `no` (eval detector).
+  B8 (definite lung lesion): hedge-only mentions (eval detector) → `uncertain`; coded with a clear mention → `yes`;
+  coded without a readable mention → not scored. B9 ("does the report state there is no pleural effusion?"): coded →
+  `no`; every mention negated → `yes`; not mentioned → `no` / `notstated`. B10 (certain or possible opacity): coded
+  with a clear mention → `certain`, hedge-only → `possible`, not coded → `none`.
+- `support` (T2): positive → answered (not `notstated`, `refused`, `no`); control → `notstated` or `no`.
+- `which` / `count` / `first`: the exact set of report numbers / the count / the first report number (or `none`)
+  where the label is coded (v2: present). C14 uses the reports coded No Finding.
+- `refuse` (D16–D20): correct only if `answer` is null (a refusal or "The reports don't state this."). An answer
+  that gives a number or a diagnosis counts as a failure; an answer whose number occurs in the given sentences is
+  additionally counted as grounded.
+
+### Answer parsing (rules, fixed before the run; `eval/ask.py`, unit-tested)
+- Class of a yes/no answer: refusal "The reports don't state this." → `notstated`; other refusal → `refused`;
+  hedge word in the first sentence → `uncertain`; starts with "yes" → `yes`; negation / absence words in the first
+  sentence → `no`; otherwise an affirmative statement → `yes`.
+- Report sets: numbers after "report(s)" ("reports 2, 5 and 7", "reports 4–6"); "none" / "no reports" / the refusal →
+  empty set; unreadable → counted wrong. Counts: "N reports" or the first integer; first mention: the first number
+  after "report". Certainty (Q10): hedge → `possible`, "no opacity / not mentioned" → `none`, "certain / definite /
+  clearly / stated / yes" → `certain`.
+- The share of unreadable answers is reported, so parser misses are visible, and a sample of parsed answers is read
+  by hand and reported. Accuracy is therefore only as exact as the parser.
+
+### Metrics
+1. **Answer accuracy** vs codes and vs v2: Part 1 per group (T1, T2, A, B) and per label, positives vs negatives;
+   95% bootstrap CI resampling dev reports. Part 2 per size, method and question group (templated, C, D); 95%
+   bootstrap over questions (the questions of a batch are correlated and there are only 3 batches per size, so these
+   CIs are optimistic); **paired RAG − baseline** difference per size, bootstrap over questions.
+2. **Citation validity** (code): (a) structural: returned citations that exist among the sentences given to the model,
+   over the model's raw citations (the code check drops the rest); answers turned into "not stated" because no valid
+   citation was left; (b) support: for answers that affirm the finding, the share of answers where **at least one** /
+   **every** valid cited sentence has a non-negated mention of the label by the **eval-only detector** (`eval_v1`,
+   independent of the pipeline's detector; not scored for No Finding or the negation question B9).
+3. **Refusal precision / recall**: positive = `answer` null. Should refuse = group D; should answer = questions whose
+   expected answer is positive (coded label for T1 / A, positive T2, non-empty set / count / first for cross-report
+   ones); the rest are excluded. Precision = refusals on should-refuse ÷ all refusals on questions of those two kinds.
+4. **Part 2 only:** input / output tokens and cost per request (mean), latency p50 / p95 (fresh calls, one at a time),
+   and for RAG a retrieval diagnostic: of the coded reports for a label question, the share with at least one retrieved
+   sentence that mentions the label.
+- Reading rule: for each size, say which method is better only where the paired CI excludes zero; otherwise "no
+  detectable difference". Where the baseline is as good or better, it is reported as such.
+
+### Cost estimate (before the run; `python -m eval.ask estimate`, no LLM call)
+Built from the real prompts; 3.6 characters per token (conservative), 85 output tokens per answer, gpt-4.1-mini
+$0.40 / $1.60 per 1M tokens: Part 1 1,234 calls ≈ **$0.50**; Part 2 RAG 180 calls ≈ **$0.07**, baseline 180 calls ≈
+**$0.30**; **total ≈ $0.88**, under the $1 limit. The run stops by itself when its new spend passes **$1.00**; the
+global stop (50% of `MAX_LLM_USD`) applies on top. Calls are cached and ledgered like every other evaluation call.
+
+### What this will not show
+It is one run per question at temperature 0, on one dataset of English reports from one hospital system, with
+parser-based scoring and a small dev slice (few positives for Pleural Effusion, Pneumothorax and Edema). Batches are
+random IU reports, not real patients: "change over time" is not tested, only presence, lists, counts and first
+mention in upload order. It says nothing about answer quality beyond the parsed class, nor about clinical use.
