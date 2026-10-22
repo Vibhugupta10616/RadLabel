@@ -1,0 +1,3263 @@
+{
+ "provenance": {
+  "git_commit": "3514dca7a6836145df9e6006a96252526f0e5c79",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "oof",
+  "created": "2026-10-22T15:49:25+00:00",
+  "eval_version": "eval_v1.2",
+  "prompts": "ask-report-v2, ask-all-v2, ask-context-v2"
+ },
+ "results": {
+  "records": 910,
+  "single": {
+   "questions": 370,
+   "groups": {
+    "T1": {
+     "report1": {
+      "codes": {
+       "n": 179,
+       "k": 174,
+       "value": 0.9720670391061452,
+       "lo": 0.9418604651162791,
+       "hi": 0.9940828402366864
+      },
+      "v2": {
+       "n": 193,
+       "k": 187,
+       "value": 0.9689119170984456,
+       "lo": 0.9427038433908046,
+       "hi": 0.9901002292347462
+      },
+      "unreadable": 0,
+      "n_questions": 193,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 308,
+       "valid_citations": 308,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 20,
+       "support_any": {
+        "n": 20,
+        "k": 13,
+        "value": 0.65,
+        "lo": 0.42105263157894735,
+        "hi": 0.85
+       },
+       "support_all": {
+        "n": 20,
+        "k": 11,
+        "value": 0.55,
+        "lo": 0.3153947368421053,
+        "hi": 0.7619047619047619
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 19,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "report2": {
+      "codes": {
+       "n": 179,
+       "k": 174,
+       "value": 0.9720670391061452,
+       "lo": 0.9433827493261455,
+       "hi": 0.994286525974026
+      },
+      "v2": {
+       "n": 193,
+       "k": 188,
+       "value": 0.9740932642487047,
+       "lo": 0.9507928989208336,
+       "hi": 0.9945659518213866
+      },
+      "unreadable": 0,
+      "n_questions": 193,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 266,
+       "valid_citations": 266,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 20,
+       "support_any": {
+        "n": 20,
+        "k": 13,
+        "value": 0.65,
+        "lo": 0.42105263157894735,
+        "hi": 0.8571428571428571
+       },
+       "support_all": {
+        "n": 20,
+        "k": 11,
+        "value": 0.55,
+        "lo": 0.3157894736842105,
+        "hi": 0.7619047619047619
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 19,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "paired_codes": {
+      "n": 179,
+      "k": 0,
+      "value": 0.0,
+      "lo": -0.01675977653631285,
+      "hi": 0.01675977653631285,
+      "excludes_zero": false
+     },
+     "paired_v2": {
+      "n": 193,
+      "k": 1,
+      "value": 0.0051813471502590676,
+      "lo": -0.010362694300518135,
+      "hi": 0.025906735751295335,
+      "excludes_zero": false
+     }
+    },
+    "T2": {
+     "report1": {
+      "codes": {
+       "n": 43,
+       "k": 41,
+       "value": 0.9534883720930233,
+       "lo": 0.8888888888888888,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 48,
+       "k": 47,
+       "value": 0.9791666666666666,
+       "lo": 0.9375,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 48,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 60,
+       "valid_citations": 60,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 19,
+       "support_any": {
+        "n": 19,
+        "k": 16,
+        "value": 0.8421052631578947,
+        "lo": 0.6666666666666666,
+        "hi": 1.0
+       },
+       "support_all": {
+        "n": 19,
+        "k": 11,
+        "value": 0.5789473684210527,
+        "lo": 0.3333333333333333,
+        "hi": 0.789736842105263
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 19,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "report2": {
+      "codes": {
+       "n": 43,
+       "k": 41,
+       "value": 0.9534883720930233,
+       "lo": 0.8808673469387754,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 48,
+       "k": 47,
+       "value": 0.9791666666666666,
+       "lo": 0.9333333333333333,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 48,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 47,
+       "valid_citations": 47,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 20,
+       "support_any": {
+        "n": 20,
+        "k": 17,
+        "value": 0.85,
+        "lo": 0.6666666666666666,
+        "hi": 1.0
+       },
+       "support_all": {
+        "n": 20,
+        "k": 15,
+        "value": 0.75,
+        "lo": 0.5263157894736842,
+        "hi": 0.9048701298701298
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 19,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "paired_codes": {
+      "n": 43,
+      "k": 0,
+      "value": 0.0,
+      "lo": -0.06976744186046512,
+      "hi": 0.06976744186046512,
+      "excludes_zero": false
+     },
+     "paired_v2": {
+      "n": 48,
+      "k": 0,
+      "value": 0.0,
+      "lo": -0.0625,
+      "hi": 0.0625,
+      "excludes_zero": false
+     }
+    },
+    "A": {
+     "report1": {
+      "codes": {
+       "n": 48,
+       "k": 48,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 54,
+       "k": 54,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 54,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 112,
+       "valid_citations": 112,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 1,
+       "support_any": {
+        "n": 1,
+        "k": 1,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       },
+       "support_all": {
+        "n": 1,
+        "k": 1,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 1,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "report2": {
+      "codes": {
+       "n": 48,
+       "k": 48,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 54,
+       "k": 54,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 54,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 91,
+       "valid_citations": 91,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 1,
+       "support_any": {
+        "n": 1,
+        "k": 1,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       },
+       "support_all": {
+        "n": 1,
+        "k": 1,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 1,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "paired_codes": {
+      "n": 48,
+      "k": 0,
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "excludes_zero": false
+     },
+     "paired_v2": {
+      "n": 54,
+      "k": 0,
+      "value": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "excludes_zero": false
+     }
+    },
+    "B": {
+     "report1": {
+      "codes": {
+       "n": 34,
+       "k": 24,
+       "value": 0.7058823529411765,
+       "lo": 0.5714285714285714,
+       "hi": 0.8235294117647058
+      },
+      "v2": {
+       "n": 36,
+       "k": 26,
+       "value": 0.7222222222222222,
+       "lo": 0.5945945945945946,
+       "hi": 0.8387945670628183
+      },
+      "unreadable": 5,
+      "n_questions": 36,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 48,
+       "valid_citations": 48,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 4,
+       "support_any": {
+        "n": 4,
+        "k": 1,
+        "value": 0.25,
+        "lo": 0.0,
+        "hi": 0.75
+       },
+       "support_all": {
+        "n": 4,
+        "k": 1,
+        "value": 0.25,
+        "lo": 0.0,
+        "hi": 0.75
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 0,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "report2": {
+      "codes": {
+       "n": 34,
+       "k": 22,
+       "value": 0.6470588235294118,
+       "lo": 0.5,
+       "hi": 0.7878787878787878
+      },
+      "v2": {
+       "n": 36,
+       "k": 24,
+       "value": 0.6666666666666666,
+       "lo": 0.5171891327063741,
+       "hi": 0.8
+      },
+      "unreadable": 4,
+      "n_questions": 36,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
+      "citations": {
+       "raw_citations": 43,
+       "valid_citations": 43,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 5,
+       "support_any": {
+        "n": 5,
+        "k": 2,
+        "value": 0.4,
+        "lo": 0.0,
+        "hi": 0.8
+       },
+       "support_all": {
+        "n": 5,
+        "k": 2,
+        "value": 0.4,
+        "lo": 0.0,
+        "hi": 0.8
+       }
+      },
+      "refusals": {
+       "should_refuse": 0,
+       "should_answer": 0,
+       "true_refusals": 0,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": null,
+       "recall": null
+      }
+     },
+     "paired_codes": {
+      "n": 34,
+      "k": -2,
+      "value": -0.058823529411764705,
+      "lo": -0.17647058823529413,
+      "hi": 0.058823529411764705,
+      "excludes_zero": false
+     },
+     "paired_v2": {
+      "n": 36,
+      "k": -2,
+      "value": -0.05555555555555555,
+      "lo": -0.16666666666666666,
+      "hi": 0.05555555555555555,
+      "excludes_zero": false
+     }
+    },
+    "D": {
+     "report1": {
+      "codes": {
+       "n": 35,
+       "k": 32,
+       "value": 0.9142857142857143,
+       "lo": 0.8125,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 39,
+       "k": 35,
+       "value": 0.8974358974358975,
+       "lo": 0.7998863636363637,
+       "hi": 0.9772727272727273
+      },
+      "unreadable": 0,
+      "n_questions": 39,
+      "lenient": {
+       "n": 39,
+       "k": 38,
+       "value": 0.9743589743589743,
+       "lo": 0.9142857142857143,
+       "hi": 1.0
+      },
+      "citations": {
+       "raw_citations": 4,
+       "valid_citations": 4,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 0,
+       "support_any": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       },
+       "support_all": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
+      },
+      "refusals": {
+       "should_refuse": 39,
+       "should_answer": 0,
+       "true_refusals": 35,
+       "false_refusals": 0,
+       "missed_refusals": 4,
+       "precision": 1.0,
+       "recall": 0.8974358974358975
+      }
+     },
+     "report2": {
+      "codes": {
+       "n": 35,
+       "k": 35,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 39,
+       "k": 39,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 39,
+      "lenient": {
+       "n": 39,
+       "k": 39,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "citations": {
+       "raw_citations": 25,
+       "valid_citations": 25,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 0,
+       "support_any": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       },
+       "support_all": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
+      },
+      "refusals": {
+       "should_refuse": 39,
+       "should_answer": 0,
+       "true_refusals": 39,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": 1.0,
+       "recall": 1.0
+      }
+     },
+     "paired_codes": {
+      "n": 35,
+      "k": 3,
+      "value": 0.08571428571428572,
+      "lo": 0.0,
+      "hi": 0.2,
+      "excludes_zero": false
+     },
+     "paired_v2": {
+      "n": 39,
+      "k": 4,
+      "value": 0.10256410256410256,
+      "lo": 0.02564102564102564,
+      "hi": 0.20512820512820512,
+      "excludes_zero": true
+     }
+    },
+    "all": {
+     "report1": {
+      "codes": {
+       "n": 339,
+       "k": 319,
+       "value": 0.9410029498525073,
+       "lo": 0.9179278404062945,
+       "hi": 0.9623824451410659
+      },
+      "v2": {
+       "n": 370,
+       "k": 349,
+       "value": 0.9432432432432433,
+       "lo": 0.9217859460527058,
+       "hi": 0.9632593902263523
+      },
+      "unreadable": 5,
+      "n_questions": 370,
+      "lenient": {
+       "n": 39,
+       "k": 38,
+       "value": 0.9743589743589743,
+       "lo": 0.9142857142857143,
+       "hi": 1.0
+      },
+      "citations": {
+       "raw_citations": 532,
+       "valid_citations": 532,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 44,
+       "support_any": {
+        "n": 44,
+        "k": 31,
+        "value": 0.7045454545454546,
+        "lo": 0.5227272727272727,
+        "hi": 0.8571428571428571
+       },
+       "support_all": {
+        "n": 44,
+        "k": 24,
+        "value": 0.5454545454545454,
+        "lo": 0.359974358974359,
+        "hi": 0.718
+       }
+      },
+      "refusals": {
+       "should_refuse": 39,
+       "should_answer": 39,
+       "true_refusals": 35,
+       "false_refusals": 0,
+       "missed_refusals": 4,
+       "precision": 1.0,
+       "recall": 0.8974358974358975
+      }
+     },
+     "report2": {
+      "codes": {
+       "n": 339,
+       "k": 320,
+       "value": 0.943952802359882,
+       "lo": 0.9196669717055798,
+       "hi": 0.9660493827160493
+      },
+      "v2": {
+       "n": 370,
+       "k": 352,
+       "value": 0.9513513513513514,
+       "lo": 0.930715128555459,
+       "hi": 0.9693635753362294
+      },
+      "unreadable": 4,
+      "n_questions": 370,
+      "lenient": {
+       "n": 39,
+       "k": 39,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "citations": {
+       "raw_citations": 472,
+       "valid_citations": 472,
+       "structural_valid_rate": 1.0,
+       "answers_lost_to_the_check": 0,
+       "affirming_answers_scored": 46,
+       "support_any": {
+        "n": 46,
+        "k": 33,
+        "value": 0.717391304347826,
+        "lo": 0.5652173913043478,
+        "hi": 0.8536712398373983
+       },
+       "support_all": {
+        "n": 46,
+        "k": 29,
+        "value": 0.6304347826086957,
+        "lo": 0.4772727272727273,
+        "hi": 0.78
+       }
+      },
+      "refusals": {
+       "should_refuse": 39,
+       "should_answer": 39,
+       "true_refusals": 39,
+       "false_refusals": 0,
+       "missed_refusals": 0,
+       "precision": 1.0,
+       "recall": 1.0
+      }
+     },
+     "paired_codes": {
+      "n": 339,
+      "k": 1,
+      "value": 0.0029498525073746312,
+      "lo": -0.017699115044247787,
+      "hi": 0.02359882005899705,
+      "excludes_zero": false
+     },
+     "paired_v2": {
+      "n": 370,
+      "k": 3,
+      "value": 0.008108108108108109,
+      "lo": -0.010810810810810811,
+      "hi": 0.02972972972972973,
+      "excludes_zero": false
+     }
+    }
+   }
+  },
+  "sizes": {
+   "3": {
+    "rag1": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.5111111111111111,
+       "hi": 0.7777777777777778
+      },
+      "v2": {
+       "n": 45,
+       "k": 24,
+       "value": 0.5333333333333333,
+       "lo": 0.4,
+       "hi": 0.6672222222222217
+      },
+      "unreadable": 5,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.3333333333333333,
+       "hi": 0.8666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 4,
+       "value": 0.26666666666666666,
+       "lo": 0.06666666666666667,
+       "hi": 0.4666666666666667
+      },
+      "unreadable": 2,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 6,
+       "value": 0.4,
+       "lo": 0.13333333333333333,
+       "hi": 0.6666666666666666
+      },
+      "v2": {
+       "n": 15,
+       "k": 6,
+       "value": 0.4,
+       "lo": 0.13333333333333333,
+       "hi": 0.6666666666666666
+      },
+      "unreadable": 3,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 42,
+      "valid_citations": 42,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 14,
+      "support_any": {
+       "n": 14,
+       "k": 6,
+       "value": 0.42857142857142855,
+       "lo": 0.21428571428571427,
+       "hi": 0.6428571428571429
+      },
+      "support_all": {
+       "n": 14,
+       "k": 5,
+       "value": 0.35714285714285715,
+       "lo": 0.14285714285714285,
+       "hi": 0.6428571428571429
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 11,
+      "true_refusals": 14,
+      "false_refusals": 0,
+      "missed_refusals": 1,
+      "precision": 1.0,
+      "recall": 0.9333333333333333
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 643.8222222222222,
+      "mean_output_tokens": 38.51111111111111,
+      "mean_cost_usd": 0.00031914666666666666,
+      "total_cost_usd": 0.0143616,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.204982099996414,
+      "latency_p95_s": 2.0412049800041125
+     },
+     "coverage": {
+      "coded_reports": 10,
+      "with_retrieved_mention": 6,
+      "share": 0.6
+     }
+    },
+    "rag2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 38,
+       "value": 0.8444444444444444,
+       "lo": 0.7333333333333333,
+       "hi": 0.9333333333333333
+      },
+      "v2": {
+       "n": 45,
+       "k": 33,
+       "value": 0.7333333333333333,
+       "lo": 0.6222222222222222,
+       "hi": 0.8449999999999995
+      },
+      "unreadable": 1,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 13,
+       "value": 0.8666666666666667,
+       "lo": 0.6666666666666666,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.8
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 11,
+       "value": 0.7333333333333333,
+       "lo": 0.5333333333333333,
+       "hi": 0.9333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 11,
+       "value": 0.7333333333333333,
+       "lo": 0.5333333333333333,
+       "hi": 0.9333333333333333
+      },
+      "unreadable": 1,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 40,
+      "valid_citations": 40,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 12,
+      "support_any": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "support_all": {
+       "n": 12,
+       "k": 5,
+       "value": 0.4166666666666667,
+       "lo": 0.16666666666666666,
+       "hi": 0.6666666666666666
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 11,
+      "true_refusals": 14,
+      "false_refusals": 0,
+      "missed_refusals": 1,
+      "precision": 1.0,
+      "recall": 0.9333333333333333
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 803.7111111111111,
+      "mean_output_tokens": 35.75555555555555,
+      "mean_cost_usd": 0.00037869333333333325,
+      "total_cost_usd": 0.017041199999999996,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.0050902999937534,
+      "latency_p95_s": 1.6723574400180947
+     },
+     "coverage": {
+      "coded_reports": 10,
+      "with_retrieved_mention": 6,
+      "share": 0.6
+     }
+    },
+    "ctx2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 33,
+       "value": 0.7333333333333333,
+       "lo": 0.6,
+       "hi": 0.8449999999999995
+      },
+      "v2": {
+       "n": 45,
+       "k": 30,
+       "value": 0.6666666666666666,
+       "lo": 0.5333333333333333,
+       "hi": 0.8
+      },
+      "unreadable": 3,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.3333333333333333,
+       "hi": 0.8
+      },
+      "v2": {
+       "n": 15,
+       "k": 6,
+       "value": 0.4,
+       "lo": 0.19833333333333344,
+       "hi": 0.6666666666666666
+      },
+      "unreadable": 2,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.4,
+       "hi": 0.8666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.4,
+       "hi": 0.8666666666666667
+      },
+      "unreadable": 1,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 50,
+      "valid_citations": 50,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 13,
+      "support_any": {
+       "n": 13,
+       "k": 3,
+       "value": 0.23076923076923078,
+       "lo": 0.0,
+       "hi": 0.46153846153846156
+      },
+      "support_all": {
+       "n": 13,
+       "k": 3,
+       "value": 0.23076923076923078,
+       "lo": 0.0,
+       "hi": 0.46153846153846156
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 11,
+      "true_refusals": 15,
+      "false_refusals": 0,
+      "missed_refusals": 0,
+      "precision": 1.0,
+      "recall": 1.0
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 989.2,
+      "mean_output_tokens": 41.333333333333336,
+      "mean_cost_usd": 0.0003662400000000001,
+      "total_cost_usd": 0.016480800000000004,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 0.9545272999966983,
+      "latency_p95_s": 1.5538725999940648
+     },
+     "coverage": null
+    },
+    "paired_codes_rag2_minus_ctx2": {
+     "n": 45,
+     "k": 5,
+     "value": 0.1111111111111111,
+     "lo": 0.0,
+     "hi": 0.2222222222222222,
+     "excludes_zero": false
+    },
+    "paired_v2_rag2_minus_ctx2": {
+     "n": 45,
+     "k": 3,
+     "value": 0.06666666666666667,
+     "lo": -0.022222222222222223,
+     "hi": 0.15555555555555556,
+     "excludes_zero": false
+    },
+    "paired_codes_rag2_minus_rag1": {
+     "n": 45,
+     "k": 9,
+     "value": 0.2,
+     "lo": 0.08888888888888889,
+     "hi": 0.3111111111111111,
+     "excludes_zero": true
+    },
+    "paired_v2_rag2_minus_rag1": {
+     "n": 45,
+     "k": 9,
+     "value": 0.2,
+     "lo": 0.08888888888888889,
+     "hi": 0.3111111111111111,
+     "excludes_zero": true
+    },
+    "paired_codes_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -4,
+     "value": -0.08888888888888889,
+     "lo": -0.2222222222222222,
+     "hi": 0.044444444444444446,
+     "excludes_zero": false
+    },
+    "paired_v2_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -6,
+     "value": -0.13333333333333333,
+     "lo": -0.26666666666666666,
+     "hi": -0.022222222222222223,
+     "excludes_zero": true
+    }
+   },
+   "10": {
+    "rag1": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 21,
+       "value": 0.4666666666666667,
+       "lo": 0.3111111111111111,
+       "hi": 0.6
+      },
+      "v2": {
+       "n": 45,
+       "k": 22,
+       "value": 0.4888888888888889,
+       "lo": 0.3333333333333333,
+       "hi": 0.6222222222222222
+      },
+      "unreadable": 6,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 12,
+       "value": 0.8,
+       "lo": 0.5333333333333333,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 3,
+       "value": 0.2,
+       "lo": 0.0,
+       "hi": 0.4
+      },
+      "v2": {
+       "n": 15,
+       "k": 3,
+       "value": 0.2,
+       "lo": 0.0,
+       "hi": 0.4
+      },
+      "unreadable": 3,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.7333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.8
+      },
+      "unreadable": 3,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 11,
+       "value": 0.7333333333333333,
+       "lo": 0.4666666666666667,
+       "hi": 0.9333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 11,
+       "value": 0.7333333333333333,
+       "lo": 0.4666666666666667,
+       "hi": 0.9333333333333333
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 12,
+       "value": 0.8,
+       "lo": 0.5333333333333333,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 88,
+      "valid_citations": 88,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 11,
+      "support_any": {
+       "n": 11,
+       "k": 6,
+       "value": 0.5454545454545454,
+       "lo": 0.2727272727272727,
+       "hi": 0.8181818181818182
+      },
+      "support_all": {
+       "n": 11,
+       "k": 6,
+       "value": 0.5454545454545454,
+       "lo": 0.2727272727272727,
+       "hi": 0.8181818181818182
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 12,
+      "true_refusals": 11,
+      "false_refusals": 3,
+      "missed_refusals": 4,
+      "precision": 0.7857142857142857,
+      "recall": 0.7333333333333333
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 652.9777777777778,
+      "mean_output_tokens": 51.644444444444446,
+      "mean_cost_usd": 0.0003438222222222223,
+      "total_cost_usd": 0.015472000000000005,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.2284701000025962,
+      "latency_p95_s": 1.8675810399930923
+     },
+     "coverage": {
+      "coded_reports": 14,
+      "with_retrieved_mention": 14,
+      "share": 1.0
+     }
+    },
+    "rag2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.5111111111111111,
+       "hi": 0.7777777777777778
+      },
+      "v2": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.5111111111111111,
+       "hi": 0.8
+      },
+      "unreadable": 2,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 6,
+       "value": 0.4,
+       "lo": 0.13333333333333333,
+       "hi": 0.6666666666666666
+      },
+      "v2": {
+       "n": 15,
+       "k": 5,
+       "value": 0.3333333333333333,
+       "lo": 0.13333333333333333,
+       "hi": 0.6
+      },
+      "unreadable": 1,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.3333333333333333,
+       "hi": 0.8666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 10,
+       "value": 0.6666666666666666,
+       "lo": 0.4,
+       "hi": 0.8666666666666667
+      },
+      "unreadable": 1,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 132,
+      "valid_citations": 131,
+      "structural_valid_rate": 0.9924242424242424,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 13,
+      "support_any": {
+       "n": 13,
+       "k": 7,
+       "value": 0.5384615384615384,
+       "lo": 0.23076923076923078,
+       "hi": 0.8461538461538461
+      },
+      "support_all": {
+       "n": 13,
+       "k": 7,
+       "value": 0.5384615384615384,
+       "lo": 0.23076923076923078,
+       "hi": 0.8461538461538461
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 12,
+      "true_refusals": 14,
+      "false_refusals": 0,
+      "missed_refusals": 1,
+      "precision": 1.0,
+      "recall": 0.9333333333333333
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 996.6222222222223,
+      "mean_output_tokens": 64.13333333333334,
+      "mean_cost_usd": 0.0005012622222222222,
+      "total_cost_usd": 0.0225568,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.3335734000138473,
+      "latency_p95_s": 2.2864894400001505
+     },
+     "coverage": {
+      "coded_reports": 14,
+      "with_retrieved_mention": 14,
+      "share": 1.0
+     }
+    },
+    "ctx2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 31,
+       "value": 0.6888888888888889,
+       "lo": 0.5555555555555556,
+       "hi": 0.8222222222222222
+      },
+      "v2": {
+       "n": 45,
+       "k": 31,
+       "value": 0.6888888888888889,
+       "lo": 0.5333333333333333,
+       "hi": 0.8222222222222222
+      },
+      "unreadable": 0,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.3333333333333333,
+       "hi": 0.8666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.8
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.7333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.8
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 158,
+      "valid_citations": 158,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 12,
+      "support_any": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      },
+      "support_all": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 12,
+      "true_refusals": 15,
+      "false_refusals": 0,
+      "missed_refusals": 0,
+      "precision": 1.0,
+      "recall": 1.0
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 2262.4444444444443,
+      "mean_output_tokens": 69.42222222222222,
+      "mean_cost_usd": 0.0004349333333333334,
+      "total_cost_usd": 0.019572000000000003,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.2141166000219528,
+      "latency_p95_s": 2.5403337599826044
+     },
+     "coverage": null
+    },
+    "paired_codes_rag2_minus_ctx2": {
+     "n": 45,
+     "k": -2,
+     "value": -0.044444444444444446,
+     "lo": -0.17777777777777778,
+     "hi": 0.08888888888888889,
+     "excludes_zero": false
+    },
+    "paired_v2_rag2_minus_ctx2": {
+     "n": 45,
+     "k": -2,
+     "value": -0.044444444444444446,
+     "lo": -0.17777777777777778,
+     "hi": 0.08888888888888889,
+     "excludes_zero": false
+    },
+    "paired_codes_rag2_minus_rag1": {
+     "n": 45,
+     "k": 8,
+     "value": 0.17777777777777778,
+     "lo": 0.06666666666666667,
+     "hi": 0.3111111111111111,
+     "excludes_zero": true
+    },
+    "paired_v2_rag2_minus_rag1": {
+     "n": 45,
+     "k": 7,
+     "value": 0.15555555555555556,
+     "lo": 0.044444444444444446,
+     "hi": 0.28888888888888886,
+     "excludes_zero": true
+    },
+    "paired_codes_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -10,
+     "value": -0.2222222222222222,
+     "lo": -0.37777777777777777,
+     "hi": -0.06666666666666667,
+     "excludes_zero": true
+    },
+    "paired_v2_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -9,
+     "value": -0.2,
+     "lo": -0.35555555555555557,
+     "hi": -0.044444444444444446,
+     "excludes_zero": true
+    }
+   },
+   "30": {
+    "rag1": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 22,
+       "value": 0.4888888888888889,
+       "lo": 0.3333333333333333,
+       "hi": 0.6227777777777773
+      },
+      "v2": {
+       "n": 45,
+       "k": 23,
+       "value": 0.5111111111111111,
+       "lo": 0.35555555555555557,
+       "hi": 0.6449999999999996
+      },
+      "unreadable": 0,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 4,
+       "value": 0.26666666666666666,
+       "lo": 0.06666666666666667,
+       "hi": 0.4666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 4,
+       "value": 0.26666666666666666,
+       "lo": 0.06666666666666667,
+       "hi": 0.4666666666666667
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 6,
+       "value": 0.4,
+       "lo": 0.2,
+       "hi": 0.6666666666666666
+      },
+      "v2": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.26666666666666666,
+       "hi": 0.7333333333333333
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 12,
+       "value": 0.8,
+       "lo": 0.6,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 12,
+       "value": 0.8,
+       "lo": 0.6,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 98,
+      "valid_citations": 98,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 23,
+      "support_any": {
+       "n": 23,
+       "k": 17,
+       "value": 0.7391304347826086,
+       "lo": 0.5652173913043478,
+       "hi": 0.9130434782608695
+      },
+      "support_all": {
+       "n": 23,
+       "k": 14,
+       "value": 0.6086956521739131,
+       "lo": 0.391304347826087,
+       "hi": 0.782608695652174
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 22,
+      "true_refusals": 12,
+      "false_refusals": 0,
+      "missed_refusals": 3,
+      "precision": 1.0,
+      "recall": 0.8
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 662.8666666666667,
+      "mean_output_tokens": 61.6,
+      "mean_cost_usd": 0.00036370666666666663,
+      "total_cost_usd": 0.016366799999999997,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.2030941999983042,
+      "latency_p95_s": 1.751523839996662
+     },
+     "coverage": {
+      "coded_reports": 80,
+      "with_retrieved_mention": 59,
+      "share": 0.7375
+     }
+    },
+    "rag2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.5111111111111111,
+       "hi": 0.7777777777777778
+      },
+      "v2": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.5111111111111111,
+       "hi": 0.7777777777777778
+      },
+      "unreadable": 0,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.7333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.7333333333333333
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.3333333333333333,
+       "hi": 0.8666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.4,
+       "hi": 0.8666666666666667
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 13,
+       "value": 0.8666666666666667,
+       "lo": 0.6666666666666666,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 13,
+       "value": 0.8666666666666667,
+       "lo": 0.6666666666666666,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 211,
+      "valid_citations": 211,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 21,
+      "support_any": {
+       "n": 21,
+       "k": 18,
+       "value": 0.8571428571428571,
+       "lo": 0.6666666666666666,
+       "hi": 1.0
+      },
+      "support_all": {
+       "n": 21,
+       "k": 13,
+       "value": 0.6190476190476191,
+       "lo": 0.42857142857142855,
+       "hi": 0.8095238095238095
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 22,
+      "true_refusals": 13,
+      "false_refusals": 0,
+      "missed_refusals": 2,
+      "precision": 1.0,
+      "recall": 0.8666666666666667
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 1844.8,
+      "mean_output_tokens": 91.33333333333333,
+      "mean_cost_usd": 0.0008840533333333336,
+      "total_cost_usd": 0.03978240000000001,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.4483017999737058,
+      "latency_p95_s": 2.8099305399926378
+     },
+     "coverage": {
+      "coded_reports": 80,
+      "with_retrieved_mention": 76,
+      "share": 0.95
+     }
+    },
+    "ctx2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.5111111111111111,
+       "hi": 0.7777777777777778
+      },
+      "v2": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.5111111111111111,
+       "hi": 0.7777777777777778
+      },
+      "unreadable": 3,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 5,
+       "value": 0.3333333333333333,
+       "lo": 0.13333333333333333,
+       "hi": 0.6
+      },
+      "v2": {
+       "n": 15,
+       "k": 5,
+       "value": 0.3333333333333333,
+       "lo": 0.13333333333333333,
+       "hi": 0.6
+      },
+      "unreadable": 1,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.39833333333333343,
+       "hi": 0.8666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.39833333333333343,
+       "hi": 0.8666666666666667
+      },
+      "unreadable": 2,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 235,
+      "valid_citations": 235,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 22,
+      "support_any": {
+       "n": 22,
+       "k": 19,
+       "value": 0.8636363636363636,
+       "lo": 0.6818181818181818,
+       "hi": 1.0
+      },
+      "support_all": {
+       "n": 22,
+       "k": 15,
+       "value": 0.6818181818181818,
+       "lo": 0.5,
+       "hi": 0.8636363636363636
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 22,
+      "true_refusals": 15,
+      "false_refusals": 0,
+      "missed_refusals": 0,
+      "precision": 1.0,
+      "recall": 1.0
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 5526.4,
+      "mean_output_tokens": 95.62222222222222,
+      "mean_cost_usd": 0.0009060622222222223,
+      "total_cost_usd": 0.040772800000000005,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.4576860000088345,
+      "latency_p95_s": 4.447284139989642
+     },
+     "coverage": null
+    },
+    "paired_codes_rag2_minus_ctx2": {
+     "n": 45,
+     "k": 0,
+     "value": 0.0,
+     "lo": -0.1111111111111111,
+     "hi": 0.1111111111111111,
+     "excludes_zero": false
+    },
+    "paired_v2_rag2_minus_ctx2": {
+     "n": 45,
+     "k": 0,
+     "value": 0.0,
+     "lo": -0.1111111111111111,
+     "hi": 0.1111111111111111,
+     "excludes_zero": false
+    },
+    "paired_codes_rag2_minus_rag1": {
+     "n": 45,
+     "k": 7,
+     "value": 0.15555555555555556,
+     "lo": 0.022222222222222223,
+     "hi": 0.26666666666666666,
+     "excludes_zero": true
+    },
+    "paired_v2_rag2_minus_rag1": {
+     "n": 45,
+     "k": 6,
+     "value": 0.13333333333333333,
+     "lo": 0.022222222222222223,
+     "hi": 0.24444444444444444,
+     "excludes_zero": true
+    },
+    "paired_codes_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -7,
+     "value": -0.15555555555555556,
+     "lo": -0.3111111111111111,
+     "hi": 0.022222222222222223,
+     "excludes_zero": false
+    },
+    "paired_v2_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -6,
+     "value": -0.13333333333333333,
+     "lo": -0.28888888888888886,
+     "hi": 0.022777777777777272,
+     "excludes_zero": false
+    }
+   },
+   "50": {
+    "rag1": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 21,
+       "value": 0.4666666666666667,
+       "lo": 0.3111111111111111,
+       "hi": 0.6
+      },
+      "v2": {
+       "n": 45,
+       "k": 21,
+       "value": 0.4666666666666667,
+       "lo": 0.3111111111111111,
+       "hi": 0.6
+      },
+      "unreadable": 1,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 13,
+       "value": 0.8666666666666667,
+       "lo": 0.6666666666666666,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 5,
+       "value": 0.3333333333333333,
+       "lo": 0.13333333333333333,
+       "hi": 0.5333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 5,
+       "value": 0.3333333333333333,
+       "lo": 0.13333333333333333,
+       "hi": 0.6
+      },
+      "unreadable": 1,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.6683333333333318
+      },
+      "v2": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.6683333333333318
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.3333333333333333,
+       "hi": 0.8666666666666667
+      },
+      "v2": {
+       "n": 15,
+       "k": 9,
+       "value": 0.6,
+       "lo": 0.3333333333333333,
+       "hi": 0.8666666666666667
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 13,
+       "value": 0.8666666666666667,
+       "lo": 0.6666666666666666,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 161,
+      "valid_citations": 161,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 22,
+      "support_any": {
+       "n": 22,
+       "k": 16,
+       "value": 0.7272727272727273,
+       "lo": 0.5454545454545454,
+       "hi": 0.9090909090909091
+      },
+      "support_all": {
+       "n": 22,
+       "k": 14,
+       "value": 0.6363636363636364,
+       "lo": 0.45454545454545453,
+       "hi": 0.8181818181818182
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 22,
+      "true_refusals": 9,
+      "false_refusals": 0,
+      "missed_refusals": 6,
+      "precision": 1.0,
+      "recall": 0.6
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 659.3111111111111,
+      "mean_output_tokens": 76.82222222222222,
+      "mean_cost_usd": 0.0003866399999999999,
+      "total_cost_usd": 0.017398799999999996,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.512799799995264,
+      "latency_p95_s": 2.243571999989217
+     },
+     "coverage": {
+      "coded_reports": 125,
+      "with_retrieved_mention": 68,
+      "share": 0.544
+     }
+    },
+    "rag2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 30,
+       "value": 0.6666666666666666,
+       "lo": 0.5333333333333333,
+       "hi": 0.8
+      },
+      "v2": {
+       "n": 45,
+       "k": 29,
+       "value": 0.6444444444444445,
+       "lo": 0.4888888888888889,
+       "hi": 0.7777777777777778
+      },
+      "unreadable": 1,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.8
+      },
+      "v2": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.7333333333333333
+      },
+      "unreadable": 1,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.7333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.7333333333333333
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 14,
+       "value": 0.9333333333333333,
+       "lo": 0.8,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 283,
+      "valid_citations": 282,
+      "structural_valid_rate": 0.9964664310954063,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 22,
+      "support_any": {
+       "n": 22,
+       "k": 19,
+       "value": 0.8636363636363636,
+       "lo": 0.6818181818181818,
+       "hi": 1.0
+      },
+      "support_all": {
+       "n": 22,
+       "k": 10,
+       "value": 0.45454545454545453,
+       "lo": 0.22727272727272727,
+       "hi": 0.6818181818181818
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 22,
+      "true_refusals": 14,
+      "false_refusals": 0,
+      "missed_refusals": 1,
+      "precision": 1.0,
+      "recall": 0.9333333333333333
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 2666.488888888889,
+      "mean_output_tokens": 108.13333333333334,
+      "mean_cost_usd": 0.0012396088888888888,
+      "total_cost_usd": 0.055782399999999996,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.1240717999753542,
+      "latency_p95_s": 4.830338499997741
+     },
+     "coverage": {
+      "coded_reports": 125,
+      "with_retrieved_mention": 91,
+      "share": 0.728
+     }
+    },
+    "ctx2": {
+     "all": {
+      "codes": {
+       "n": 45,
+       "k": 28,
+       "value": 0.6222222222222222,
+       "lo": 0.4888888888888889,
+       "hi": 0.7555555555555555
+      },
+      "v2": {
+       "n": 45,
+       "k": 30,
+       "value": 0.6666666666666666,
+       "lo": 0.5333333333333333,
+       "hi": 0.7777777777777778
+      },
+      "unreadable": 2,
+      "n_questions": 45,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "templated": {
+      "codes": {
+       "n": 15,
+       "k": 6,
+       "value": 0.4,
+       "lo": 0.19833333333333344,
+       "hi": 0.6666666666666666
+      },
+      "v2": {
+       "n": 15,
+       "k": 8,
+       "value": 0.5333333333333333,
+       "lo": 0.26666666666666666,
+       "hi": 0.8
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_C": {
+      "codes": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.7333333333333333
+      },
+      "v2": {
+       "n": 15,
+       "k": 7,
+       "value": 0.4666666666666667,
+       "lo": 0.2,
+       "hi": 0.7333333333333333
+      },
+      "unreadable": 2,
+      "n_questions": 15,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "hand_written_D": {
+      "codes": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "v2": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "unreadable": 0,
+      "n_questions": 15,
+      "lenient": {
+       "n": 15,
+       "k": 15,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "citations": {
+      "raw_citations": 368,
+      "valid_citations": 368,
+      "structural_valid_rate": 1.0,
+      "answers_lost_to_the_check": 0,
+      "affirming_answers_scored": 23,
+      "support_any": {
+       "n": 23,
+       "k": 19,
+       "value": 0.8260869565217391,
+       "lo": 0.6521739130434783,
+       "hi": 0.9565217391304348
+      },
+      "support_all": {
+       "n": 23,
+       "k": 8,
+       "value": 0.34782608695652173,
+       "lo": 0.17391304347826086,
+       "hi": 0.5652173913043478
+      }
+     },
+     "refusals": {
+      "should_refuse": 15,
+      "should_answer": 22,
+      "true_refusals": 15,
+      "false_refusals": 0,
+      "missed_refusals": 0,
+      "precision": 1.0,
+      "recall": 1.0
+     },
+     "cost": {
+      "requests": 45,
+      "mean_input_tokens": 8781.644444444444,
+      "mean_output_tokens": 124.24444444444444,
+      "mean_cost_usd": 0.001328942222222222,
+      "total_cost_usd": 0.05980239999999999,
+      "latency_fresh_requests": 45,
+      "latency_p50_s": 1.4323941000038758,
+      "latency_p95_s": 5.410033679986372
+     },
+     "coverage": null
+    },
+    "paired_codes_rag2_minus_ctx2": {
+     "n": 45,
+     "k": 2,
+     "value": 0.044444444444444446,
+     "lo": -0.08888888888888889,
+     "hi": 0.17777777777777778,
+     "excludes_zero": false
+    },
+    "paired_v2_rag2_minus_ctx2": {
+     "n": 45,
+     "k": -1,
+     "value": -0.022222222222222223,
+     "lo": -0.13388888888888886,
+     "hi": 0.1111111111111111,
+     "excludes_zero": false
+    },
+    "paired_codes_rag2_minus_rag1": {
+     "n": 45,
+     "k": 9,
+     "value": 0.2,
+     "lo": 0.06666666666666667,
+     "hi": 0.3333333333333333,
+     "excludes_zero": true
+    },
+    "paired_v2_rag2_minus_rag1": {
+     "n": 45,
+     "k": 8,
+     "value": 0.17777777777777778,
+     "lo": 0.044444444444444446,
+     "hi": 0.3111111111111111,
+     "excludes_zero": true
+    },
+    "paired_codes_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -7,
+     "value": -0.15555555555555556,
+     "lo": -0.3111111111111111,
+     "hi": 0.0,
+     "excludes_zero": false
+    },
+    "paired_v2_rag1_minus_ctx2": {
+     "n": 45,
+     "k": -9,
+     "value": -0.2,
+     "lo": -0.35555555555555557,
+     "hi": -0.044444444444444446,
+     "excludes_zero": true
+    }
+   }
+  },
+  "hand_written": {
+   "11": {
+    "question": "Which reports describe an enlarged heart?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 5,
+       "value": 0.4166666666666667,
+       "lo": 0.16666666666666666,
+       "hi": 0.6666666666666666
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 9,
+       "value": 0.75,
+       "lo": 0.5,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 5,
+       "value": 0.4166666666666667,
+       "lo": 0.16666666666666666,
+       "hi": 0.6666666666666666
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     }
+    }
+   },
+   "12": {
+    "question": "In how many reports is a pleural effusion present?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 4,
+       "value": 0.3333333333333333,
+       "lo": 0.08333333333333333,
+       "hi": 0.5833333333333334
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 8,
+       "value": 0.6666666666666666,
+       "lo": 0.4166666666666667,
+       "hi": 0.9166666666666666
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 8,
+       "value": 0.6666666666666666,
+       "lo": 0.4166666666666667,
+       "hi": 0.9166666666666666
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     }
+    }
+   },
+   "13": {
+    "question": "In which report is a tube, line or device first mentioned?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 6,
+       "value": 0.5,
+       "lo": 0.25,
+       "hi": 0.75
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 9,
+       "value": 0.75,
+       "lo": 0.5,
+       "hi": 0.9166666666666666
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 9,
+       "value": 0.75,
+       "lo": 0.5,
+       "hi": 0.9166666666666666
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     }
+    }
+   },
+   "14": {
+    "question": "Is there any report without abnormal findings?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 0,
+       "value": 0.0,
+       "lo": 0.0,
+       "hi": 0.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 0,
+       "value": 0.0,
+       "lo": 0.0,
+       "hi": 0.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 0,
+       "value": 0.0,
+       "lo": 0.0,
+       "hi": 0.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     }
+    }
+   },
+   "15": {
+    "question": "Does any report describe a pneumothorax as present?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
+     }
+    }
+   },
+   "16": {
+    "question": "How old is the patient?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      },
+      "lenient": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     }
+    }
+   },
+   "17": {
+    "question": "Is this cancer?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      },
+      "lenient": {
+       "n": 12,
+       "k": 7,
+       "value": 0.5833333333333334,
+       "lo": 0.3333333333333333,
+       "hi": 0.8333333333333334
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     }
+    }
+   },
+   "18": {
+    "question": "What treatment should the patient receive?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     }
+    }
+   },
+   "19": {
+    "question": "What does the patient's CT scan show?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 8,
+       "value": 0.6666666666666666,
+       "lo": 0.4166666666666667,
+       "hi": 0.9166666666666666
+      },
+      "lenient": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 8,
+       "value": 0.6666666666666666,
+       "lo": 0.4166666666666667,
+       "hi": 0.9166666666666666
+      },
+      "lenient": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     }
+    }
+   },
+   "20": {
+    "question": "What was the patient's oxygen saturation?",
+    "methods": {
+     "rag1": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "rag2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     },
+     "ctx2": {
+      "codes": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      }
+     }
+    }
+   }
+  },
+  "decisions": {
+   "rag2_significantly_worse_than_ctx2_by_size": {
+    "3": false,
+    "10": false,
+    "30": false,
+    "50": false
+   },
+   "scope_all": "rag2",
+   "single_report_pooled_paired_v2_minus_v1": {
+    "n": 339,
+    "k": 1,
+    "value": 0.0029498525073746312,
+    "lo": -0.017699115044247787,
+    "hi": 0.02359882005899705,
+    "excludes_zero": false
+   },
+   "single_report_groups_significantly_worse": {
+    "T1": false,
+    "T2": false,
+    "A": false,
+    "B": false,
+    "D": false
+   },
+   "single_report_uses_v2": true
+  },
+  "new_spend_usd": 0.615386000000001
+ }
+}

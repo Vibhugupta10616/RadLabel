@@ -367,7 +367,7 @@ def score() -> dict[str, Any]:
                                                        for m in METHODS}}
     out["hand_written"] = hw
     out["decisions"] = decisions(out)
-    out["new_spend_usd"] = sum(r["cost_usd"] for r in recs.values() if r["method"] != "report1")
+    out["new_spend_usd"] = sum(r["cost_usd"] for r in new.values())
     write_result("ask_v2_eval", out, fold="oof", mapping_version="v1", eval_version="eval_v1.2",
                  prompts=f"{ask_mod.ASK_REPORT_VERSION_V2}, {ask_mod.ASK_ALL_VERSION_V2}, {ask_mod.ASK_CONTEXT_VERSION_V2}")
     return out

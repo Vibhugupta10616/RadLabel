@@ -536,3 +536,89 @@ Citations (Part 2), structural validity and support by the eval detector (at lea
 | 18 | What treatment should the patient receive? | 100.0% (100–100) n=28; post-hoc lenient 100.0% (100–100) n=30 | 100.0% (100–100) n=12; post-hoc lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; post-hoc lenient 100.0% (100–100) n=12 |
 | 19 | What does the patient's CT scan show? | 100.0% (100–100) n=28; post-hoc lenient 100.0% (100–100) n=30 | 50.0% (25–75) n=12; post-hoc lenient 91.7% (75–100) n=12 | 83.3% (58–100) n=12; post-hoc lenient 83.3% (58–100) n=12 |
 | 20 | What was the patient's oxygen saturation? | 100.0% (100–100) n=28; post-hoc lenient 100.0% (100–100) n=30 | 91.7% (75–100) n=12; post-hoc lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; post-hoc lenient 100.0% (100–100) n=12 |
+
+## Ask v2 (M10b follow-up, SPEC §8.3)
+
+Pre-registered in [evaluation_notes.md](evaluation_notes.md) ("Ask v2"). New synthetic batches (new seed, never the dev slice or an M10b batch), same questions, parser and metrics as M10b. RAG v1 = the M10b configuration (top 12, prompt v1); RAG v2 = per-report coverage (top 12 plus the top 2 of every report) and prompt v2; all in prompt = every sentence, prompt v2. Cells: share correct (95% bootstrap CI) n.
+
+New spend 0.615 USD (evaluation answers).
+
+| Reports | Method | Correct vs codes (all) | Templated | Frozen C | Frozen D (refuse) | D, post-hoc lenient | Correct vs v2 | Unreadable | Mean input tokens | Cost / request | Latency p50 / p95 s | Coverage |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 3 | RAG v1 | 64.4% (51–78) n=45 | 60.0% (33–87) n=15 | 40.0% (13–67) n=15 | 93.3% (80–100) n=15 | 93.3% (80–100) n=15 | 53.3% (40–67) n=45 | 5 of 45 | 644 | $0.00032 | 1.20 / 2.04 | 60.0% of 10 |
+| 3 | RAG v2 | 84.4% (73–93) n=45 | 86.7% (67–100) n=15 | 73.3% (53–93) n=15 | 93.3% (80–100) n=15 | 93.3% (80–100) n=15 | 73.3% (62–84) n=45 | 1 of 45 | 804 | $0.00038 | 1.01 / 1.67 | 60.0% of 10 |
+| 3 | all in prompt (v2) | 73.3% (60–84) n=45 | 60.0% (33–80) n=15 | 60.0% (40–87) n=15 | 100.0% (100–100) n=15 | 100.0% (100–100) n=15 | 66.7% (53–80) n=45 | 3 of 45 | 989 | $0.00037 | 0.95 / 1.55 | – |
+| 10 | RAG v1 | 46.7% (31–60) n=45 | 20.0% (0–40) n=15 | 46.7% (20–73) n=15 | 73.3% (47–93) n=15 | 80.0% (53–100) n=15 | 48.9% (33–62) n=45 | 6 of 45 | 653 | $0.00034 | 1.23 / 1.87 | 100.0% of 14 |
+| 10 | RAG v2 | 64.4% (51–78) n=45 | 40.0% (13–67) n=15 | 60.0% (33–87) n=15 | 93.3% (80–100) n=15 | 93.3% (80–100) n=15 | 64.4% (51–80) n=45 | 2 of 45 | 997 | $0.00050 | 1.33 / 2.29 | 100.0% of 14 |
+| 10 | all in prompt (v2) | 68.9% (56–82) n=45 | 60.0% (33–87) n=15 | 46.7% (20–73) n=15 | 100.0% (100–100) n=15 | 100.0% (100–100) n=15 | 68.9% (53–82) n=45 | 0 of 45 | 2262 | $0.00043 | 1.21 / 2.54 | – |
+| 30 | RAG v1 | 48.9% (33–62) n=45 | 26.7% (7–47) n=15 | 40.0% (20–67) n=15 | 80.0% (60–100) n=15 | 93.3% (80–100) n=15 | 51.1% (36–64) n=45 | 0 of 45 | 663 | $0.00036 | 1.20 / 1.75 | 73.8% of 80 |
+| 30 | RAG v2 | 64.4% (51–78) n=45 | 46.7% (20–73) n=15 | 60.0% (33–87) n=15 | 86.7% (67–100) n=15 | 93.3% (80–100) n=15 | 64.4% (51–78) n=45 | 0 of 45 | 1845 | $0.00088 | 1.45 / 2.81 | 95.0% of 80 |
+| 30 | all in prompt (v2) | 64.4% (51–78) n=45 | 33.3% (13–60) n=15 | 60.0% (40–87) n=15 | 100.0% (100–100) n=15 | 100.0% (100–100) n=15 | 64.4% (51–78) n=45 | 3 of 45 | 5526 | $0.00091 | 1.46 / 4.45 | – |
+| 50 | RAG v1 | 46.7% (31–60) n=45 | 33.3% (13–53) n=15 | 46.7% (20–67) n=15 | 60.0% (33–87) n=15 | 86.7% (67–100) n=15 | 46.7% (31–60) n=45 | 1 of 45 | 659 | $0.00039 | 1.51 / 2.24 | 54.4% of 125 |
+| 50 | RAG v2 | 66.7% (53–80) n=45 | 53.3% (27–80) n=15 | 53.3% (27–73) n=15 | 93.3% (80–100) n=15 | 100.0% (100–100) n=15 | 64.4% (49–78) n=45 | 1 of 45 | 2666 | $0.00124 | 1.12 / 4.83 | 72.8% of 125 |
+| 50 | all in prompt (v2) | 62.2% (49–76) n=45 | 40.0% (20–67) n=15 | 46.7% (20–73) n=15 | 100.0% (100–100) n=15 | 100.0% (100–100) n=15 | 66.7% (53–78) n=45 | 2 of 45 | 8782 | $0.00133 | 1.43 / 5.41 | – |
+
+Paired differences in accuracy vs the codes (same questions; bootstrap over questions; "worse" / "better" only where the CI excludes zero):
+
+| Reports | RAG v2 − all in prompt (v2) | RAG v2 − RAG v1 | RAG v1 − all in prompt (v2) |
+|---|---|---|---|
+| 3 | +11.1 pts (+0.0 to +22.2) | +20.0 pts (+8.9 to +31.1) better | -8.9 pts (-22.2 to +4.4) |
+| 10 | -4.4 pts (-17.8 to +8.9) | +17.8 pts (+6.7 to +31.1) better | -22.2 pts (-37.8 to -6.7) worse |
+| 30 | +0.0 pts (-11.1 to +11.1) | +15.6 pts (+2.2 to +26.7) better | -15.6 pts (-31.1 to +2.2) |
+| 50 | +4.4 pts (-8.9 to +17.8) | +20.0 pts (+6.7 to +33.3) better | -15.6 pts (-31.1 to +0.0) |
+
+Citations and refusals (Part 2 style): structural validity, support by the eval detector (≥1 / every cited sentence), refusal precision / recall:
+
+| Reports | Method | Cited sentences that existed | Affirming answers | Support (≥1) | Support (all) | Refusal precision / recall |
+|---|---|---|---|---|---|---|
+| 3 | RAG v1 | 100.0% | 14 | 42.9% (21–64) n=14 | 35.7% (14–64) n=14 | 1.00 / 0.93 |
+| 3 | RAG v2 | 100.0% | 12 | 50.0% (25–75) n=12 | 41.7% (17–67) n=12 | 1.00 / 0.93 |
+| 3 | all in prompt (v2) | 100.0% | 13 | 23.1% (0–46) n=13 | 23.1% (0–46) n=13 | 1.00 / 1.00 |
+| 10 | RAG v1 | 100.0% | 11 | 54.5% (27–82) n=11 | 54.5% (27–82) n=11 | 0.79 / 0.73 |
+| 10 | RAG v2 | 99.2% | 13 | 53.8% (23–85) n=13 | 53.8% (23–85) n=13 | 1.00 / 0.93 |
+| 10 | all in prompt (v2) | 100.0% | 12 | 58.3% (33–83) n=12 | 58.3% (33–83) n=12 | 1.00 / 1.00 |
+| 30 | RAG v1 | 100.0% | 23 | 73.9% (57–91) n=23 | 60.9% (39–78) n=23 | 1.00 / 0.80 |
+| 30 | RAG v2 | 100.0% | 21 | 85.7% (67–100) n=21 | 61.9% (43–81) n=21 | 1.00 / 0.87 |
+| 30 | all in prompt (v2) | 100.0% | 22 | 86.4% (68–100) n=22 | 68.2% (50–86) n=22 | 1.00 / 1.00 |
+| 50 | RAG v1 | 100.0% | 22 | 72.7% (55–91) n=22 | 63.6% (45–82) n=22 | 1.00 / 0.60 |
+| 50 | RAG v2 | 99.6% | 22 | 86.4% (68–100) n=22 | 45.5% (23–68) n=22 | 1.00 / 0.93 |
+| 50 | all in prompt (v2) | 100.0% | 23 | 82.6% (65–96) n=23 | 34.8% (17–57) n=23 | 1.00 / 1.00 |
+
+**Single-report ask, prompt v2 vs v1** on the same 370 dev-slice questions (a seeded subset of the M10b Part 1 questions):
+
+| Group | v1 vs codes | v2 vs codes | Paired v2 − v1 | v1 vs v2-labels | v2 vs v2-labels | D lenient v1 / v2 (post-hoc) |
+|---|---|---|---|---|---|---|
+| T1 | 97.2% (94–99) n=179 | 97.2% (94–99) n=179 | +0.0 pts (-1.7 to +1.7) | 96.9% (94–99) n=193 | 97.4% (95–99) n=193 | – |
+| T2 | 95.3% (89–100) n=43 | 95.3% (88–100) n=43 | +0.0 pts (-7.0 to +7.0) | 97.9% (94–100) n=48 | 97.9% (93–100) n=48 | – |
+| A | 100.0% (100–100) n=48 | 100.0% (100–100) n=48 | +0.0 pts (+0.0 to +0.0) | 100.0% (100–100) n=54 | 100.0% (100–100) n=54 | – |
+| B | 70.6% (57–82) n=34 | 64.7% (50–79) n=34 | -5.9 pts (-17.6 to +5.9) | 72.2% (59–84) n=36 | 66.7% (52–80) n=36 | – |
+| D | 91.4% (81–100) n=35 | 100.0% (100–100) n=35 | +8.6 pts (+0.0 to +20.0) | 89.7% (80–98) n=39 | 100.0% (100–100) n=39 | 97.4% (91–100) n=39 / 100.0% (100–100) n=39 |
+| all | 94.1% (92–96) n=339 | 94.4% (92–97) n=339 | +0.3 pts (-1.8 to +2.4) | 94.3% (92–96) n=370 | 95.1% (93–97) n=370 | – |
+
+**Hand-written questions across reports** (frozen C and D; correct vs codes; D also post-hoc lenient):
+
+| # | Question | RAG v1 | RAG v2 | All in prompt (v2) |
+|---|---|---|---|---|
+| 11 | Which reports describe an enlarged heart? | 41.7% (17–67) n=12 | 75.0% (50–100) n=12 | 41.7% (17–67) n=12 |
+| 12 | In how many reports is a pleural effusion present? | 33.3% (8–58) n=12 | 66.7% (42–92) n=12 | 66.7% (42–92) n=12 |
+| 13 | In which report is a tube, line or device first mentioned? | 50.0% (25–75) n=12 | 75.0% (50–92) n=12 | 75.0% (50–92) n=12 |
+| 14 | Is there any report without abnormal findings? | 0.0% (0–0) n=12 | 0.0% (0–0) n=12 | 0.0% (0–0) n=12 |
+| 15 | Does any report describe a pneumothorax as present? | 91.7% (75–100) n=12 | 91.7% (75–100) n=12 | 83.3% (58–100) n=12 |
+| 16 | How old is the patient? | 58.3% (33–83) n=12; lenient 91.7% (75–100) n=12 | 91.7% (75–100) n=12; lenient 91.7% (75–100) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 |
+| 17 | Is this cancer? | 58.3% (33–83) n=12; lenient 58.3% (33–83) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 |
+| 18 | What treatment should the patient receive? | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 |
+| 19 | What does the patient's CT scan show? | 66.7% (42–92) n=12; lenient 91.7% (75–100) n=12 | 66.7% (42–92) n=12; lenient 83.3% (58–100) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 |
+| 20 | What was the patient's oxygen saturation? | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; lenient 100.0% (100–100) n=12 |
+
+**Website decisions (pre-committed rules):** RAG v2 significantly worse than all-in-prompt (v2) at: no batch size → scope "all" uses **rag2**. Single-report ask uses prompt v2: **yes** (pooled paired v2 − v1 +0.3 pts (-1.8 to +2.4); groups significantly worse: none).
+
+### Ask v2: prompt development on the dev slice
+
+Prompt development (dev slice only; 15 dev reports for the single-report check, two dev batches of 10 and 30 reports for scope "all"; one iteration, then frozen):
+
+| Configuration | Questions | Correct vs codes | Unanswerable questions answered in the refusal field | Reports listed that only negate the finding | Unreadable |
+|---|---|---|---|---|---|
+| scope all, RAG v1 (dev batches of 10 and 30) | 30 | 17 of 30 | 7 of 10 | 0 of 6 listed | 4 |
+| scope all, RAG v2 + prompt v2 (v2a) | 30 | 23 of 30 | 9 of 10 | 0 of 8 listed | 0 |
+| single report, prompt v1 (M10b answers) | 105 | 94 of 98 | 72 of 75 | 0 of 0 listed | 0 |
+| single report, prompt v2 (v2a) | 105 | 95 of 98 | 75 of 75 | 0 of 0 listed | 0 |
