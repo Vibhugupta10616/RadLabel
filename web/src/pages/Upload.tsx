@@ -1,6 +1,7 @@
 import { useState, type DragEvent, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MACRO_F1, MAX_FILES, REPORTS_TESTED, UNVERIFIED_RIGHT, VERIFIED_RIGHT } from '../numbers'
+import { SAMPLE_FILES } from '../sample'
 import { useSession } from '../session'
 import { GITHUB, LogoMark, Warn } from '../ui'
 
@@ -15,8 +16,11 @@ export function Upload() {
   const [confirmed, setConfirmed] = useState(false)
   const [error, setError] = useState('')
   const [dragging, setDragging] = useState(false)
+  const [sample, setSample] = useState(false) // the built-in sample patient is loaded in the list
+  const [shown, setShown] = useState<number | null>(null) // sample card whose text is open
 
   function addFiles(list: FileList | null) {
+    setSample(false) // your own files replace the sample
     const picked = Array.from(list ?? [])
     const ok = picked.filter((f) => ACCEPTED.test(f.name))
     const all = [...files, ...ok.filter((f) => !files.some((x) => x.name === f.name && x.size === f.size))]
@@ -27,6 +31,10 @@ export function Upload() {
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    if (sample) { // made-up reports: no confirmation needed; the outputs are precomputed
+      start({ sample: true })
+      return navigate('/results')
+    }
     if (!text.trim() && !files.length) return setError('Paste a report or add at least one file.')
     if (!confirmed) return setError('Please confirm the reports contain no information that identifies a person.')
     start({ text: text.trim() || undefined, files })
@@ -59,7 +67,7 @@ export function Upload() {
         <div className="flex flex-wrap gap-6 items-stretch">
           <form onSubmit={submit} noValidate className={`${card} flex-[999_1_560px] min-w-0 flex flex-col gap-4`}>
             <label htmlFor="report" className="text-[15px] font-semibold">Paste a report</label>
-            <textarea id="report" value={text} onChange={(e) => setText(e.target.value)} placeholder={'INDICATION: ...\nFINDINGS: ...\nIMPRESSION: ...'}
+            <textarea id="report" value={text} onChange={(e) => { setText(e.target.value); setSample(false) }} placeholder={'INDICATION: ...\nFINDINGS: ...\nIMPRESSION: ...'}
               className="h-[200px] resize-y border border-[#C9D1D9] rounded-[10px] p-3.5 font-mono text-sm leading-normal text-ink placeholder:text-[#6A7782]" />
 
             <div className="flex items-center gap-3 text-[#5F6C77] text-sm" aria-hidden="true"><span className="flex-1 h-px bg-line" />or<span className="flex-1 h-px bg-line" /></div>
@@ -71,6 +79,24 @@ export function Upload() {
               <span className="text-[13px] text-muted">.txt or .pdf with selectable text · up to {MAX_FILES} reports</span>
               <input id="files" type="file" multiple accept=".txt,.pdf" className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = '' }} />
             </label>
+
+            {sample && (
+              <section aria-label="Sample patient" className="flex flex-col gap-3 bg-[#F3F8F8] border border-[#D3E6E6] rounded-xl p-4">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <p className="m-0 text-sm font-semibold text-teal-text">Made-up reports for demonstration <span className="font-normal text-muted">· 5 follow-up reports of one fictional patient</span></p>
+                  <button type="button" onClick={() => { setSample(false); setShown(null) }} className="min-h-8 px-2.5 rounded-lg bg-white border border-line text-[13px] text-muted cursor-pointer hover:text-ink">Remove sample</button>
+                </div>
+                <ul aria-label="Sample files" className="list-none m-0 p-0 flex flex-wrap gap-2">
+                  {SAMPLE_FILES.map((f, k) => (
+                    <li key={f.name}>
+                      <button type="button" aria-pressed={shown === k} onClick={() => setShown(shown === k ? null : k)}
+                        className={`min-h-9 px-3 rounded-lg border text-[13px] cursor-pointer ${shown === k ? 'bg-teal text-white border-teal' : 'bg-white text-ink border-line hover:border-teal'}`}>{f.name}</button>
+                    </li>
+                  ))}
+                </ul>
+                {shown !== null && <pre aria-label={`Text of ${SAMPLE_FILES[shown].name}`} className="m-0 p-3 bg-white border border-line rounded-lg font-mono text-[13px] leading-normal text-ink whitespace-pre-wrap">{SAMPLE_FILES[shown].text}</pre>}
+              </section>
+            )}
 
             {files.length > 0 && (
               <ul aria-label="Added files" className="list-none m-0 p-0 flex flex-wrap gap-2">
@@ -93,15 +119,15 @@ export function Upload() {
 
             <label className="flex gap-2.5 items-start text-sm leading-normal cursor-pointer">
               <input type="checkbox" required checked={confirmed} onChange={(e) => { setConfirmed(e.target.checked); setError('') }} className="w-[18px] h-[18px] mt-0.5 flex-none accent-teal" />
-              <span>I confirm these reports contain no information that identifies a person.</span>
+              <span>I confirm these reports contain no information that identifies a person.{sample && <span className="text-muted"> (Not needed for the sample.)</span>}</span>
             </label>
 
             <p role="alert" className={`m-0 text-sm font-medium text-[#A0300E] ${error ? '' : 'hidden'}`}>{error}</p>
 
             <div className="flex gap-3 flex-wrap">
               <button type="submit" className="inline-flex items-center justify-center min-h-12 px-6 rounded-[10px] bg-teal hover:bg-[#0B5A5A] text-white font-semibold text-base border-0 cursor-pointer">Analyze reports</button>
-              <button type="button" onClick={() => { start({ sample: true }); navigate('/results') }}
-                className="inline-flex items-center justify-center min-h-12 px-5 rounded-[10px] bg-white text-teal-text border border-[#9FC2C2] hover:border-teal font-semibold text-base cursor-pointer">Try a sample patient (5 reports)</button>
+              <button type="button" onClick={() => { setSample(true); setShown(null); setText(''); setFiles([]); setError('') }}
+                className="inline-flex items-center justify-center min-h-12 px-5 rounded-[10px] bg-white text-teal-text border border-[#9FC2C2] hover:border-teal font-semibold text-base cursor-pointer">Load sample patient (5 reports)</button>
             </div>
           </form>
 

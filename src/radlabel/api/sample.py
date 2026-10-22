@@ -16,7 +16,7 @@ from radlabel.llm import LLMClient
 from radlabel.pipeline import PipelineResult, run_pipeline
 
 SAMPLE_DIR = Path(__file__).resolve().parents[3] / "data" / "sample"
-FILES = ("R1.txt", "R2.txt", "R3.txt", "R4.txt", "R5.txt")
+FILES = ("exam_1.txt", "exam_2.txt", "exam_3.txt", "exam_4.txt", "exam_5.txt")
 PRECOMPUTED = SAMPLE_DIR / "sample_results.json"
 
 

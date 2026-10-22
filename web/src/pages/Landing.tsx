@@ -1,8 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import type { ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { MACRO_F1, MAX_FILES, NEGATED_TOP10_BASE, NEGATED_TOP10_FINETUNED, REPORTS_TESTED, SEARCH_NDCG_BASE, SEARCH_NDCG_FINETUNED, UNVERIFIED_RIGHT, VERIFIED_RIGHT } from '../numbers'
-import { useSession } from '../session'
 import type { LabelName, Status } from '../contract'
 import { Arrow, Check, GITHUB, LogoMark, Pop, Reveal, StatusGrid, StatusPill, Up } from '../ui'
 
@@ -11,17 +10,7 @@ const h2 = 'm-0 text-[32px] sm:text-[42px] tracking-[-0.025em] leading-[1.1]'
 const primary = 'rl-btn inline-flex items-center gap-2.5 min-h-[54px] px-[26px] rounded-full bg-teal text-white font-semibold text-[17px] no-underline cursor-pointer border-0'
 const mono = 'font-mono'
 
-function useStartSample() {
-  const { start } = useSession()
-  const navigate = useNavigate()
-  return () => {
-    start({ sample: true })
-    navigate('/results')
-  }
-}
-
 export function Landing() {
-  const startSample = useStartSample()
   return (
     <div className="font-sans text-ink bg-white overflow-x-clip">
       <header className="sticky top-0 z-10 bg-white/92 backdrop-blur-md border-b border-[#E8ECEF]">
@@ -58,7 +47,7 @@ export function Landing() {
                 </p>
               </Up>
               <Up delay={0.3} className="flex gap-3 flex-wrap">
-                <button type="button" onClick={startSample} className={primary}>Try a sample patient<Arrow /></button>
+                <Link to="/upload" className={primary}>Try a sample patient<Arrow /></Link>
                 <a href="#how" className="rl-btn inline-flex items-center min-h-[54px] px-6 rounded-full bg-white border border-[#B8D2D2] text-teal-text font-semibold text-[17px] no-underline">See how it works</a>
               </Up>
               <Up delay={0.4}>
@@ -78,7 +67,7 @@ export function Landing() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-20 flex flex-col items-center gap-[18px] text-center">
             <Reveal as="h2" className="m-0 text-[32px] sm:text-[40px] tracking-[-0.025em]">See it on a patient series</Reveal>
             <Reveal as="p" className="m-0 text-lg leading-[1.6] text-body max-w-[560px]">Start with our sample of five follow-up reports, or paste your own with personal details removed.</Reveal>
-            <button type="button" onClick={startSample} className={`${primary} px-7`}>Try a sample patient<Arrow /></button>
+            <Link to="/upload" className={`${primary} px-7`}>Try a sample patient<Arrow /></Link>
           </div>
         </section>
       </main>

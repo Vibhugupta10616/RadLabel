@@ -17,6 +17,12 @@ uploading your own reports shows the error state on purpose. `VITE_MOCK=false np
 a build. `VITE_API_BASE` sets an absolute API origin for a build (the default is the same origin). To run the
 whole site against the real backend locally, see "Try it locally" in `docs/SPEC.md`.
 
+**Sample patient.** On `/upload`, "Load sample patient (5 reports)" fills the list with five readable file cards
+(`exam_1.txt` … `exam_5.txt`, labelled "Made-up reports for demonstration"; click a card to read it). "Analyze
+reports" then sends `sample=true` (precomputed outputs, no LLM call) and needs no confirmation; the visitor's own
+text or files do. The texts are a copy of `data/sample/exam_*.txt` in `src/sample/`; `tests/test_web_sample.py` fails
+if they differ.
+
 **Fonts** are self-hosted (`@fontsource/ibm-plex-sans`, `@fontsource/ibm-plex-mono`); the site makes no
 requests to Google.
 

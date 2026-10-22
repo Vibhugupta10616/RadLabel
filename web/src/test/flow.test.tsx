@@ -10,6 +10,12 @@ import { SessionProvider } from '../session'
 
 const reportText = () => within(screen.getByRole('region', { name: /^Report \d/ }))
 
+// The visitor loads the sample into the upload list, then analyzes it (no confirmation: the reports are made up).
+const loadSample = async (user: ReturnType<typeof userEvent.setup>) => {
+  await user.click(screen.getByRole('button', { name: 'Load sample patient (5 reports)' }))
+  await user.click(screen.getByRole('button', { name: 'Analyze reports' }))
+}
+
 const renderAt = (path: string) => render(
   <SessionProvider><MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter></SessionProvider>,
 )
@@ -17,7 +23,7 @@ const renderAt = (path: string) => render(
 test('sample patient → results → ask across all reports → citation switches report', async () => {
   const user = userEvent.setup()
   renderAt('/upload')
-  await user.click(screen.getByRole('button', { name: 'Try a sample patient (5 reports)' }))
+  await loadSample(user)
 
   expect(await screen.findByRole('heading', { level: 1, name: /Report 1/ })).toBeInTheDocument()
   expect(screen.getByRole('tab', { name: 'Ask across all 5 reports' })).toHaveAttribute('aria-selected', 'true')
@@ -41,7 +47,7 @@ test('sample patient → results → ask across all reports → citation switche
 test('ask about one report, and refusals', async () => {
   const user = userEvent.setup()
   renderAt('/upload')
-  await user.click(screen.getByRole('button', { name: 'Try a sample patient (5 reports)' }))
+  await loadSample(user)
   await screen.findByRole('heading', { level: 1, name: /Report 1/ })
 
   await user.selectOptions(screen.getByLabelText('Report'), 'Report 3 of 5')
@@ -116,9 +122,40 @@ test('a citation of an indication sentence highlights it', async () => {
   })
   const user = userEvent.setup()
   renderAt('/upload')
-  await user.click(screen.getByRole('button', { name: 'Try a sample patient (5 reports)' }))
+  await loadSample(user)
   await screen.findByRole('heading', { level: 1, name: /Report 1/ })
   await user.type(screen.getByLabelText('Your question'), 'Why was the first X-ray taken?{Enter}')
   await user.click(await screen.findByRole('button', { name: 'Show report 1, sentence N1' }))
   expect(reportText().getByText('Shortness of breath.')).toHaveClass('bg-hl')
+})
+
+test('the sample fills the upload list with readable file cards; no confirmation needed', async () => {
+  const user = userEvent.setup()
+  renderAt('/upload')
+  await user.click(screen.getByRole('button', { name: 'Load sample patient (5 reports)' }))
+  expect(screen.getByText(/Made-up reports for demonstration/)).toBeInTheDocument()
+  const cards = within(screen.getByRole('list', { name: 'Sample files' })).getAllByRole('button')
+  expect(cards.map((c) => c.textContent)).toEqual(['exam_1.txt', 'exam_2.txt', 'exam_3.txt', 'exam_4.txt', 'exam_5.txt'])
+  await user.click(cards[2])
+  expect(screen.getByLabelText('Text of exam_3.txt')).toHaveTextContent('A new left-sided pacemaker is present')
+  expect(screen.queryByRole('alert')?.textContent ?? '').toBe('') // nothing is shown as an error yet
+  await user.click(screen.getByRole('button', { name: 'Analyze reports' })) // the confirmation box is still unchecked
+  expect(await screen.findByRole('heading', { level: 1, name: /Report 1/ })).toBeInTheDocument()
+})
+
+test('typing your own report replaces the sample and needs the confirmation', async () => {
+  const user = userEvent.setup()
+  renderAt('/upload')
+  await user.click(screen.getByRole('button', { name: 'Load sample patient (5 reports)' }))
+  await user.type(screen.getByLabelText('Paste a report'), 'FINDINGS: No pneumothorax.')
+  expect(screen.queryByRole('list', { name: 'Sample files' })).toBeNull()
+  await user.click(screen.getByRole('button', { name: 'Analyze reports' }))
+  expect(screen.getByRole('alert')).toHaveTextContent('Please confirm')
+})
+
+test('the landing page sample and sign-up buttons go to /upload', () => {
+  renderAt('/')
+  for (const name of ['Try a sample patient', 'Try it free']) {
+    for (const link of screen.getAllByRole('link', { name: new RegExp(`^${name}`) })) expect(link).toHaveAttribute('href', '/upload')
+  }
 })
