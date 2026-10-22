@@ -572,6 +572,7 @@ All results are generated into [RESULTS.md](RESULTS.md) by `python -m eval.repor
 - About 11% of reports have redactions next to finding terms.
 - Subsets and noise adjustment depend on a rule-based eval detector, deliberately separate from the pipeline's own.
 - Rare labels have 27–53 positives in total, hence wide CIs.
+- Embedding fine-tuning (M9) helps the findings it was trained on and their unseen wordings, not unseen findings: there is no gain on the three held-out findings ([RESULTS.md](RESULTS.md)).
 - Labels describe the report text, not the image.
 - The CC BY-NC-ND licence keeps models and processed data private.
 - Pipeline aliases and the eval lexicon share standard vocabulary (same author); independence comes from expert-code ground truth and separate negation detectors.

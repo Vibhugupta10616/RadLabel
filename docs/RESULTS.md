@@ -13,6 +13,7 @@ Limitations that bound these numbers (details in [SPEC §11](SPEC.md#11-limitati
 - 7 reports refused by the Azure content filter are scored with the rule baseline's labels.
 - The ground truth misses some clearly stated findings, so scores are a lower bound.
 - Labels describe the report text, not the images.
+- Embedding fine-tuning helps the findings it was trained on and their unseen wordings, not unseen findings: no gain on the three held-out findings (nDCG@10 change -0.010 (-0.058–0.040)).
 - v1 sent 30.5% of reports to human review (hedged 57.7%, clear 27.8%); v2 replaced the review queue with the verifier agent and an `unverified` mark (see the verifier agent section, M7).
 
 ## Labelling (SPEC §8.1)

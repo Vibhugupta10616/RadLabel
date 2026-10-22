@@ -1,0 +1,66 @@
+{
+ "provenance": {
+  "git_commit": "fcf9e7ba4e1c782087c3068b9912e761d388b4ef",
+  "seed": 13,
+  "llm_provider": "azure",
+  "deployments": {
+   "tier1": [
+    "gpt-4.1-mini",
+    "2025-04-14"
+   ],
+   "fallback": [
+    "gpt-5.4-mini",
+    "2026-03-17"
+   ],
+   "repair": [
+    "gpt-5-mini",
+    "2025-08-07"
+   ],
+   "cheap": [
+    "gpt-5.4-nano",
+    "2026-03-17"
+   ]
+  },
+  "mapping_version": "v1",
+  "fold": "pooled",
+  "created": "2026-10-22T07:10:50+00:00",
+  "retrieval_spec": "retrieval_v1"
+ },
+ "results": {
+  "variant": "ft_sentence",
+  "top_two": [
+   "ft_sentence_filter",
+   "ft_sentence"
+  ],
+  "tied": true,
+  "rule": "highest pooled nDCG@10; if the top two are within each other's 95% CI, the simpler one",
+  "negation_filter": false,
+  "bm25": false,
+  "candidates": {
+   "ft_sentence": {
+    "ndcg": {
+     "value": 0.5915654335567891,
+     "lo": 0.5648001523396885,
+     "hi": 0.6179702284855003
+    },
+    "contamination": {
+     "value": 0.09652509652509653,
+     "lo": 0.07450772200772199,
+     "hi": 0.12047297297297298
+    }
+   },
+   "ft_sentence_filter": {
+    "ndcg": {
+     "value": 0.601657744029979,
+     "lo": 0.5753153009666863,
+     "hi": 0.6276802503192259
+    },
+    "contamination": {
+     "value": 0.06602316602316603,
+     "lo": 0.04826254826254826,
+     "hi": 0.08456563706563706
+    }
+   }
+  }
+ }
+}

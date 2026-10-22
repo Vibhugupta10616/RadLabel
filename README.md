@@ -2,6 +2,8 @@
 
 **Agentic, evidence-grounded information extraction and retrieval-augmented QA over chest X-ray radiology reports.**
 
+[![CI](https://github.com/Vibhugupta10616/RadLabel/actions/workflows/ci.yml/badge.svg)](https://github.com/Vibhugupta10616/RadLabel/actions/workflows/ci.yml)
+
 > Research and portfolio project. **Not a medical device and not for clinical use.** Labels describe the report text, not the X-ray image.
 
 <!-- Screenshot of the website goes here once it is live (docs/img/results.png). -->
@@ -14,7 +16,7 @@ RadLabel turns free-text radiology reports into **structured, verifiable finding
 - **Agentic verification:** NegEx-style rule checks on every report; disagreements go to a LangGraph ReAct agent with tool calling. Each label ends *verified*, *corrected*, *suggested* or *unverified*.
 - **Hybrid retrieval:** dense bi-encoder embeddings + BM25, fused with Reciprocal Rank Fusion, with negation-aware filtering.
 - **RAG over a patient series:** ephemeral per-session vector index; answers grounded in retrieved sentences, every citation validated in code.
-- **Negation-aware embedding fine-tuning** *(in progress)*: contrastive training with hard negatives ("effusion" vs "no effusion").
+- **Negation-aware embedding fine-tuning:** contrastive training with hard negatives ("effusion" vs "no effusion"), per-fold and GPU-trained; better ranking and fewer negation mix-ups in search (see Results).
 - **Rigorous evaluation:** cluster-aware stratified 5-fold CV, bootstrap CIs, paired tests, leakage tests, nDCG@10 for retrieval.
 - **Production-minded:** single `run_pipeline` entry point, cached and budget-capped LLM calls, uploads never stored.
 
@@ -49,12 +51,15 @@ Out-of-fold on 3,086 expert-coded reports (Indiana University chest X-ray collec
 
 - Verified labels are right far more often than unverified ones: precision **0.938 vs 0.393**.
 - Only **2.9%** of reports end with any unverified label.
-- Search with negation-aware fine-tuned embeddings: nDCG@10 **0.592** vs 0.564 for the base model (494 query–fold pairs), negation contamination 0.097 vs 0.140; the fine-tuned model is used for search.
+- Search (nDCG@10, 494 query–fold pairs): base embeddings 0.564 (0.537–0.589) → negation-aware fine-tuned **0.592 (0.565–0.618)**; reports that only mention the finding as negated drop from 14.0% to 9.7% of the top 10. The fine-tuned model is used for search.
 
 <!-- summary:end -->
 
 Full tables, per-label results, ablations and paired comparisons: [docs/RESULTS.md](docs/RESULTS.md).
 
+## Tech stack
+
+**LLMs:** Azure OpenAI (gpt-4.1-mini extractor, gpt-5-mini agent), structured outputs · **Agents:** LangGraph (ReAct, tool calling) · **Retrieval:** sentence-transformers (bge-small), Qdrant, BM25, RRF · **Training:** contrastive fine-tuning with hard negatives · **Backend:** FastAPI, Postgres · **Frontend:** React, TypeScript, Tailwind, Framer Motion · **Ops:** Docker, GitHub Actions, pytest, mypy, ruff
 
 ## Run it locally
 
