@@ -21,7 +21,8 @@ PRECOMPUTED = SAMPLE_DIR / "sample_results.json"
 
 
 def texts() -> list[str]:
-    return [(SAMPLE_DIR / f).read_text(encoding="utf-8") for f in FILES]
+    # line endings normalised: a CRLF checkout must not change the hash (and trigger LLM calls)
+    return [(SAMPLE_DIR / f).read_text(encoding="utf-8").replace("\r\n", "\n") for f in FILES]
 
 
 def digest(ts: list[str]) -> str:
