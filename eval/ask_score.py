@@ -403,4 +403,4 @@ def summary_line(res: dict[str, Any]) -> str:
             f"expert codes, and {pct(hw['support_any']['value'])} of affirming answers cite a sentence that names the "
             f"finding. Across {max(ev.SIZES)} reports, searching the session answers {pct(rg['all']['codes']['value'])} "
             f"of questions correctly vs {pct(fu['all']['codes']['value'])} with every report in the prompt, at "
-            f"{cheaper:.0f}× lower cost per request.")
+            f"{cheaper:.1f}× lower cost per request.")
