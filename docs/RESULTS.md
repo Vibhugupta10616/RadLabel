@@ -541,7 +541,7 @@ Citations (Part 2), structural validity and support by the eval detector (at lea
 
 Pre-registered in [evaluation_notes.md](evaluation_notes.md) ("Ask v2"). New synthetic batches (new seed, never the dev slice or an M10b batch), same questions, parser and metrics as M10b. RAG v1 = the M10b configuration (top 12, prompt v1); RAG v2 = per-report coverage (top 12 plus the top 2 of every report) and prompt v2; all in prompt = every sentence, prompt v2. Cells: share correct (95% bootstrap CI) n.
 
-New spend 0.615 USD (evaluation answers).
+New spend 0.486 USD (evaluation answers).
 
 | Reports | Method | Correct vs codes (all) | Templated | Frozen C | Frozen D (refuse) | D, post-hoc lenient | Correct vs v2 | Unreadable | Mean input tokens | Cost / request | Latency p50 / p95 s | Coverage |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|

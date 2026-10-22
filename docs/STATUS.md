@@ -86,7 +86,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 
 **Budget:** `MAX_LLM_USD=20` (`.env.example`; `.env` uses the same value). Stop rule (`src/radlabel/llm/client.py`, `BUDGET_FRACTION = 0.5`): fresh LLM calls are refused once the ledger total reaches 50% of `MAX_LLM_USD`, i.e. **$10**; cache hits are always free; the owner raises the limit explicitly. Per-run caps sit inside it (M5: $3 of new spend).
 
-`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$6.08** (M6 $0.25; M6 follow-up $0.54; M7 dev slice $0.20; M7 full run $2.07; M10a sample run $0.008; M10c local site run $0.0025; M10b ask evaluation $0.64) (ledger `artifacts/llm_cache/ledger.jsonl`; docs/RESULTS.md).
+`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$6.62** (M6 $0.25; M6 follow-up $0.54; M7 dev slice $0.20; M7 full run $2.07; M10a sample run $0.008; M10c local site run $0.0025; M10b ask evaluation $0.64; ask v2 $0.55) (ledger `artifacts/llm_cache/ledger.jsonl`; docs/RESULTS.md).
 
 ## M2 notes
 - `iterstrat` (SPEC §4.2 fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
@@ -345,3 +345,19 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 - No commit contains a Co-Authored-By trailer (checked 2026-10-20).
 - `.venv`: stdlib venv on uv-managed CPython 3.11.15, packages via `uv pip --python`. `make` not installed; run the Makefile commands directly.
 - Data source: Wayback raw capture (Open-i serving a maintenance page). SHA-256 verified.
+
+## Ask v2 (owner, 2026-10-22)
+- M10b accepted; SPEC §12, §6.2 (borderline rule) and §8.3 updated. **M8 index: no rerun** (plain-sentence search does
+  not read predicted labels).
+- Ask v2 built, pre-registered before any run (docs/evaluation_notes.md "Ask v2"), evaluated once: per-report retrieval
+  coverage (global top 12 + the top 2 of every report), prompts `ask-report-v2` / `ask-all-v2` / `ask-context-v2`
+  (developed on the dev slice only, **one iteration**, frozen with hash tests before the evaluation), new synthetic
+  batches (3/10/30/50 × 3), RAG v1 vs RAG v2 vs all-in-prompt (v2). Spend $0.55 (dev $0.07, evaluation $0.49; estimate
+  $0.86); ledger total $6.62.
+- **D24, website decisions (pre-committed rules, computed by `eval/ask_v2.py`; RESULTS "Website decisions")**:
+  - scope "all" uses **RAG v2 at every session size** (RAG v2 was not significantly worse than all-in-prompt at any batch
+    size; `CONTEXT_ABOVE` stays None; the hybrid mode exists in `ask_scope_all` and is tested, unused);
+  - single-report ask uses **prompt v2** (pooled paired v2 − v1 not worse, no group significantly worse; the
+    "tricky wording" group B is 5.9 points lower, CI includes zero).
+  - `DEFAULT_REPORT_VERSION` / `DEFAULT_ALL_VERSION` = "v2" in `src/radlabel/api/ask.py`. The v1 prompts stay frozen and pinned.
+- Not changed without the owner's OK: SPEC §6.4 still describes the v1 retrieval (top 12 only).

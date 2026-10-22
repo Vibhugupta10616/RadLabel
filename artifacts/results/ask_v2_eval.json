@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "3514dca7a6836145df9e6006a96252526f0e5c79",
+  "git_commit": "7bb53a0f9ff033fcf6dad6919751169716411dcf",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-22T15:49:25+00:00",
+  "created": "2026-10-22T15:50:19+00:00",
   "eval_version": "eval_v1.2",
   "prompts": "ask-report-v2, ask-all-v2, ask-context-v2"
  },
@@ -3258,6 +3258,6 @@
    },
    "single_report_uses_v2": true
   },
-  "new_spend_usd": 0.615386000000001
+  "new_spend_usd": 0.4860940000000005
  }
 }

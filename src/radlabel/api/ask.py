@@ -81,8 +81,8 @@ upload order) and sentence ID (N = indication, C = comparison, F = findings, I =
 # version -> (report system, report prompt version, all system, all prompt version, per-report retrieval)
 VERSIONS = {"v1": (REPORT_SYSTEM, ASK_REPORT_VERSION, ALL_SYSTEM, ASK_ALL_VERSION, 0),
             "v2": (REPORT_SYSTEM_V2, ASK_REPORT_VERSION_V2, ALL_SYSTEM_V2, ASK_ALL_VERSION_V2, PER_REPORT)}
-DEFAULT_REPORT_VERSION = "v1"  # the website's choices (ask v2 decisions are recorded in docs/STATUS.md)
-DEFAULT_ALL_VERSION = "v1"
+DEFAULT_REPORT_VERSION = "v2"  # the website's choices: the ask v2 decisions (docs/STATUS.md, RESULTS "Ask v2")
+DEFAULT_ALL_VERSION = "v2"
 CONTEXT_ABOVE: int | None = None  # scope "all": above this many reports in scope, put every sentence in the prompt
 
 SCHEMA: dict[str, Any] = {

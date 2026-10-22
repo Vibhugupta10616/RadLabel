@@ -465,9 +465,13 @@ def summary_line(res: dict[str, Any]) -> str:
     big = res["sizes"][str(max(SIZES))]
     r2, c2, r1 = big["rag2"], big["ctx2"], big["rag1"]
     dc = res["decisions"]
-    return (f"- Ask v2 (new batches, {max(SIZES)} reports): per-report retrieval coverage + a revised prompt answer "
+    ratio = r2["cost"]["mean_cost_usd"] / c2["cost"]["mean_cost_usd"] if c2["cost"]["mean_cost_usd"] else float("nan")
+    use = ("session search with per-report coverage" if dc["scope_all"] == "rag2"
+           else "session search up to 10 reports and every report in the prompt above")
+    return (f"- Ask v2 (new batches, {max(SIZES)} reports): per-report retrieval coverage and a revised prompt answer "
             f"{sc.pct(r2['all']['codes']['value'])} of questions correctly vs {sc.pct(r1['all']['codes']['value'])} before and "
-            f"{sc.pct(c2['all']['codes']['value'])} with every report in the prompt; scope \"all\" uses {dc['scope_all']}.")
+            f"{sc.pct(c2['all']['codes']['value'])} with every report in the prompt, at {ratio:.2f}× the cost per request of the "
+            f"latter; the website uses {use}.")
 
 
 if __name__ == "__main__":
