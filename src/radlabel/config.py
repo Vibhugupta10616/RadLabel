@@ -65,8 +65,16 @@ class Settings(BaseSettings):
 
     # App
     seed: int = 13
-    api_rate_limit: str = "30/minute"
+    api_rate_limit: str = "30/minute"  # per client IP, website API
     log_level: str = "INFO"
+
+    # Website session API (M10a): uploads live in memory only
+    web_daily_cap_usd: float = Field(default=1.0, ge=0)  # LLM spend per day, on top of the global stop
+    web_max_reports: int = Field(default=50, ge=1)  # per session
+    web_max_text_chars: int = Field(default=20_000, ge=100)  # per report
+    web_max_file_bytes: int = Field(default=2_000_000, ge=1_000)
+    web_session_ttl_minutes: int = Field(default=60, ge=1)  # idle expiry
+    web_cors_origins: str = "http://localhost:5173"  # comma-separated (the Vercel URL in deployment)
 
     @property
     def pilot_list(self) -> list[str]:

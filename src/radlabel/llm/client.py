@@ -17,6 +17,7 @@ import logging
 import random
 import threading
 import time
+from collections import OrderedDict
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -88,10 +89,20 @@ def spent_usd(cache_dir: Path) -> float:
     return sum(json.loads(line)["cost_usd"] for line in ledger.open(encoding="utf-8"))
 
 
+MEMORY_CACHE_ENTRIES = 2000
+
+
 class LLMClient:
+    """`memory_cache=True` (website requests): responses are cached in a bounded in-memory dict and spend is tracked
+    in memory only, so nothing is written to disk (no report or question text anywhere); the global stop still counts
+    the existing ledger (read only). `daily_cap_usd`: fresh calls stop once today's spend reaches it."""
+
     def __init__(self, settings: Settings | None = None, cache_dir: Path | None = None,
-                 cache_only: bool = False) -> None:
+                 cache_only: bool = False, memory_cache: bool = False, daily_cap_usd: float | None = None) -> None:
         self.cache_only = cache_only
+        self._memory: OrderedDict[str, LLMResponse] | None = OrderedDict() if memory_cache else None
+        self.daily_cap_usd = daily_cap_usd
+        self._day: dict[str, float] = {}
         self.s = settings or get_settings()
         self.cache_dir = Path(cache_dir or self.s.llm_cache_dir)
         self._sdk: Any = None
@@ -102,6 +113,13 @@ class LLMClient:
     @property
     def spent(self) -> float:
         return self._spent
+
+    @property
+    def spent_today(self) -> float:
+        return self._day.get(datetime.now(UTC).date().isoformat(), 0.0)
+
+    def daily_cap_reached(self) -> bool:
+        return self.daily_cap_usd is not None and self.spent_today >= self.daily_cap_usd
 
     # ---- public
     def complete(
@@ -128,16 +146,30 @@ class LLMClient:
         key = hashlib.sha256(
             json.dumps([dep, version, messages, params], sort_keys=True).encode()
         ).hexdigest()
-        path = self.cache_dir / dep / f"{key}.json"
-        if path.exists():
-            return LLMResponse(**json.loads(path.read_text(encoding="utf-8")), cached=True)
+        if self._memory is not None:
+            with self._lock:
+                hit = self._memory.get(key)
+            if hit is not None:
+                return hit.model_copy(update={"cached": True})
+        else:
+            path = self.cache_dir / dep / f"{key}.json"
+            if path.exists():
+                return LLMResponse(**json.loads(path.read_text(encoding="utf-8")), cached=True)
         if self.cache_only:
             raise CacheMiss(f"{dep}: no cached response for this request (cache_only mode)")
+        if self.daily_cap_reached():
+            raise BudgetExceeded(f"daily LLM spend cap ${self.daily_cap_usd:.2f} reached")
 
         resp = self._call(dep, messages, json_schema, max_tokens, temperature, reasoning_effort, tools)
         self._ledger(resp, purpose)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(resp.model_dump_json(exclude={"cached"}), encoding="utf-8")
+        if self._memory is not None:
+            with self._lock:
+                self._memory[key] = resp
+                while len(self._memory) > MEMORY_CACHE_ENTRIES:
+                    self._memory.popitem(last=False)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(resp.model_dump_json(exclude={"cached"}), encoding="utf-8")
         return resp
 
     # ---- internals
@@ -209,13 +241,17 @@ class LLMClient:
         prev = r.model if r.filtered else self._models.setdefault(r.deployment, r.model)
         if prev != r.model:
             log.warning("deployment %s returned model %s (was %s): silent upgrade?", r.deployment, r.model, prev)
+        with self._lock:
+            self._spent += r.cost_usd
+            day = datetime.now(UTC).date().isoformat()
+            self._day[day] = self._day.get(day, 0.0) + r.cost_usd
+        if self._memory is not None:
+            return  # website requests: spend in memory only, nothing on disk
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         row = {"ts": datetime.now(UTC).isoformat(timespec="seconds"), "purpose": purpose,
                **r.model_dump(exclude={"text", "cached", "tool_calls"})}
-        with self._lock:
-            self._spent += r.cost_usd
-            with (self.cache_dir / "ledger.jsonl").open("a", encoding="utf-8") as f:
-                f.write(json.dumps(row) + "\n")
+        with self._lock, (self.cache_dir / "ledger.jsonl").open("a", encoding="utf-8") as f:
+            f.write(json.dumps(row) + "\n")
 
     @property
     def sdk(self) -> Any:
@@ -241,8 +277,8 @@ class FakeLLM(LLMClient):
     ({"name", "arguments"}). No cost, no network."""
 
     def __init__(self, responder: Callable[[list[dict[str, Any]]], str | list[dict[str, str]]], cache_dir: Path,
-                 settings: Settings | None = None) -> None:
-        super().__init__(settings or Settings(_env_file=None), cache_dir)  # type: ignore[call-arg]
+                 settings: Settings | None = None, **kw: Any) -> None:
+        super().__init__(settings or Settings(_env_file=None), cache_dir, **kw)  # type: ignore[call-arg]
         self.responder = responder
         self.calls = 0
 

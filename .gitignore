@@ -10,6 +10,8 @@ data/*
 !data/mapping/
 data/mapping/*
 !data/mapping/*.yaml
+# synthetic sample patient for the website (hand-written, not IU text)
+!data/sample/
 artifacts/llm_cache/
 artifacts/mapping/
 artifacts/predictions/

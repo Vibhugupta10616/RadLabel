@@ -40,6 +40,7 @@ class PipelineResult(BaseModel):
     content_filtered: bool = False
     invalid_output: bool = False
     tagger_cost_usd: float = 0.0  # cost of the tagger call (kept on cache hits)
+    rules_only: bool = False  # labels from the rule labeller alone (budget reached, content filter or invalid output)
 
 
 def run_pipeline(raw_text: str, llm: LLMClient | None = None, report_id: str = "upload",
@@ -47,14 +48,21 @@ def run_pipeline(raw_text: str, llm: LLMClient | None = None, report_id: str = "
     llm = llm or LLMClient()
     parsed = parse_report(raw_text)
     sents = report_sentences(parsed.findings, parsed.impression)
-    out, resp = extract(llm, report_id, sents, temperature=0.0)
     rules = label_report(report_id, sents)
+    try:
+        out, resp = extract(llm, report_id, sents, temperature=0.0)
+    except BudgetExceeded:  # spend cap reached before the tagger: rule labels only, all unverified
+        return PipelineResult(report_id=report_id, sections_identified=parsed.sections_identified, parse=parsed,
+                              sentences=sents, tagger=None, labels=rules, rules_only=True, final=[
+                                  FinalLabel(label=x.label, status=x.status, evidence=x.evidence,
+                                             verification="unverified", reason="LLM budget reached: rule checks only")
+                                  for x in rules.labels])
     common = {"report_id": report_id, "sections_identified": parsed.sections_identified, "parse": parsed,
               "sentences": sents, "tagger": out, "content_filtered": resp.filtered,
               "invalid_output": out is None and not resp.filtered, "tagger_cost_usd": resp.cost_usd}
     if out is None:
         why = "tagger output unavailable (content filter)" if resp.filtered else "tagger output invalid"
-        return PipelineResult(**common, labels=rules, final=[
+        return PipelineResult(**common, labels=rules, rules_only=True, final=[
             FinalLabel(label=x.label, status=x.status, evidence=x.evidence, verification="unverified", reason=why)
             for x in rules.labels])
     labels = verify(out, sents)

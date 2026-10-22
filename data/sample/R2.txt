@@ -1,0 +1,4 @@
+INDICATION: Worsening shortness of breath.
+COMPARISON: Prior chest radiograph.
+FINDINGS: The cardiac silhouette is mildly enlarged. The left pleural effusion has increased and is now moderate in size. There is an opacity at the left lung base, possibly atelectasis. No pneumothorax.
+IMPRESSION: Moderate left pleural effusion, increased since the prior study. Mild cardiomegaly. Left basilar opacity, possibly atelectasis.

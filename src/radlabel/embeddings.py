@@ -4,6 +4,7 @@ fine-tuned model (M9) is for search and RAG only."""
 
 from __future__ import annotations
 
+import logging
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,8 @@ import numpy as np
 from radlabel.config import get_settings
 
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "  # bge retrieval instruction
+log = logging.getLogger(__name__)
+_warned: set[str] = set()
 
 
 @lru_cache
@@ -43,7 +46,16 @@ def search_encode(texts: list[str], batch_size: int = 64) -> np.ndarray:
     path = get_settings().search_embed_model
     if not path:
         return encode(texts, batch_size)
-    if not Path(path).is_dir():
-        raise FileNotFoundError(f"search model {path!r} not found: train it (make train-embeddings, then --serving) "
-                                "or fetch it from the private MODEL_STORE; SEARCH_EMBED_MODEL= uses the base model")
+    if not Path(path).is_dir():  # a fresh machine without the private model still works, on the base model
+        if path not in _warned:
+            _warned.add(path)
+            log.warning("search model %s not found; falling back to the base model %s", path,
+                        get_settings().embed_base_model)
+        return encode(texts, batch_size)
     return np.asarray(load_encoder(path).encode(texts, normalize_embeddings=True, batch_size=batch_size))
+
+
+def search_model_name() -> str:
+    """The model search_encode actually uses (for /ready and logs)."""
+    path = get_settings().search_embed_model
+    return path if path and Path(path).is_dir() else get_settings().embed_base_model
