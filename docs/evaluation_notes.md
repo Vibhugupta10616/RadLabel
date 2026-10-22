@@ -544,3 +544,14 @@ actual). Every script stops by itself at $1.00 of new spend; the global stop app
 The same limits as M10b (one run per question, parser-based scoring, 3 batches per size so the paired CIs are wide, random
 IU reports rather than real patients, no change over time), and: with 3 replicates, "not significantly worse" is a weak
 bar at small sizes; the dev-slice prompt development and the single-report check share data.
+
+### Ask v2: prompt development and freeze (dev slice only; before the evaluation)
+- **One iteration** (`v2a`, the first draft, no wording changed afterwards); counts are in docs/RESULTS.md ("Ask v2",
+  development table; `artifacts/results/ask_v2_dev.json`). On the dev slice, v2a puts every unanswerable single-report
+  question in the refusal field and all but one of those in the dev batches; the one left ("The reports don't provide any
+  findings from the patient's CT scan, only a comparison to a CT of the chest is mentioned.") is a partly informative
+  answer and was not iterated on.
+- The negated-listing fix (b) **could not be checked on the dev slice**: the v1 baseline listed no report that only
+  negates the finding there either (a small dev set), so its effect is measured only in the evaluation.
+- Frozen: `ask-report-v2`, `ask-all-v2`, `ask-context-v2` (sha256 in `tests/test_api.py`, pinned before the evaluation).
+  Development used no evaluation batch and no M10b batch.

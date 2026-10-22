@@ -315,7 +315,11 @@ def test_ask_v2_prompts_frozen() -> None:
                                                                           ask_mod.ALL_SYSTEM_V2),
                (ask_mod.ASK_CONTEXT_VERSION_V2, ask_mod.CONTEXT_SYSTEM_V2))
     h = {v: hashlib.sha256((s + json.dumps(ask_mod.SCHEMA, sort_keys=True)).encode()).hexdigest() for v, s in prompts}
-    pinned = {"ask-report-v2": "PIN", "ask-all-v2": "PIN", "ask-context-v2": "PIN"}
+    pinned = {
+    "ask-report-v2": "e9934736d613447068509820e440c4406099c67182de5d6f3b43ab4fc1be6544",
+    "ask-all-v2": "4345fe3af686c160b1acf69181bf9c4ad3f4d59c784aabf5f36a2c8343c7ac24",
+    "ask-context-v2": "78c3b562870aec5bc9bca1d391c87d19f6cf139df8cb316537335343001f8929"
+    }
     if "PIN" in pinned.values():
         pytest.skip(f"ask v2 prompts not frozen yet: {h}")
     assert h == pinned, "ask v2 prompt changed: needs owner OK and a new version"
