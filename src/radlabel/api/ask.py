@@ -22,7 +22,11 @@ from radlabel.llm import BudgetExceeded, LLMClient
 
 ASK_REPORT_VERSION = "ask-report-v1"
 ASK_ALL_VERSION = "ask-all-v1"
+ASK_REPORT_VERSION_V2 = "ask-report-v2"  # ask v2 (M10b follow-up): developed on the dev slice only, then frozen
+ASK_ALL_VERSION_V2 = "ask-all-v2"
+ASK_CONTEXT_VERSION_V2 = "ask-context-v2"  # all sentences of all reports in the prompt (no retrieval)
 TOP_K = 12
+PER_REPORT = 2  # ask v2 retrieval: the top 2 sentences of every report are added to the global top TOP_K
 MAX_TOKENS = 600
 NOT_STATED = "The reports don't state this."
 UNAVAILABLE = "Questions are temporarily unavailable (the daily usage limit was reached). Please try again later."
@@ -51,6 +55,34 @@ medical device). You get the sentences retrieved for the question, each with its
 numbered in upload order) and sentence ID (N = indication, C = comparison, F = findings, I = impression). Only these
 sentences were retrieved; other sentences of the reports are not available to you.
 {_RULES}"""
+
+# ---- ask v2: the v1 rules with two fixes (a "not stated" reply goes in `refusal`, never in `answer`; a report that
+# negates a finding is never listed or counted as having it)
+_RULES_V2 = _RULES.replace(
+    "- If the sentences do not answer the question, return the refusal "
+    '"The reports don\'t state this." and no answer.',
+    """- If the sentences do not answer the question, or the question asks for something these reports cannot state (the
+  patient's age, other tests, vital signs), put exactly "The reports don't state this." in "refusal" and set
+  "answer" to null. A reply that says something is not stated, not specified, not provided or not mentioned belongs in
+  "refusal" in that exact wording, never in "answer".
+- A sentence that negates a finding ("no pleural effusion", "no pneumothorax", "the effusion has resolved") does not
+  describe that finding. Never list or count a report as having a finding because of a negating sentence; list and
+  count only reports with a sentence that states the finding is present. If no report has the finding, say that none
+  do and cite the negating sentences.""")
+assert _RULES_V2 != _RULES
+
+REPORT_SYSTEM_V2 = REPORT_SYSTEM.replace(_RULES, _RULES_V2)
+ALL_SYSTEM_V2 = ALL_SYSTEM.replace(_RULES, _RULES_V2)
+CONTEXT_SYSTEM_V2 = f"""You answer questions across several chest X-ray reports of one patient for a research demo (not
+a medical device). You get ALL sentences of ALL the reports, each with its report number (reports are numbered in
+upload order) and sentence ID (N = indication, C = comparison, F = findings, I = impression).
+{_RULES_V2}"""
+
+# version -> (report system, report prompt version, all system, all prompt version, per-report retrieval)
+VERSIONS = {"v1": (REPORT_SYSTEM, ASK_REPORT_VERSION, ALL_SYSTEM, ASK_ALL_VERSION, 0),
+            "v2": (REPORT_SYSTEM_V2, ASK_REPORT_VERSION_V2, ALL_SYSTEM_V2, ASK_ALL_VERSION_V2, PER_REPORT)}
+DEFAULT_REPORT_VERSION = "v1"  # the website's choices (ask v2 decisions are recorded in docs/STATUS.md)
+DEFAULT_ALL_VERSION = "v1"
 
 SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -106,7 +138,9 @@ def _complete(llm: LLMClient, system: str, user: str, version: str) -> str:
     return "" if r.filtered else r.text
 
 
-def ask_report(llm: LLMClient, session: Session, report_no: int, question: str) -> AskResult:
+def ask_report(llm: LLMClient, session: Session, report_no: int, question: str,
+               version: str = DEFAULT_REPORT_VERSION) -> AskResult:
+    system, prompt_version = VERSIONS[version][:2]
     rep = session.report(report_no)
     if rep is None:
         raise KeyError(report_no)
@@ -116,7 +150,7 @@ def ask_report(llm: LLMClient, session: Session, report_no: int, question: str) 
     user = (f"Report {report_no} sentences:\n" + "\n".join(_line(e) for e in given)
             + f"\n\nPipeline labels:\n{labels}\n\nQuestion: {question}")
     try:
-        answer, refusal, cites = check(_complete(llm, REPORT_SYSTEM, user, ASK_REPORT_VERSION), given)
+        answer, refusal, cites = check(_complete(llm, system, user, prompt_version), given)
     except BudgetExceeded:
         answer, refusal, cites = None, UNAVAILABLE, []
     return AskResult(answer=answer, refusal=refusal, citations=cites, retrieved_sentences=len(given),
@@ -131,9 +165,11 @@ class _State(TypedDict):
 
 
 def ask_all(llm: LLMClient, session: Session, question: str, report_nos: list[int] | None = None,
-            labels: list[str] | None = None, k: int = TOP_K) -> AskResult:
+            labels: list[str] | None = None, k: int = TOP_K, version: str = DEFAULT_ALL_VERSION) -> AskResult:
+    system, prompt_version, per_report = VERSIONS[version][2:]
+
     def retrieve(st: _State) -> dict[str, Any]:
-        return {"retrieved": session.retrieve(st["question"], k, report_nos, labels)}
+        return {"retrieved": session.retrieve(st["question"], k, report_nos, labels, per_report)}
 
     def answer(st: _State) -> dict[str, Any]:
         if not st["retrieved"]:
@@ -141,7 +177,7 @@ def ask_all(llm: LLMClient, session: Session, question: str, report_nos: list[in
         user = ("Retrieved sentences:\n" + "\n".join(_line(e) for e in st["retrieved"])
                 + f"\n\nQuestion: {st['question']}")
         try:
-            return {"raw": _complete(llm, ALL_SYSTEM, user, ASK_ALL_VERSION)}
+            return {"raw": _complete(llm, system, user, prompt_version)}
         except BudgetExceeded:
             return {"raw": "", "result": AskResult(answer=None, refusal=UNAVAILABLE, citations=[],
                                                    retrieved_sentences=len(st["retrieved"]),
@@ -165,3 +201,19 @@ def ask_all(llm: LLMClient, session: Session, question: str, report_nos: list[in
     out = g.compile().invoke({"question": question, "retrieved": [], "raw": "", "result": None})
     result: AskResult = out["result"]
     return result
+
+
+def ask_context(llm: LLMClient, session: Session, question: str, report_nos: list[int] | None = None,
+                labels: list[str] | None = None) -> AskResult:
+    """Ask v2, long-context mode: every sentence in scope goes into the prompt (no retrieval); same rules, same
+    citation check. Costs more per question as the session grows (SPEC §8.3)."""
+    given = [session.entries[i] for i in session.select(report_nos, labels)]
+    reports = len({e.report_no for e in given})
+    if not given:
+        return AskResult(answer=None, refusal=NOT_STATED, citations=[], retrieved_sentences=0, retrieved_reports=0)
+    user = "All report sentences:\n" + "\n".join(_line(e) for e in given) + f"\n\nQuestion: {question}"
+    try:
+        a, r, c = check(_complete(llm, CONTEXT_SYSTEM_V2, user, ASK_CONTEXT_VERSION_V2), given)
+    except BudgetExceeded:
+        a, r, c = None, UNAVAILABLE, []
+    return AskResult(answer=a, refusal=r, citations=c, retrieved_sentences=len(given), retrieved_reports=reports)

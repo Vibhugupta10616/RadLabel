@@ -110,12 +110,9 @@ class Session:
     def report(self, report_no: int) -> ReportOut | None:
         return next((r for r in self.reports if r.report_no == report_no), None)
 
-    def retrieve(self, question: str, k: int, report_nos: list[int] | None = None,
-                 labels: list[str] | None = None) -> list[Entry]:
-        """Top-k sentences by cosine (ties: report_no, sentence_id); optional filters: these reports only, and/or
-        reports where one of these labels is present or uncertain."""
-        if self.vectors is None or not self.entries:
-            return []
+    def select(self, report_nos: list[int] | None = None, labels: list[str] | None = None) -> list[int]:
+        """Indices of the entries in scope: these reports only, and/or reports where one of these labels is present
+        or uncertain."""
         keep = np.ones(len(self.entries), bool)
         if report_nos:
             keep &= np.array([e.report_no in report_nos for e in self.entries])
@@ -123,11 +120,29 @@ class Session:
             hit = {r.report_no for r in self.reports
                    if any(x.label in labels and x.status in ("present", "uncertain") for x in r.labels)}
             keep &= np.array([e.report_no in hit for e in self.entries])
+        return [int(i) for i in np.flatnonzero(keep)]
+
+    def retrieve(self, question: str, k: int, report_nos: list[int] | None = None,
+                 labels: list[str] | None = None, per_report: int = 0) -> list[Entry]:
+        """Top-k sentences by cosine (ties: report_no, sentence_id); optional filters (see `select`). With
+        `per_report` > 0 (ask v2) the top `per_report` sentences of EVERY report in scope are added to the global top
+        k, deduplicated: the global top k first, then the added ones by report number and rank."""
+        if self.vectors is None or not self.entries:
+            return []
         q = search_encode([QUERY_PREFIX + question])[0]
         sims = np.round(self.vectors @ q, 6)
-        idx = [i for i in sorted(range(len(self.entries)), key=lambda i: (-sims[i], self.entries[i].report_no,
-                                                                            self.entries[i].sentence_id)) if keep[i]]
-        return [self.entries[i] for i in idx[:k]]
+        order = sorted(self.select(report_nos, labels),
+                       key=lambda i: (-sims[i], self.entries[i].report_no, self.entries[i].sentence_id))
+        top = order[:k]
+        if per_report:
+            per: dict[int, list[int]] = {}
+            for i in order:
+                got = per.setdefault(self.entries[i].report_no, [])
+                if len(got) < per_report:
+                    got.append(i)
+            seen = set(top)
+            top += [i for r in sorted(per) for i in per[r] if i not in seen]
+        return [self.entries[i] for i in top]
 
     def timeline(self) -> list[dict[str, object]]:
         """Labels present or uncertain in at least one report (No Finding left out), status per report."""

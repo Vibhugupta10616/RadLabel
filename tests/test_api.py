@@ -269,3 +269,53 @@ def test_ask_prompts_frozen() -> None:
     if "PIN" in pinned.values():
         pytest.skip(f"ask prompts not pinned yet: {h}")
     assert h == pinned, "ask prompt changed: needs owner OK and a new version"
+
+
+def _session_of(tmp_path: Path, n: int) -> tuple[session_mod.Session, FakeLLM]:
+    """n reports, each with a distinct sentence; the fake encoder (word hashing) indexes them."""
+    llm = FakeLLM(responder, tmp_path, memory_cache=True)
+    s = session_mod.Session("t")
+    for k in range(1, n + 1):
+        text = f"INDICATION: zq{k} cough.\nFINDINGS: Small pleural effusion number {k}. The heart size is normal.\n" \
+               f"IMPRESSION: Effusion {k}."
+        from radlabel.pipeline import run_pipeline
+        s.add(session_mod.to_report(k, f"r{k}.txt", run_pipeline(text, llm, str(k))))
+    return s, llm
+
+
+def test_per_report_coverage_adds_the_top_sentences_of_every_report(tmp_path: Path) -> None:
+    s, _ = _session_of(tmp_path, 6)
+    base = s.retrieve("pleural effusion", 3)
+    cov = s.retrieve("pleural effusion", 3, per_report=2)
+    assert len(base) == 3 and cov[:3] == base  # the global top k come first, unchanged
+    assert {e.report_no for e in cov} == set(range(1, 7))  # every report is represented
+    assert all(sum(e.report_no == r for e in cov) >= 2 for r in range(1, 7))  # at least its top 2
+    assert len({(e.report_no, e.sentence_id) for e in cov}) == len(cov)  # deduplicated
+    assert [(e.report_no, e.sentence_id) for e in cov] == [(e.report_no, e.sentence_id)
+                                                           for e in s.retrieve("pleural effusion", 3, per_report=2)]
+    only = s.retrieve("pleural effusion", 3, report_nos=[2, 5], per_report=2)  # filters still apply
+    assert {e.report_no for e in only} == {2, 5}
+
+
+def test_ask_v2_modes_use_their_prompts(tmp_path: Path) -> None:
+    s, llm = _session_of(tmp_path, 4)
+    seen: list[str] = []
+    llm.responder = lambda m: (seen.append(m[0]["content"]), json.dumps(  # type: ignore[assignment]
+        {"answer": "ok", "refusal": None, "citations": [{"report_no": 1, "sentence_id": "F1"}]}))[1]
+    ask_mod.ask_all(llm, s, "pleural effusion", version="v2")
+    r = ask_mod.ask_context(llm, s, "pleural effusion")
+    ask_mod.ask_all(llm, s, "pleural effusion", version="v1")
+    assert seen[0] == ask_mod.ALL_SYSTEM_V2 and seen[1] == ask_mod.CONTEXT_SYSTEM_V2 and seen[2] == ask_mod.ALL_SYSTEM
+    assert r.retrieved_reports == 4 and r.citations == [ask_mod.Citation(report_no=1, sentence_id="F1")]
+    assert ask_mod.DEFAULT_ALL_VERSION in ask_mod.VERSIONS and ask_mod.DEFAULT_REPORT_VERSION in ask_mod.VERSIONS
+
+
+def test_ask_v2_prompts_frozen() -> None:
+    prompts = ((ask_mod.ASK_REPORT_VERSION_V2, ask_mod.REPORT_SYSTEM_V2), (ask_mod.ASK_ALL_VERSION_V2,
+                                                                          ask_mod.ALL_SYSTEM_V2),
+               (ask_mod.ASK_CONTEXT_VERSION_V2, ask_mod.CONTEXT_SYSTEM_V2))
+    h = {v: hashlib.sha256((s + json.dumps(ask_mod.SCHEMA, sort_keys=True)).encode()).hexdigest() for v, s in prompts}
+    pinned = {"ask-report-v2": "PIN", "ask-all-v2": "PIN", "ask-context-v2": "PIN"}
+    if "PIN" in pinned.values():
+        pytest.skip(f"ask v2 prompts not frozen yet: {h}")
+    assert h == pinned, "ask v2 prompt changed: needs owner OK and a new version"

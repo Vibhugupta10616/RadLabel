@@ -484,3 +484,63 @@ Nothing here changes a pre-registered score or a prompt. Items marked *post-hoc*
   would be a new version (`ask-*-v2`) developed on the dev slice only, with the owner's OK.
 - **Accuracy is as exact as the parser** (unreadable answers are counted wrong and shown); questions in a batch are
   correlated and there are 3 batches per size, so the Part 2 CIs are optimistic; one run per question.
+
+## Ask v2 (owner, 2026-10-22; pre-committed before any run)
+Follow-up to M10b, which found that scope "all" loses accuracy at 30–50 reports (the top 12 sentences cannot cover every
+report) and two prompt-level weaknesses ("not stated" replies in the `answer` field; reports that negate a finding listed
+as describing it). Code: `src/radlabel/api/` (retrieval, prompts), `eval/ask_v2.py` (`estimate` → `dev` → `run` →
+`score`); records in `artifacts/predictions/ask_v2_*.jsonl` (git-ignored); results in
+`artifacts/results/ask_v2_eval.json` → docs/RESULTS.md ("Ask v2") and one README line. M8 index: **no rerun**
+(plain-sentence search does not read predicted labels, so the borderline rule cannot change it).
+
+### What changes
+1. **Retrieval v2 (rule fixed now, nothing else about retrieval changes):** for scope "all", the top **2 sentences of
+   EVERY report in scope** plus the **global top 12**, deduplicated (the global top 12 first, then the added ones by report
+   number and rank). `Session.retrieve(..., per_report=2)`; unit-tested. Filters (`report_nos`, `labels`) still apply.
+2. **Prompt v2** (`ask-report-v2`, `ask-all-v2`, and `ask-context-v2` for the all-sentences mode): the v1 rules with two
+   fixes only: (a) a "not stated" reply, or a question the reports cannot answer, goes in `refusal` (exactly "The reports
+   don't state this."), `answer` null; (b) a sentence that negates a finding does not describe it: never list or count a
+   report because of a negating sentence; if no report has the finding, say so and cite the negating sentences. The
+   v1 prompts stay frozen and pinned. **Developed on the 102 dev-slice reports only, then frozen with a hash test before
+   the evaluation.**
+3. Prompt development protocol (dev slice only, never an evaluation batch):
+   - single-report check: 15 dev reports (seeded, from the M10b frozen-question sample; their v1 answers are the M10b
+     records) with the frozen D16–D20 and the edema / negated-effusion questions (7, 9);
+   - scope-"all" check: two dev-slice batches (10 and 30 non-hedged dev reports, disjoint, seeded), the 15 batch questions
+     (templated + frozen C and D), RAG v2, and RAG v1 once as the baseline (the serving fine-tuned model indexes them:
+     this is prompt development, not a retrieval measurement);
+   - signals: share of D answers in the refusal field, `negated_listed` (a report listed for a finding that it only
+     negates, by the eval detector), accuracy vs codes, unreadable answers. **At most two iterations**; the iteration
+     count and every wording change are reported; the final text is frozen (hash test) before `run`.
+   - the single-report v2 decision (item 5) uses the same dev slice the prompt was developed on, so it is a check
+     that v2 did not make things worse, not an independent estimate.
+4. **Evaluation (once, on NEW synthetic batches):** new seed; sizes **3, 10, 30, 50**, 3 replicates each (folds 0, 1, 2);
+   reports never from the dev slice, `hedged`, or an M10b batch; same five templated questions per batch and the frozen
+   groups C and D as in M10b (15 per batch, 180 questions); the fold-k fine-tuned model indexes a fold-k batch.
+   Methods: **RAG v1** (M10b configuration: top 12, prompt v1), **RAG v2** (retrieval v2 + prompt v2), **all in prompt
+   (v2)** (every sentence, `ask-context-v2`). Metrics as in M10b (accuracy vs codes and vs v2 labels, parsed by the same
+   fixed rules; citation validity; refusal precision / recall; tokens, cost, latency) **plus coverage** (the share of
+   coded reports with a retrieved sentence naming the finding, eval detector), paired differences per size (RAG v2 −
+   all in prompt, RAG v2 − RAG v1, RAG v1 − all in prompt; bootstrap over questions), and the frozen questions per
+   question. Also single-report prompt v2 on a seeded **30% subset** of the M10b Part 1 questions (370 questions),
+   paired with the M10b v1 answers.
+5. The post-hoc lenient reading of the unanswerable questions is reported alongside the strict one, as in M10b.
+
+### Decisions, pre-committed (computed by `eval/ask_v2.py decisions`, recorded in STATUS and RESULTS)
+- **Scope "all":** if RAG v2 is **not significantly worse** than all-in-prompt (v2) at any batch size (paired accuracy
+  difference vs the codes, 95% CI upper bound ≥ 0 at every size), scope "all" uses **RAG v2**. Otherwise it uses RAG v2
+  for sessions of up to 10 reports and all-in-prompt above 10.
+- **Single-report ask** switches to prompt v2 only if its dev-slice scores are **not worse than v1**: the pooled paired
+  difference (v2 − v1, vs the codes, on the same questions) is ≥ 0 and no question group is significantly worse (CI
+  upper bound < 0).
+
+### Cost
+`python -m eval.ask_v2 estimate` (no LLM call; the real prompts, 3.6 characters per token, 85 output tokens): single-report
+subset ≈ $0.18, evaluation batches RAG v1 ≈ $0.07 + RAG v2 ≈ $0.14 + all in prompt ≈ $0.32, development ≈ $0.07 per
+iteration (two budgeted) + $0.01 baseline: **total ≈ $0.86**, under the $1 limit (the M10b estimate was ~27% above its
+actual). Every script stops by itself at $1.00 of new spend; the global stop applies on top.
+
+### What this will not show
+The same limits as M10b (one run per question, parser-based scoring, 3 batches per size so the paired CIs are wide, random
+IU reports rather than real patients, no change over time), and: with 3 replicates, "not significantly worse" is a weak
+bar at small sizes; the dev-slice prompt development and the single-report check share data.
