@@ -47,6 +47,6 @@ def build(llm: LLMClient) -> list[PipelineResult]:
 
 
 if __name__ == "__main__":
-    client = LLMClient(memory_cache=True)
+    client = LLMClient()  # an owner-run build: the synthetic texts may be cached and the spend goes to the ledger
     rs = build(client)
-    print(f"{len(rs)} sample reports; LLM spend ${client.spent_today:.4f}")
+    print(f"{len(rs)} sample reports; LLM spend this run ${client.spent_today:.4f}")

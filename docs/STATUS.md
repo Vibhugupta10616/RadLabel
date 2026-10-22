@@ -16,7 +16,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 | M7 | **Done** (owner-accepted 2026-10-22; tag `m7-verifier-agent`) (code `77e8abd`, `6729cb0`, `33e2667`) | Full run (prompt `verifier-v2`, owner-approved): headline macro-F1 (v1) **0.887** (0.874–0.899), strict 0.883; paired v2 − LLM + verifier + Tier 2 +0.022 (0.013–0.031), v2 − LLM only +0.025 (0.016–0.035), v2 − rule baseline +0.050 (0.037–0.063) → agent **kept** (pre-committed rule). Verified + verified_rules labels precision 0.938 vs unverified 0.393. Reports with any unverified label 2.9% (v1 review rate 30.5%). Escalated 1,290 (41.8%). Agent cost $2.07 new ($2.12 incl. the cached dev reports); rerun from cache $0, byte-identical. |
 | M8 | **Done** (owner-accepted 2026-10-22) (spec `8628794`, code `d4c154b`..`0f25dfa`) | Serving index from the M7 v2 outputs: Postgres 3,086 reports / 40,118 labels (Alembic `0001`), Qdrant 3,086 report + 19,006 contextual sentence points; leakage checks on the stored points pass (payload whitelist; indication text 0 of 2,192). Retrieval (spec frozen before the run, 259 queries, per fold + pooled): best pooled nDCG@10 the negated-sentence filter 0.528 ≈ RRF 0.526; seen-label nDCG 0.637 → 0.871 and contamination 0.310 → 0.070 with the filter; report-to-report best BM25 0.463. No LLM calls ($0). |
 | M9 | **Done** (owner-accepted 2026-10-22) (code `a793a6f`, `fe859bc`, `853ffd0`) | Fine-tuned bge-small (plain sentences, CachedGISTEmbedLoss, GPU): pooled nDCG@10 0.564 → 0.592, paired +0.028 (0.019–0.038), negation contamination 0.140 → 0.097 → **use rule passes**, search default = fine-tuned serving model. Seen labels +0.134, held-out aliases +0.069, compositional +0.045; held-out labels −0.010 (CI includes 0), attribute −0.013 (CI includes 0). With the filter: 0.582 → 0.602. |
-| M10a | **next** | Website backend: session API (`/api/session`, `/reports`, `/ask` scope report or all, `/timeline`), in memory, nothing stored; session RAG. |
+| M10a | **built, waiting for owner review** (code `b60e667`) | FastAPI session API in `src/radlabel/api/` matching the m9c-frontend contract; in memory only; frozen prompts `ask-report-v1`, `ask-all-v1`; sample patient precomputed (no LLM call on load). Real run on the sample: $0.008. |
 | M10b | planned | Website evaluation: 20 frozen questions (`docs/m9b_handwritten_questions.md`) on the dev slice; session RAG vs all reports in the prompt on batches of 3/10/30/50; latency and cost. |
 | M10c | in progress (branch `m9c-frontend`) | Website frontend (React); runs on a mock API until M10a. |
 | M11 | planned | Deployment: Vercel (frontend) + Hugging Face Docker Space (backend); secrets as Space secrets; no private models in the image. |
@@ -86,7 +86,7 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
 
 **Budget:** `MAX_LLM_USD=20` (`.env.example`; `.env` uses the same value). Stop rule (`src/radlabel/llm/client.py`, `BUDGET_FRACTION = 0.5`): fresh LLM calls are refused once the ledger total reaches 50% of `MAX_LLM_USD`, i.e. **$10**; cache hits are always free; the owner raises the limit explicitly. Per-run caps sit inside it (M5: $3 of new spend).
 
-`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$5.43** (M6 $0.25; M6 follow-up $0.54; M7 dev slice $0.20; M7 full run $2.07) (ledger `artifacts/llm_cache/ledger.jsonl`; docs/RESULTS.md).
+`AZURE_OPENAI_API_VERSION` is empty, so the client uses Azure's GA v1 API. LLM spend so far, all milestones: **$5.44** (M6 $0.25; M6 follow-up $0.54; M7 dev slice $0.20; M7 full run $2.07; M10a sample run $0.008) (ledger `artifacts/llm_cache/ledger.jsonl`; docs/RESULTS.md).
 
 ## M2 notes
 - `iterstrat` (SPEC §4.2 fallback) used: scikit-multilearn 0.2.0 can't take a seed with scikit-learn 1.9.
@@ -266,6 +266,32 @@ _Owner rule (2026-10-19): stop after every milestone and report hard stops / gap
   plain sentences, no filter, no BM25** (`artifacts/results/search_config.json`, `python -m eval.search_config`).
 - Limitation recorded (RESULTS, SPEC §11): no gain on the three held-out findings.
 - `docs/m9b_handwritten_questions.md` is frozen (committed in `4375486`, unchanged since).
+
+## M10a notes
+- Contract (`web/README.md`, `web/src/contract.ts` on m9c-frontend) matched. Additions, not changes: `DELETE
+  /api/session/{id}`; optional `report_nos` / `labels` filters on ask scope "all"; `rules_only` always present.
+  Indication / comparison sentences carry IDs N1.. / C1.. so answers can cite them (the frontend does not show IDs).
+  The upload response returns all of the session's reports, in report_no order.
+- **Sample patient:** the contract says loading it needs no LLM call, so its pipeline outputs are computed once
+  (`python -m radlabel.api.sample`, real pipeline, $0.0068) and committed as `data/sample/sample_results.json` with
+  the texts' hash; they are synthetic, hand-written reports, not IU text. Recomputed only if the texts change.
+- Privacy: the website LLM client caches in memory and tracks spend in memory (no ledger lines, no cache files);
+  logs are JSON lines with route, status and timing only. Test: upload + ask open no file for writing and log no
+  report or question text. Consequence: website spend is not in `ledger.jsonl`; the daily cap ($1) and the global
+  stop (ledger total + in-memory spend) still apply.
+- Daily cap reached → `run_pipeline` falls back to rule labels (`rules_only`, all `unverified`), ask returns
+  "temporarily unavailable".
+- Search: fine-tuned plain sentences (D21); a missing private model falls back to the base model with a warning.
+- Real run on the sample (owner request): R1 effusion present; R2 effusion + cardiomegaly present, atelectasis
+  uncertain ("possibly atelectasis"), lung opacity present (agent-corrected); R3 adds support devices (pacemaker),
+  lung opacity present (agent-corrected); R4 effusion, cardiomegaly, devices present; R5 effusion absent, devices
+  present, **cardiomegaly uncertain for "Heart size is borderline"** (the tagger's own status; the label definition
+  counts borderline enlargement as present, so this is a tagger reading, left as is: no tuning on the sample).
+  Questions: effusion course answered with 10 citations across all 5 reports; pacemaker first described in report 3
+  (2 citations); "Should the patient start antibiotics?" refused. Asks $0.0011.
+- New settings in `.env.example`: WEB_DAILY_CAP_USD, WEB_MAX_REPORTS, WEB_MAX_TEXT_CHARS, WEB_MAX_FILE_BYTES,
+  WEB_SESSION_TTL_MINUTES, WEB_CORS_ORIGINS. New core dependencies: fastapi, uvicorn, python-multipart, pypdf.
+- Not yet merged with the frontend branch (memory: merge only after the backend matches the contract; owner decides).
 
 ## Blocked (owner action)
 - (resolved 2026-10-20) Docker installed by the owner; compose healthy.

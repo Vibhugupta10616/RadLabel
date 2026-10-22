@@ -1,0 +1,1912 @@
+{
+ "texts_sha256": "2b2a77760aac60805aff10e7415f9a4c7e117e33cee2cc406ee859ce8acdb026",
+ "results": [
+  {
+   "report_id": "1",
+   "sections_identified": true,
+   "parse": {
+    "indication": "Shortness of breath for one week.",
+    "comparison": "None.",
+    "findings": "The heart is normal in size. There is a small left pleural effusion. The right lung is clear. No pneumothorax.",
+    "impression": "Small left pleural effusion.",
+    "sections_identified": true,
+    "headers": [
+     "INDICATION",
+     "COMPARISON",
+     "FINDINGS",
+     "IMPRESSION"
+    ],
+    "unassigned": ""
+   },
+   "sentences": [
+    {
+     "id": "F1",
+     "section": "findings",
+     "text": "The heart is normal in size."
+    },
+    {
+     "id": "F2",
+     "section": "findings",
+     "text": "There is a small left pleural effusion."
+    },
+    {
+     "id": "F3",
+     "section": "findings",
+     "text": "The right lung is clear."
+    },
+    {
+     "id": "F4",
+     "section": "findings",
+     "text": "No pneumothorax."
+    },
+    {
+     "id": "I1",
+     "section": "impression",
+     "text": "Small left pleural effusion."
+    }
+   ],
+   "tagger": {
+    "report_id": "1",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "absent",
+      "evidence": [
+       "F1"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "absent",
+      "evidence": [
+       "F3"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Atelectasis",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": []
+   },
+   "labels": {
+    "report_id": "1",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "absent",
+      "evidence": [
+       "F1"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "absent",
+      "evidence": [
+       "F3"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Atelectasis",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": [
+     {
+      "check": "evidence_mentions_label",
+      "label": "Lung Opacity",
+      "level": "flag",
+      "detail": "absent: cited sentences neither name the label nor state a normal finding"
+     }
+    ]
+   },
+   "final": [
+    {
+     "label": "No Finding",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Cardiomegaly",
+     "status": "absent",
+     "evidence": [
+      "F1"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Lung Opacity",
+     "status": "absent",
+     "evidence": [
+      "F3"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Lung Lesion",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Atelectasis",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Effusion",
+     "status": "present",
+     "evidence": [
+      "F2",
+      "I1"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "both"
+    },
+    {
+     "label": "Fracture",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Support Devices",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Other Abnormality",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Edema",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Other",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Consolidation",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pneumothorax",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    }
+   ],
+   "escalations": [],
+   "agent_used": false,
+   "agent": null,
+   "content_filtered": false,
+   "invalid_output": false,
+   "tagger_cost_usd": 0.0009692,
+   "rules_only": false
+  },
+  {
+   "report_id": "2",
+   "sections_identified": true,
+   "parse": {
+    "indication": "Worsening shortness of breath.",
+    "comparison": "Prior chest radiograph.",
+    "findings": "The cardiac silhouette is mildly enlarged. The left pleural effusion has increased and is now moderate in size. There is an opacity at the left lung base, possibly atelectasis. No pneumothorax.",
+    "impression": "Moderate left pleural effusion, increased since the prior study. Mild cardiomegaly. Left basilar opacity, possibly atelectasis.",
+    "sections_identified": true,
+    "headers": [
+     "INDICATION",
+     "COMPARISON",
+     "FINDINGS",
+     "IMPRESSION"
+    ],
+    "unassigned": ""
+   },
+   "sentences": [
+    {
+     "id": "F1",
+     "section": "findings",
+     "text": "The cardiac silhouette is mildly enlarged."
+    },
+    {
+     "id": "F2",
+     "section": "findings",
+     "text": "The left pleural effusion has increased and is now moderate in size."
+    },
+    {
+     "id": "F3",
+     "section": "findings",
+     "text": "There is an opacity at the left lung base, possibly atelectasis."
+    },
+    {
+     "id": "F4",
+     "section": "findings",
+     "text": "No pneumothorax."
+    },
+    {
+     "id": "I1",
+     "section": "impression",
+     "text": "Moderate left pleural effusion, increased since the prior study."
+    },
+    {
+     "id": "I2",
+     "section": "impression",
+     "text": "Mild cardiomegaly."
+    },
+    {
+     "id": "I3",
+     "section": "impression",
+     "text": "Left basilar opacity, possibly atelectasis."
+    }
+   ],
+   "tagger": {
+    "report_id": "2",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "present",
+      "evidence": [
+       "F1",
+       "I2"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "present",
+      "evidence": [
+       "F3",
+       "I3"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Atelectasis",
+      "status": "uncertain",
+      "evidence": [
+       "F3",
+       "I3"
+      ]
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": []
+   },
+   "labels": {
+    "report_id": "2",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "present",
+      "evidence": [
+       "F1",
+       "I2"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "uncertain",
+      "evidence": [
+       "F3",
+       "I3"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Atelectasis",
+      "status": "uncertain",
+      "evidence": [
+       "F3",
+       "I3"
+      ]
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": [
+     {
+      "check": "hedge_consistency",
+      "label": "Lung Opacity",
+      "level": "flag",
+      "detail": "only hedged evidence: set to uncertain"
+     }
+    ]
+   },
+   "final": [
+    {
+     "label": "No Finding",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Cardiomegaly",
+     "status": "present",
+     "evidence": [
+      "F1",
+      "I2"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "both"
+    },
+    {
+     "label": "Lung Opacity",
+     "status": "present",
+     "evidence": [
+      "F3"
+     ],
+     "verification": "corrected",
+     "reason": "The report explicitly states an opacity at the left lung base; the hedging refers to its cause (atelectasis), not presence of the opacity.",
+     "corroboration": "findings"
+    },
+    {
+     "label": "Lung Lesion",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Atelectasis",
+     "status": "uncertain",
+     "evidence": [
+      "F3",
+      "I3"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Effusion",
+     "status": "present",
+     "evidence": [
+      "F2",
+      "I1"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "both"
+    },
+    {
+     "label": "Fracture",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Support Devices",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Other Abnormality",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Edema",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Other",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Consolidation",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pneumothorax",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    }
+   ],
+   "escalations": [
+    {
+     "label": "Lung Opacity",
+     "reason": "hedge_consistency",
+     "detail": "only hedged evidence: set to uncertain"
+    }
+   ],
+   "agent_used": true,
+   "agent": {
+    "report_id": "2",
+    "stop": "submitted",
+    "decisions": [
+     {
+      "label": "Lung Opacity",
+      "status": "present",
+      "evidence": [
+       {
+        "sentence_id": "F3",
+        "quote": "There is an opacity at the left lung base, possibly atelectasis."
+       }
+      ],
+      "reason": "The report explicitly states an opacity at the left lung base; the hedging refers to its cause (atelectasis), not presence of the opacity."
+     }
+    ],
+    "tool_calls": 1,
+    "tool_names": [
+     "submit"
+    ],
+    "llm_calls": 1,
+    "tokens": 2416,
+    "cost_usd": 0.00121825,
+    "models": [
+     "gpt-5-mini-2025-08-07"
+    ]
+   },
+   "content_filtered": false,
+   "invalid_output": false,
+   "tagger_cost_usd": 0.00057,
+   "rules_only": false
+  },
+  {
+   "report_id": "3",
+   "sections_identified": true,
+   "parse": {
+    "indication": "Follow-up after pacemaker placement. Fever.",
+    "comparison": "Prior chest radiograph.",
+    "findings": "A new left-sided pacemaker is present with leads in the right atrium and right ventricle. The moderate left pleural effusion is stable. Mild cardiomegaly is unchanged. Patchy opacity at the left lung base; infection cannot be excluded. No pneumothorax.",
+    "impression": "New pacemaker with leads in good position. Stable moderate left pleural effusion. Left basilar opacity; infection cannot be excluded.",
+    "sections_identified": true,
+    "headers": [
+     "INDICATION",
+     "COMPARISON",
+     "FINDINGS",
+     "IMPRESSION"
+    ],
+    "unassigned": ""
+   },
+   "sentences": [
+    {
+     "id": "F1",
+     "section": "findings",
+     "text": "A new left-sided pacemaker is present with leads in the right atrium and right ventricle."
+    },
+    {
+     "id": "F2",
+     "section": "findings",
+     "text": "The moderate left pleural effusion is stable."
+    },
+    {
+     "id": "F3",
+     "section": "findings",
+     "text": "Mild cardiomegaly is unchanged."
+    },
+    {
+     "id": "F4",
+     "section": "findings",
+     "text": "Patchy opacity at the left lung base; infection cannot be excluded."
+    },
+    {
+     "id": "F5",
+     "section": "findings",
+     "text": "No pneumothorax."
+    },
+    {
+     "id": "I1",
+     "section": "impression",
+     "text": "New pacemaker with leads in good position."
+    },
+    {
+     "id": "I2",
+     "section": "impression",
+     "text": "Stable moderate left pleural effusion."
+    },
+    {
+     "id": "I3",
+     "section": "impression",
+     "text": "Left basilar opacity; infection cannot be excluded."
+    }
+   ],
+   "tagger": {
+    "report_id": "3",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "present",
+      "evidence": [
+       "F3"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "uncertain",
+      "evidence": [
+       "F4",
+       "I3"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Atelectasis",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I2"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "present",
+      "evidence": [
+       "F1",
+       "I1"
+      ]
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F5"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": []
+   },
+   "labels": {
+    "report_id": "3",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "present",
+      "evidence": [
+       "F3"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "uncertain",
+      "evidence": [
+       "F4",
+       "I3"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Atelectasis",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I2"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "present",
+      "evidence": [
+       "F1",
+       "I1"
+      ]
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F5"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": [
+     {
+      "check": "section_rule",
+      "label": "Lung Opacity",
+      "level": "flag",
+      "detail": "affirmed in the report and not explicitly contradicted by the Impression"
+     }
+    ]
+   },
+   "final": [
+    {
+     "label": "No Finding",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Cardiomegaly",
+     "status": "present",
+     "evidence": [
+      "F3"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "findings"
+    },
+    {
+     "label": "Lung Opacity",
+     "status": "present",
+     "evidence": [
+      "F4",
+      "I3"
+     ],
+     "verification": "corrected",
+     "reason": "The report explicitly states an opacity in the left lung base (F4 and I3). The hedging refers to the cause (infection) not to the presence of the opacity, so the finding is present.",
+     "corroboration": "both"
+    },
+    {
+     "label": "Lung Lesion",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Atelectasis",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Effusion",
+     "status": "present",
+     "evidence": [
+      "F2",
+      "I2"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "both"
+    },
+    {
+     "label": "Fracture",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Support Devices",
+     "status": "present",
+     "evidence": [
+      "F1",
+      "I1"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "both"
+    },
+    {
+     "label": "Other Abnormality",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Edema",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Other",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Consolidation",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pneumothorax",
+     "status": "absent",
+     "evidence": [
+      "F5"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    }
+   ],
+   "escalations": [
+    {
+     "label": "Lung Opacity",
+     "reason": "section_rule",
+     "detail": "affirmed in the report and not explicitly contradicted by the Impression"
+    }
+   ],
+   "agent_used": true,
+   "agent": {
+    "report_id": "3",
+    "stop": "submitted",
+    "decisions": [
+     {
+      "label": "Lung Opacity",
+      "status": "present",
+      "evidence": [
+       {
+        "sentence_id": "F4",
+        "quote": "Patchy opacity at the left lung base; infection cannot be excluded."
+       },
+       {
+        "sentence_id": "I3",
+        "quote": "Left basilar opacity; infection cannot be excluded."
+       }
+      ],
+      "reason": "The report explicitly states an opacity in the left lung base (F4 and I3). The hedging refers to the cause (infection) not to the presence of the opacity, so the finding is present."
+     }
+    ],
+    "tool_calls": 2,
+    "tool_names": [
+     "find_by_alias",
+     "submit"
+    ],
+    "llm_calls": 2,
+    "tokens": 4932,
+    "cost_usd": 0.0019086,
+    "models": [
+     "gpt-5-mini-2025-08-07"
+    ]
+   },
+   "content_filtered": false,
+   "invalid_output": false,
+   "tagger_cost_usd": 0.0010056,
+   "rules_only": false
+  },
+  {
+   "report_id": "4",
+   "sections_identified": true,
+   "parse": {
+    "indication": "Follow-up of pleural effusion.",
+    "comparison": "Prior chest radiograph.",
+    "findings": "The pacemaker and leads are unchanged. The left pleural effusion is decreasing and is now small. Mild cardiomegaly is stable. The lungs are otherwise clear. No pneumothorax.",
+    "impression": "Decreasing small left pleural effusion. Stable mild cardiomegaly.",
+    "sections_identified": true,
+    "headers": [
+     "INDICATION",
+     "COMPARISON",
+     "FINDINGS",
+     "IMPRESSION"
+    ],
+    "unassigned": ""
+   },
+   "sentences": [
+    {
+     "id": "F1",
+     "section": "findings",
+     "text": "The pacemaker and leads are unchanged."
+    },
+    {
+     "id": "F2",
+     "section": "findings",
+     "text": "The left pleural effusion is decreasing and is now small."
+    },
+    {
+     "id": "F3",
+     "section": "findings",
+     "text": "Mild cardiomegaly is stable."
+    },
+    {
+     "id": "F4",
+     "section": "findings",
+     "text": "The lungs are otherwise clear."
+    },
+    {
+     "id": "F5",
+     "section": "findings",
+     "text": "No pneumothorax."
+    },
+    {
+     "id": "I1",
+     "section": "impression",
+     "text": "Decreasing small left pleural effusion."
+    },
+    {
+     "id": "I2",
+     "section": "impression",
+     "text": "Stable mild cardiomegaly."
+    }
+   ],
+   "tagger": {
+    "report_id": "4",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "present",
+      "evidence": [
+       "F3",
+       "I2"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Atelectasis",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "absent",
+      "evidence": [
+       "F1",
+       "F2",
+       "F3",
+       "F4",
+       "F5"
+      ]
+     },
+     {
+      "label": "Support Devices",
+      "status": "present",
+      "evidence": [
+       "F1"
+      ]
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F5"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": []
+   },
+   "labels": {
+    "report_id": "4",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "present",
+      "evidence": [
+       "F3",
+       "I2"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Atelectasis",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "present",
+      "evidence": [
+       "F2",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "absent",
+      "evidence": [
+       "F1",
+       "F2",
+       "F3",
+       "F4",
+       "F5"
+      ]
+     },
+     {
+      "label": "Support Devices",
+      "status": "present",
+      "evidence": [
+       "F1"
+      ]
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F5"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": [
+     {
+      "check": "evidence_mentions_label",
+      "label": "Fracture",
+      "level": "flag",
+      "detail": "absent: cited sentences neither name the label nor state a normal finding"
+     }
+    ]
+   },
+   "final": [
+    {
+     "label": "No Finding",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Cardiomegaly",
+     "status": "present",
+     "evidence": [
+      "F3",
+      "I2"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "both"
+    },
+    {
+     "label": "Lung Opacity",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Lung Lesion",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Atelectasis",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Effusion",
+     "status": "present",
+     "evidence": [
+      "F2",
+      "I1"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "both"
+    },
+    {
+     "label": "Fracture",
+     "status": "absent",
+     "evidence": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Support Devices",
+     "status": "present",
+     "evidence": [
+      "F1"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "findings"
+    },
+    {
+     "label": "Other Abnormality",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Edema",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Other",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Consolidation",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pneumothorax",
+     "status": "absent",
+     "evidence": [
+      "F5"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    }
+   ],
+   "escalations": [],
+   "agent_used": false,
+   "agent": null,
+   "content_filtered": false,
+   "invalid_output": false,
+   "tagger_cost_usd": 0.0005816,
+   "rules_only": false
+  },
+  {
+   "report_id": "5",
+   "sections_identified": true,
+   "parse": {
+    "indication": "Follow-up.",
+    "comparison": "Prior chest radiograph.",
+    "findings": "The left pleural effusion has resolved. Heart size is borderline. The pacemaker is in unchanged position. The lungs are clear. No pneumothorax.",
+    "impression": "Resolved left pleural effusion. Borderline heart size.",
+    "sections_identified": true,
+    "headers": [
+     "INDICATION",
+     "COMPARISON",
+     "FINDINGS",
+     "IMPRESSION"
+    ],
+    "unassigned": ""
+   },
+   "sentences": [
+    {
+     "id": "F1",
+     "section": "findings",
+     "text": "The left pleural effusion has resolved."
+    },
+    {
+     "id": "F2",
+     "section": "findings",
+     "text": "Heart size is borderline."
+    },
+    {
+     "id": "F3",
+     "section": "findings",
+     "text": "The pacemaker is in unchanged position."
+    },
+    {
+     "id": "F4",
+     "section": "findings",
+     "text": "The lungs are clear."
+    },
+    {
+     "id": "F5",
+     "section": "findings",
+     "text": "No pneumothorax."
+    },
+    {
+     "id": "I1",
+     "section": "impression",
+     "text": "Resolved left pleural effusion."
+    },
+    {
+     "id": "I2",
+     "section": "impression",
+     "text": "Borderline heart size."
+    }
+   ],
+   "tagger": {
+    "report_id": "5",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "uncertain",
+      "evidence": [
+       "F2",
+       "I2"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Atelectasis",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "absent",
+      "evidence": [
+       "F1",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "present",
+      "evidence": [
+       "F3"
+      ]
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F5"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": []
+   },
+   "labels": {
+    "report_id": "5",
+    "labels": [
+     {
+      "label": "No Finding",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Cardiomegaly",
+      "status": "uncertain",
+      "evidence": [
+       "F2",
+       "I2"
+      ]
+     },
+     {
+      "label": "Lung Opacity",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Lung Lesion",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Atelectasis",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Effusion",
+      "status": "absent",
+      "evidence": [
+       "F1",
+       "I1"
+      ]
+     },
+     {
+      "label": "Fracture",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Support Devices",
+      "status": "present",
+      "evidence": [
+       "F3"
+      ]
+     },
+     {
+      "label": "Other Abnormality",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Edema",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pleural Other",
+      "status": "not_mentioned",
+      "evidence": []
+     },
+     {
+      "label": "Consolidation",
+      "status": "absent",
+      "evidence": [
+       "F4"
+      ]
+     },
+     {
+      "label": "Pneumothorax",
+      "status": "absent",
+      "evidence": [
+       "F5"
+      ]
+     }
+    ],
+    "tier": 1,
+    "route": "accepted",
+    "verifier_messages": []
+   },
+   "final": [
+    {
+     "label": "No Finding",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Cardiomegaly",
+     "status": "uncertain",
+     "evidence": [
+      "F2",
+      "I2"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Lung Opacity",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Lung Lesion",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Atelectasis",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Effusion",
+     "status": "absent",
+     "evidence": [
+      "F1",
+      "I1"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Fracture",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Support Devices",
+     "status": "present",
+     "evidence": [
+      "F3"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": "findings"
+    },
+    {
+     "label": "Other Abnormality",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Edema",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pleural Other",
+     "status": "not_mentioned",
+     "evidence": [],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Consolidation",
+     "status": "absent",
+     "evidence": [
+      "F4"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    },
+    {
+     "label": "Pneumothorax",
+     "status": "absent",
+     "evidence": [
+      "F5"
+     ],
+     "verification": "verified_rules",
+     "reason": "",
+     "corroboration": null
+    }
+   ],
+   "escalations": [],
+   "agent_used": false,
+   "agent": null,
+   "content_filtered": false,
+   "invalid_output": false,
+   "tagger_cost_usd": 0.0005596000000000002,
+   "rules_only": false
+  }
+ ]
+}
