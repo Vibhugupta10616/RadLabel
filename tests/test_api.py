@@ -323,3 +323,17 @@ def test_ask_v2_prompts_frozen() -> None:
     if "PIN" in pinned.values():
         pytest.skip(f"ask v2 prompts not frozen yet: {h}")
     assert h == pinned, "ask v2 prompt changed: needs owner OK and a new version"
+
+
+def test_scope_all_dispatch_uses_the_context_mode_above_the_threshold(tmp_path: Path, monkeypatch: Any) -> None:
+    s, llm = _session_of(tmp_path, 4)
+    seen: list[str] = []
+    llm.responder = lambda m: (seen.append(m[0]["content"]), json.dumps(  # type: ignore[assignment]
+        {"answer": "ok", "refusal": None, "citations": [{"report_no": 1, "sentence_id": "F1"}]}))[1]
+    monkeypatch.setattr(ask_mod, "DEFAULT_ALL_VERSION", "v2")
+    monkeypatch.setattr(ask_mod, "CONTEXT_ABOVE", None)
+    ask_mod.ask_scope_all(llm, s, "pleural effusion")
+    monkeypatch.setattr(ask_mod, "CONTEXT_ABOVE", 3)
+    ask_mod.ask_scope_all(llm, s, "pleural effusion")  # 4 reports > 3
+    ask_mod.ask_scope_all(llm, s, "pleural effusion", report_nos=[1, 2])  # 2 in scope: retrieval again
+    assert seen == [ask_mod.ALL_SYSTEM_V2, ask_mod.CONTEXT_SYSTEM_V2, ask_mod.ALL_SYSTEM_V2]

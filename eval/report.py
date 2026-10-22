@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from eval import ask_score, entry_point, retrieval, verifier_agent
+from eval import ask_score, ask_v2, entry_point, retrieval, verifier_agent
 from eval.labelling import _fmt, load_result, render_summary, summary_inputs
 from radlabel.results import RESULTS_DIR
 
@@ -210,6 +210,12 @@ def render() -> str:
     ask = load_result("ask_eval")
     if ask is not None:
         lines += ["", "## Ask evaluation (M10b, SPEC §8.3)", "", ask_score.render(ask).rstrip()]
+    v2 = load_result("ask_v2_eval")
+    if v2 is not None:
+        lines += ["", "## Ask v2 (M10b follow-up, SPEC §8.3)", "", ask_v2.render(v2).rstrip()]
+        dv = load_result("ask_v2_dev")
+        if dv is not None:
+            lines += ["", "### Ask v2: prompt development on the dev slice", "", ask_v2.render_dev(dv).rstrip()]
     return "\n".join(lines) + "\n"
 
 
@@ -232,7 +238,8 @@ def summary() -> str:
         f"- Verified labels are right far more often than unverified ones: precision "
         f"**{g['verified_or_verified_rules']['precision']:.3f} vs {g['unverified']['precision']:.3f}**.",
         f"- Only **{_pct(r['unverified_report_rate'])}** of reports end with any unverified label.",
-        search_line(best, b), *([ask_score.summary_line(ask)] if (ask := load_result("ask_eval")) else [])]) + "\n"
+        search_line(best, b), *([ask_score.summary_line(ask)] if (ask := load_result("ask_eval")) else []),
+        *([ask_v2.summary_line(v2)] if (v2 := load_result("ask_v2_eval")) else [])]) + "\n"
 
 
 def search_line(best: str, b: dict[str, Any]) -> str:

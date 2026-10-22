@@ -446,6 +446,21 @@ def render(res: dict[str, Any]) -> str:
     return "\n".join(L) + "\n"
 
 
+def render_dev(dv: dict[str, Any]) -> str:
+    """Prompt development on the dev slice only (one iteration, v2a): counts."""
+    names = {"report1@m10b": "single report, prompt v1 (M10b answers)", "report2@v2a": "single report, prompt v2 (v2a)",
+             "rag1@base": "scope all, RAG v1 (dev batches of 10 and 30)", "rag2@v2a": "scope all, RAG v2 + prompt v2 (v2a)"}
+    L = ["Prompt development (dev slice only; 15 dev reports for the single-report check, two dev batches of 10 and 30 "
+         "reports for scope \"all\"; one iteration, then frozen):", "",
+         "| Configuration | Questions | Correct vs codes | Unanswerable questions answered in the refusal field | Reports listed that only negate the finding | Unreadable |",
+         "|---|---|---|---|---|---|"]
+    for k, x in dv.items():
+        L.append(f"| {names.get(k, k)} | {x['n']:.0f} | {x.get('correct_codes', 0):.0f} of {x.get('scored', 0):.0f} | "
+                 f"{x.get('D_refusal_field', 0):.0f} of {x.get('D_questions', 0):.0f} | "
+                 f"{x.get('negated_listed', 0):.0f} of {x.get('which_listed', 0):.0f} listed | {x.get('unreadable', 0):.0f} |")
+    return "\n".join(L) + "\n"
+
+
 def summary_line(res: dict[str, Any]) -> str:
     big = res["sizes"][str(max(SIZES))]
     r2, c2, r1 = big["rag2"], big["ctx2"], big["rag1"]

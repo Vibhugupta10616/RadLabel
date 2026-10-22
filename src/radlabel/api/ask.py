@@ -83,6 +83,7 @@ VERSIONS = {"v1": (REPORT_SYSTEM, ASK_REPORT_VERSION, ALL_SYSTEM, ASK_ALL_VERSIO
             "v2": (REPORT_SYSTEM_V2, ASK_REPORT_VERSION_V2, ALL_SYSTEM_V2, ASK_ALL_VERSION_V2, PER_REPORT)}
 DEFAULT_REPORT_VERSION = "v1"  # the website's choices (ask v2 decisions are recorded in docs/STATUS.md)
 DEFAULT_ALL_VERSION = "v1"
+CONTEXT_ABOVE: int | None = None  # scope "all": above this many reports in scope, put every sentence in the prompt
 
 SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -139,8 +140,8 @@ def _complete(llm: LLMClient, system: str, user: str, version: str) -> str:
 
 
 def ask_report(llm: LLMClient, session: Session, report_no: int, question: str,
-               version: str = DEFAULT_REPORT_VERSION) -> AskResult:
-    system, prompt_version = VERSIONS[version][:2]
+               version: str | None = None) -> AskResult:
+    system, prompt_version = VERSIONS[version or DEFAULT_REPORT_VERSION][:2]
     rep = session.report(report_no)
     if rep is None:
         raise KeyError(report_no)
@@ -165,8 +166,8 @@ class _State(TypedDict):
 
 
 def ask_all(llm: LLMClient, session: Session, question: str, report_nos: list[int] | None = None,
-            labels: list[str] | None = None, k: int = TOP_K, version: str = DEFAULT_ALL_VERSION) -> AskResult:
-    system, prompt_version, per_report = VERSIONS[version][2:]
+            labels: list[str] | None = None, k: int = TOP_K, version: str | None = None) -> AskResult:
+    system, prompt_version, per_report = VERSIONS[version or DEFAULT_ALL_VERSION][2:]
 
     def retrieve(st: _State) -> dict[str, Any]:
         return {"retrieved": session.retrieve(st["question"], k, report_nos, labels, per_report)}
@@ -217,3 +218,13 @@ def ask_context(llm: LLMClient, session: Session, question: str, report_nos: lis
     except BudgetExceeded:
         a, r, c = None, UNAVAILABLE, []
     return AskResult(answer=a, refusal=r, citations=c, retrieved_sentences=len(given), retrieved_reports=reports)
+
+
+def ask_scope_all(llm: LLMClient, session: Session, question: str, report_nos: list[int] | None = None,
+                  labels: list[str] | None = None) -> AskResult:
+    """What the website runs for scope "all" (the ask v2 decision, docs/STATUS.md): session RAG, or every sentence in
+    the prompt above CONTEXT_ABOVE reports in scope."""
+    n = len({session.entries[i].report_no for i in session.select(report_nos, labels)})
+    if CONTEXT_ABOVE is not None and n > CONTEXT_ABOVE:
+        return ask_context(llm, session, question, report_nos, labels)
+    return ask_all(llm, session, question, report_nos, labels)

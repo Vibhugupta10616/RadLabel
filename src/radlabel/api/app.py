@@ -34,7 +34,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from radlabel.api import sample
-from radlabel.api.ask import AskResult, ask_all, ask_report
+from radlabel.api.ask import AskResult, ask_report, ask_scope_all
 from radlabel.api.session import ReportOut, Session, SessionStore, to_report
 from radlabel.config import get_settings
 from radlabel.embeddings import search_model_name
@@ -207,7 +207,7 @@ def create_app(llm: LLMClient | None = None) -> FastAPI:
         bad = [x for x in body.labels or [] if x not in LABELS]
         if bad:
             raise HTTPException(400, "Unknown label in the filter.")
-        return ask_all(web_llm, sess, body.question, body.report_nos, body.labels)
+        return ask_scope_all(web_llm, sess, body.question, body.report_nos, body.labels)
 
     @app.get("/api/session/{sid}/timeline")
     def timeline(sid: str) -> dict[str, Any]:
