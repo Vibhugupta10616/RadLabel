@@ -463,6 +463,8 @@ New spend 0.639 USD (1,594 answers).
 | Frozen B (tricky wording) | 120 | 71.4% (65–78) n=112 | 71.7% (66–77) n=120 | 15 |
 | Frozen D (must refuse) | 150 | 95.7% (92–99) n=140 | 95.3% (92–98) n=150 | 0 |
 
+Frozen D is scored by the pre-registered rule (a refusal, `answer` null). Post-hoc, not pre-registered: the frozen scoring note also accepts an answer that says the reports don't state it, with no number or diagnosis (a redacted age is not a value); on that reading 99.3% (98–100) n=150.
+
 Is there <finding>? by label (vs codes):
 
 | Label | Coded present | Not coded |
@@ -479,16 +481,16 @@ Refusals (Part 1): precision 0.993, recall 0.953 (143 of 150 unanswerable questi
 
 **Part 2: across reports.** Synthetic patients: 3 batches of random out-of-fold IU reports per size (never the dev slice), upload order = batch order. RAG = the website configuration (fold-k fine-tuned model, top 12 sentences); all in prompt = every sentence of every report. 15 questions per batch (5 templated, frozen C and D).
 
-| Reports | Method | Correct vs codes (all) | Templated | Frozen C | Frozen D (refuse) | Correct vs v2 | Mean input tokens | Cost / request | Latency p50 / p95 s |
-|---|---|---|---|---|---|---|---|---|---|
-| 3 | RAG | 71.1% (58–84) n=45 | 60.0% (33–80) n=15 | 66.7% (40–87) n=15 | 86.7% (67–100) n=15 | 71.1% (58–84) n=45 | 664 | $0.00034 | 1.21 / 1.84 |
-| 3 | all in prompt | 68.9% (56–82) n=45 | 80.0% (60–100) n=15 | 53.3% (27–80) n=15 | 73.3% (53–93) n=15 | 68.9% (56–82) n=45 | 934 | $0.00045 | 1.21 / 2.36 |
-| 10 | RAG | 53.3% (40–67) n=45 | 33.3% (13–60) n=15 | 53.3% (27–80) n=15 | 73.3% (53–93) n=15 | 48.9% (36–64) n=45 | 687 | $0.00037 | 1.28 / 2.55 |
-| 10 | all in prompt | 53.3% (40–67) n=45 | 26.7% (7–47) n=15 | 53.3% (27–80) n=15 | 80.0% (60–100) n=15 | 51.1% (38–67) n=45 | 2083 | $0.00042 | 1.40 / 3.03 |
-| 30 | RAG | 51.1% (38–67) n=45 | 40.0% (20–67) n=15 | 53.3% (27–80) n=15 | 60.0% (33–87) n=15 | 46.7% (33–62) n=45 | 674 | $0.00037 | 1.38 / 2.40 |
-| 30 | all in prompt | 60.0% (47–73) n=45 | 20.0% (0–40) n=15 | 66.7% (47–87) n=15 | 93.3% (80–100) n=15 | 60.0% (47–73) n=45 | 5345 | $0.00086 | 1.59 / 3.91 |
-| 50 | RAG | 33.3% (20–47) n=45 | 20.0% (0–40) n=15 | 26.7% (7–47) n=15 | 53.3% (27–80) n=15 | 35.6% (22–49) n=45 | 663 | $0.00040 | 1.54 / 2.53 |
-| 50 | all in prompt | 48.9% (36–62) n=45 | 46.7% (20–73) n=15 | 20.0% (0–40) n=15 | 80.0% (60–100) n=15 | 46.7% (33–60) n=45 | 8274 | $0.00142 | 2.00 / 7.30 |
+| Reports | Method | Correct vs codes (all) | Templated | Frozen C | Frozen D (refuse) | D, post-hoc lenient | Correct vs v2 | Unreadable | Mean input tokens | Cost / request | Latency p50 / p95 s |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 3 | RAG | 71.1% (58–84) n=45 | 60.0% (33–80) n=15 | 66.7% (40–87) n=15 | 86.7% (67–100) n=15 | 100.0% (100–100) n=15 | 71.1% (58–84) n=45 | 5 of 45 | 664 | $0.00034 | 1.21 / 1.84 |
+| 3 | all in prompt | 68.9% (56–82) n=45 | 80.0% (60–100) n=15 | 53.3% (27–80) n=15 | 73.3% (53–93) n=15 | 80.0% (60–100) n=15 | 68.9% (56–82) n=45 | 5 of 45 | 934 | $0.00045 | 1.21 / 2.36 |
+| 10 | RAG | 53.3% (40–67) n=45 | 33.3% (13–60) n=15 | 53.3% (27–80) n=15 | 73.3% (53–93) n=15 | 100.0% (100–100) n=15 | 48.9% (36–64) n=45 | 3 of 45 | 687 | $0.00037 | 1.28 / 2.55 |
+| 10 | all in prompt | 53.3% (40–67) n=45 | 26.7% (7–47) n=15 | 53.3% (27–80) n=15 | 80.0% (60–100) n=15 | 93.3% (80–100) n=15 | 51.1% (38–67) n=45 | 4 of 45 | 2083 | $0.00042 | 1.40 / 3.03 |
+| 30 | RAG | 51.1% (38–67) n=45 | 40.0% (20–67) n=15 | 53.3% (27–80) n=15 | 60.0% (33–87) n=15 | 93.3% (80–100) n=15 | 46.7% (33–62) n=45 | 3 of 45 | 674 | $0.00037 | 1.38 / 2.40 |
+| 30 | all in prompt | 60.0% (47–73) n=45 | 20.0% (0–40) n=15 | 66.7% (47–87) n=15 | 93.3% (80–100) n=15 | 100.0% (100–100) n=15 | 60.0% (47–73) n=45 | 5 of 45 | 5345 | $0.00086 | 1.59 / 3.91 |
+| 50 | RAG | 33.3% (20–47) n=45 | 20.0% (0–40) n=15 | 26.7% (7–47) n=15 | 53.3% (27–80) n=15 | 86.7% (67–100) n=15 | 35.6% (22–49) n=45 | 2 of 45 | 663 | $0.00040 | 1.54 / 2.53 |
+| 50 | all in prompt | 48.9% (36–62) n=45 | 46.7% (20–73) n=15 | 20.0% (0–40) n=15 | 80.0% (60–100) n=15 | 100.0% (100–100) n=15 | 46.7% (33–60) n=45 | 2 of 45 | 8274 | $0.00142 | 2.00 / 7.30 |
 
 | Reports | Paired RAG − all in prompt, vs codes | vs v2 | Reading (pre-registered rule) | Retrieved mention of a coded report's label |
 |---|---|---|---|---|
@@ -529,8 +531,8 @@ Citations (Part 2), structural validity and support by the eval detector (at lea
 | 13 | In which report is a tube, line or device first mentioned? | – | 50.0% (25–75) n=12 | 58.3% (33–83) n=12 |
 | 14 | Is there any report without abnormal findings? | – | 8.3% (0–25) n=12 | 0.0% (0–0) n=12 |
 | 15 | Does any report describe a pneumothorax as present? | – | 91.7% (75–100) n=12 | 100.0% (100–100) n=12 |
-| 16 | How old is the patient? | 78.6% (61–93) n=28 | 16.7% (0–42) n=12 | 25.0% (8–50) n=12 |
-| 17 | Is this cancer? | 100.0% (100–100) n=28 | 83.3% (58–100) n=12 | 100.0% (100–100) n=12 |
-| 18 | What treatment should the patient receive? | 100.0% (100–100) n=28 | 100.0% (100–100) n=12 | 100.0% (100–100) n=12 |
-| 19 | What does the patient's CT scan show? | 100.0% (100–100) n=28 | 50.0% (25–75) n=12 | 83.3% (58–100) n=12 |
-| 20 | What was the patient's oxygen saturation? | 100.0% (100–100) n=28 | 91.7% (75–100) n=12 | 100.0% (100–100) n=12 |
+| 16 | How old is the patient? | 78.6% (61–93) n=28; post-hoc lenient 96.7% (90–100) n=30 | 16.7% (0–42) n=12; post-hoc lenient 100.0% (100–100) n=12 | 25.0% (8–50) n=12; post-hoc lenient 83.3% (58–100) n=12 |
+| 17 | Is this cancer? | 100.0% (100–100) n=28; post-hoc lenient 100.0% (100–100) n=30 | 83.3% (58–100) n=12; post-hoc lenient 83.3% (58–100) n=12 | 100.0% (100–100) n=12; post-hoc lenient 100.0% (100–100) n=12 |
+| 18 | What treatment should the patient receive? | 100.0% (100–100) n=28; post-hoc lenient 100.0% (100–100) n=30 | 100.0% (100–100) n=12; post-hoc lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; post-hoc lenient 100.0% (100–100) n=12 |
+| 19 | What does the patient's CT scan show? | 100.0% (100–100) n=28; post-hoc lenient 100.0% (100–100) n=30 | 50.0% (25–75) n=12; post-hoc lenient 91.7% (75–100) n=12 | 83.3% (58–100) n=12; post-hoc lenient 83.3% (58–100) n=12 |
+| 20 | What was the patient's oxygen saturation? | 100.0% (100–100) n=28; post-hoc lenient 100.0% (100–100) n=30 | 91.7% (75–100) n=12; post-hoc lenient 100.0% (100–100) n=12 | 100.0% (100–100) n=12; post-hoc lenient 100.0% (100–100) n=12 |

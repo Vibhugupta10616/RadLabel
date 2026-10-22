@@ -1,6 +1,6 @@
 {
  "provenance": {
-  "git_commit": "c37afdc6d5cf6d2396a92c69cdfec4f526d30725",
+  "git_commit": "c3a96fe70c96418ab272c4097b1b7bae57f62527",
   "seed": 13,
   "llm_provider": "azure",
   "deployments": {
@@ -23,7 +23,7 @@
   },
   "mapping_version": "v1",
   "fold": "oof",
-  "created": "2026-10-22T15:08:16+00:00",
+  "created": "2026-10-22T15:10:49+00:00",
   "eval_version": "eval_v1.2",
   "prompts": "ask-report-v1, ask-all-v1, baseline (eval/ask.py)"
  },
@@ -49,7 +49,13 @@
       "hi": 0.9918300653594772
      },
      "unreadable": 0,
-     "n_questions": 612
+     "n_questions": 612,
+     "lenient": {
+      "n": 0,
+      "value": NaN,
+      "lo": NaN,
+      "hi": NaN
+     }
     },
     "T2": {
      "codes": {
@@ -67,7 +73,13 @@
       "hi": 1.0
      },
      "unreadable": 0,
-     "n_questions": 172
+     "n_questions": 172,
+     "lenient": {
+      "n": 0,
+      "value": NaN,
+      "lo": NaN,
+      "hi": NaN
+     }
     },
     "A": {
      "codes": {
@@ -85,7 +97,13 @@
       "hi": 0.9888888888888889
      },
      "unreadable": 0,
-     "n_questions": 180
+     "n_questions": 180,
+     "lenient": {
+      "n": 0,
+      "value": NaN,
+      "lo": NaN,
+      "hi": NaN
+     }
     },
     "B": {
      "codes": {
@@ -103,7 +121,13 @@
       "hi": 0.7666666666666667
      },
      "unreadable": 15,
-     "n_questions": 120
+     "n_questions": 120,
+     "lenient": {
+      "n": 0,
+      "value": NaN,
+      "lo": NaN,
+      "hi": NaN
+     }
     },
     "D": {
      "codes": {
@@ -121,7 +145,14 @@
       "hi": 0.98
      },
      "unreadable": 0,
-     "n_questions": 150
+     "n_questions": 150,
+     "lenient": {
+      "n": 150,
+      "k": 149,
+      "value": 0.9933333333333333,
+      "lo": 0.98,
+      "hi": 1.0
+     }
     }
    },
    "t1_by_label": {
@@ -142,7 +173,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 13
+      "n_questions": 13,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      },
      "negatives_codes": {
       "codes": {
@@ -160,7 +197,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 89
+      "n_questions": 89,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      }
     },
     "Pleural Effusion": {
@@ -180,7 +223,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 5
+      "n_questions": 5,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      },
      "negatives_codes": {
       "codes": {
@@ -198,7 +247,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 97
+      "n_questions": 97,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      }
     },
     "Support Devices": {
@@ -218,7 +273,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 12
+      "n_questions": 12,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      },
      "negatives_codes": {
       "codes": {
@@ -236,7 +297,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 90
+      "n_questions": 90,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      }
     },
     "Lung Opacity": {
@@ -256,7 +323,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 20
+      "n_questions": 20,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      },
      "negatives_codes": {
       "codes": {
@@ -274,7 +347,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 82
+      "n_questions": 82,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      }
     },
     "Atelectasis": {
@@ -294,7 +373,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 11
+      "n_questions": 11,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      },
      "negatives_codes": {
       "codes": {
@@ -312,7 +397,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 91
+      "n_questions": 91,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      }
     },
     "Pneumothorax": {
@@ -332,7 +423,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 1
+      "n_questions": 1,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      },
      "negatives_codes": {
       "codes": {
@@ -350,7 +447,13 @@
        "hi": 1.0
       },
       "unreadable": 0,
-      "n_questions": 101
+      "n_questions": 101,
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      }
      }
     }
    },
@@ -467,7 +570,14 @@
         "hi": 0.8444444444444444
        },
        "unreadable": 5,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -485,7 +595,13 @@
         "hi": 0.8
        },
        "unreadable": 3,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -503,7 +619,13 @@
         "hi": 0.8666666666666667
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -521,7 +643,14 @@
         "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 69,
@@ -581,7 +710,14 @@
         "hi": 0.8222222222222222
        },
        "unreadable": 5,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -599,7 +735,13 @@
         "hi": 1.0
        },
        "unreadable": 3,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -617,7 +759,13 @@
         "hi": 0.8
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -635,7 +783,14 @@
         "hi": 0.9333333333333333
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 12,
+        "value": 0.8,
+        "lo": 0.6,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 75,
@@ -718,7 +873,14 @@
         "hi": 0.6444444444444445
        },
        "unreadable": 3,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -736,7 +898,13 @@
         "hi": 0.5333333333333333
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -754,7 +922,13 @@
         "hi": 0.7333333333333333
        },
        "unreadable": 1,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -772,7 +946,14 @@
         "hi": 0.9333333333333333
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 98,
@@ -832,7 +1013,14 @@
         "hi": 0.6666666666666666
        },
        "unreadable": 4,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 14,
+        "value": 0.9333333333333333,
+        "lo": 0.8,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -850,7 +1038,13 @@
         "hi": 0.4683333333333318
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -868,7 +1062,13 @@
         "hi": 0.7333333333333333
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -886,7 +1086,14 @@
         "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 14,
+        "value": 0.9333333333333333,
+        "lo": 0.8,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 125,
@@ -969,7 +1176,14 @@
         "hi": 0.6222222222222222
        },
        "unreadable": 3,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 14,
+        "value": 0.9333333333333333,
+        "lo": 0.8,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -987,7 +1201,13 @@
         "hi": 0.5333333333333333
        },
        "unreadable": 1,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -1005,7 +1225,13 @@
         "hi": 0.8
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -1023,7 +1249,14 @@
         "hi": 0.8666666666666667
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 14,
+        "value": 0.9333333333333333,
+        "lo": 0.8,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 126,
@@ -1083,7 +1316,14 @@
         "hi": 0.7333333333333333
        },
        "unreadable": 5,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -1101,7 +1341,13 @@
         "hi": 0.4016666666666652
        },
        "unreadable": 3,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -1119,7 +1365,13 @@
         "hi": 0.8666666666666667
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -1137,7 +1389,14 @@
         "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 262,
@@ -1220,7 +1479,14 @@
         "hi": 0.4888888888888889
        },
        "unreadable": 2,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 13,
+        "value": 0.8666666666666667,
+        "lo": 0.6666666666666666,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -1238,7 +1504,13 @@
         "hi": 0.4016666666666652
        },
        "unreadable": 1,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -1256,7 +1528,13 @@
         "hi": 0.6
        },
        "unreadable": 1,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -1274,7 +1552,14 @@
         "hi": 0.8
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 13,
+        "value": 0.8666666666666667,
+        "lo": 0.6666666666666666,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 183,
@@ -1334,7 +1619,14 @@
         "hi": 0.6
        },
        "unreadable": 2,
-       "n_questions": 45
+       "n_questions": 45,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "templated": {
        "codes": {
@@ -1352,7 +1644,13 @@
         "hi": 0.6666666666666666
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_C": {
        "codes": {
@@ -1370,7 +1668,13 @@
         "hi": 0.4
        },
        "unreadable": 2,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 0,
+        "value": NaN,
+        "lo": NaN,
+        "hi": NaN
+       }
       },
       "hand_written_D": {
        "codes": {
@@ -1388,7 +1692,14 @@
         "hi": 1.0
        },
        "unreadable": 0,
-       "n_questions": 15
+       "n_questions": 15,
+       "lenient": {
+        "n": 15,
+        "k": 15,
+        "value": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+       }
       },
       "citations": {
        "raw_citations": 572,
@@ -1476,6 +1787,12 @@
        "lo": 0.9,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      }
     }
@@ -1498,6 +1815,12 @@
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 0
      }
@@ -1522,6 +1845,12 @@
        "lo": 1.0,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      }
     }
@@ -1544,6 +1873,12 @@
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 0
      }
@@ -1568,6 +1903,12 @@
        "lo": 0.9,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      }
     }
@@ -1590,6 +1931,12 @@
        "value": 0.8666666666666667,
        "lo": 0.7333333333333333,
        "hi": 0.9666666666666667
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 0
      }
@@ -1614,6 +1961,12 @@
        "lo": 1.0,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      }
     }
@@ -1636,6 +1989,12 @@
        "value": 0.8666666666666667,
        "lo": 0.7333333333333333,
        "hi": 0.9666666666666667
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 0
      }
@@ -1660,6 +2019,12 @@
        "lo": 0.7333333333333333,
        "hi": 0.9666666666666667
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      }
     }
@@ -1682,6 +2047,12 @@
        "value": 0.13333333333333333,
        "lo": 0.03333333333333333,
        "hi": 0.26666666666666666
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 15
      }
@@ -1706,6 +2077,12 @@
        "lo": 0.3333333333333333,
        "hi": 0.8333333333333334
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      },
      "full": {
@@ -1723,6 +2100,12 @@
        "value": 0.5,
        "lo": 0.25,
        "hi": 0.75
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 0
      }
@@ -1747,6 +2130,12 @@
        "lo": 0.16666666666666666,
        "hi": 0.6666666666666666
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 4
      },
      "full": {
@@ -1764,6 +2153,12 @@
        "value": 0.3333333333333333,
        "lo": 0.08333333333333333,
        "hi": 0.5833333333333334
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 3
      }
@@ -1788,6 +2183,12 @@
        "lo": 0.25,
        "hi": 0.75
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      },
      "full": {
@@ -1805,6 +2206,12 @@
        "value": 0.5,
        "lo": 0.25,
        "hi": 0.75
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 0
      }
@@ -1829,6 +2236,12 @@
        "lo": 0.0,
        "hi": 0.25
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 2
      },
      "full": {
@@ -1846,6 +2259,12 @@
        "value": 0.0,
        "lo": 0.0,
        "hi": 0.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 5
      }
@@ -1870,6 +2289,12 @@
        "lo": 0.75,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
+      },
       "unreadable": 0
      },
      "full": {
@@ -1887,6 +2312,12 @@
        "value": 1.0,
        "lo": 1.0,
        "hi": 1.0
+      },
+      "lenient": {
+       "n": 0,
+       "value": NaN,
+       "lo": NaN,
+       "hi": NaN
       },
       "unreadable": 0
      }
@@ -1911,6 +2342,13 @@
        "lo": 0.6,
        "hi": 0.9
       },
+      "lenient": {
+       "n": 30,
+       "k": 29,
+       "value": 0.9666666666666667,
+       "lo": 0.9,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "rag": {
@@ -1929,6 +2367,13 @@
        "lo": 0.0,
        "hi": 0.4166666666666667
       },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "full": {
@@ -1946,6 +2391,13 @@
        "value": 0.25,
        "lo": 0.08333333333333333,
        "hi": 0.5
+      },
+      "lenient": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
       },
       "unreadable": 0
      }
@@ -1970,6 +2422,13 @@
        "lo": 1.0,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 30,
+       "k": 30,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "rag": {
@@ -1988,6 +2447,13 @@
        "lo": 0.5833333333333334,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "full": {
@@ -2000,6 +2466,13 @@
        "hi": 1.0
       },
       "v2": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
        "n": 12,
        "k": 12,
        "value": 1.0,
@@ -2029,6 +2502,13 @@
        "lo": 1.0,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 30,
+       "k": 30,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "rag": {
@@ -2047,6 +2527,13 @@
        "lo": 1.0,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "full": {
@@ -2059,6 +2546,13 @@
        "hi": 1.0
       },
       "v2": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
        "n": 12,
        "k": 12,
        "value": 1.0,
@@ -2088,6 +2582,13 @@
        "lo": 1.0,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 30,
+       "k": 30,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "rag": {
@@ -2106,6 +2607,13 @@
        "lo": 0.25,
        "hi": 0.75
       },
+      "lenient": {
+       "n": 12,
+       "k": 11,
+       "value": 0.9166666666666666,
+       "lo": 0.75,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "full": {
@@ -2118,6 +2626,13 @@
        "hi": 1.0
       },
       "v2": {
+       "n": 12,
+       "k": 10,
+       "value": 0.8333333333333334,
+       "lo": 0.5833333333333334,
+       "hi": 1.0
+      },
+      "lenient": {
        "n": 12,
        "k": 10,
        "value": 0.8333333333333334,
@@ -2147,6 +2662,13 @@
        "lo": 1.0,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 30,
+       "k": 30,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "rag": {
@@ -2165,6 +2687,13 @@
        "lo": 0.75,
        "hi": 1.0
       },
+      "lenient": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
       "unreadable": 0
      },
      "full": {
@@ -2177,6 +2706,13 @@
        "hi": 1.0
       },
       "v2": {
+       "n": 12,
+       "k": 12,
+       "value": 1.0,
+       "lo": 1.0,
+       "hi": 1.0
+      },
+      "lenient": {
        "n": 12,
        "k": 12,
        "value": 1.0,

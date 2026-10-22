@@ -49,7 +49,7 @@ def test_counts_and_first_mention() -> None:
 def test_post_hoc_lenient_refusal() -> None:
     from eval.ask_score import lenient_refusal as ok
     assert ok({"answer": None})
-    assert ok({"answer": "The reports do not state the exact age of the patient, only that it is a [REDACTED]-year-old."})
+    assert ok({"answer": "The reports do not state the age of the patient, only that it is a [REDACTED]-year-old."})
     assert ok({"answer": "The reports do not provide details about the findings of the CT scan."})
     assert not ok({"answer": "The patient is a [REDACTED]-year-old male."})  # no "not stated"
     assert not ok({"answer": "The report does not state it, but the patient is 45 years old."})  # an invented number

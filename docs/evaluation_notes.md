@@ -456,3 +456,31 @@ It is one run per question at temperature 0, on one dataset of English reports f
 parser-based scoring and a small dev slice (few positives for Pleural Effusion, Pneumothorax and Edema). Batches are
 random IU reports, not real patients: "change over time" is not tested, only presence, lists, counts and first
 mention in upload order. It says nothing about answer quality beyond the parsed class, nor about clinical use.
+
+### M10b: reading of the results (hand reading and post-hoc checks; the tables are in docs/RESULTS.md)
+Nothing here changes a pre-registered score or a prompt. Items marked *post-hoc* were added after seeing the answers.
+- **Spend:** below the estimate (the estimate used 3.6 characters per token and 85 output tokens per answer, both
+  conservative); the run did not reach the $1 stop.
+- **Question 10 is mostly a parser miss.** The model answers "The lung opacity is described as absent with
+  certainty." (no opacity) or "…described with certainty as right basilar airspace disease.", which the
+  pre-registered rules cannot read as `none` / `certain`. *Post-hoc, by hand:* of the 28 scored answers, 26 are right
+  by reading (the two wrong ones: an answer that calls a dense nodule an opacity where the codes have none, and an
+  answer that calls a coded opacity uncertain). The table keeps the pre-registered score.
+- **Unanswerable questions (D).** The pre-registered rule (`answer` null) is stricter than the frozen scoring note
+  ("refuses or says the reports don't state it"): the model often puts "The reports do not state the age…" in the
+  `answer` field instead of using the refusal field. *Post-hoc lenient reading* (no number, no diagnosis word, "not
+  stated" wording): in the tables, labelled. The one real failure kind seen: "The patient is a [REDACTED]-year-old
+  male." (gives the sex, not the age).
+- **Counting and "first mention" errors are partly model errors** (counting a report that says "no pleural
+  effusion"; listing reports that negate a pneumothorax; missing reports) **and partly coding policy**: "first
+  mentioned" and "count" follow the expert codes, which do not always agree with the text (e.g. a stent or a gastric
+  band mentioned in a report that is not coded Support Devices).
+- **RAG at 30–50 reports is limited by retrieval:** the top 12 sentences cannot cover every coded report (the
+  retrieval diagnostic in RESULTS: the share of coded reports with a retrieved sentence naming the finding falls with
+  batch size). `TOP_K` is a code constant, not a prompt; making it scale with the number of reports is a candidate
+  change, not tested here.
+- **Weaknesses at prompt level, not acted on (no prompt changed):** "not stated" replies in the `answer` field
+  instead of the refusal field; reports that negate a finding being listed as describing it. A revised ask prompt
+  would be a new version (`ask-*-v2`) developed on the dev slice only, with the owner's OK.
+- **Accuracy is as exact as the parser** (unreadable answers are counted wrong and shown); questions in a batch are
+  correlated and there are 3 batches per size, so the Part 2 CIs are optimistic; one run per question.
